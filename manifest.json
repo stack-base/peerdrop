@@ -1,5 +1,5 @@
 {
-  "name": "PeerDrop File Transfer",
+  "name": "PeerDrop",
   "short_name": "PeerDrop",
   "description": "Fast, P2P file sharing from StackBase",
   "start_url": "./application.html",

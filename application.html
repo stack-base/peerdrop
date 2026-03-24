@@ -160,8 +160,9 @@
         .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
         .drop-zone:active { transform: scale(0.97); }
         .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: none; /* Handled via JS to prevent overlay clicks */ }
         
+        #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
         .drop-zone.dragover .drop-icon { fill: var(--accent); }
         #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4; z-index: 2;}
@@ -186,13 +187,10 @@
         .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.95); }
 
-        /* Bigger QR Code */
         .qr-wrapper { padding: 20px; border-radius: 20px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
 
-        /* Transfer Stats UI (With Cancel Button) */
-        .transfer-active-ui {
-            width: 100%; position: relative; z-index: 10; margin-top: 16px;
-        }
+        /* Transfer Stats UI (With Cancel) */
+        .transfer-active-ui { width: 100%; position: relative; z-index: 10; margin-top: 16px; }
         .transfer-stats {
             display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);
             margin-top: 12px; font-family: 'Courier New', Courier, monospace; font-weight: 600; text-align: left;
@@ -384,12 +382,14 @@
             </div>
 
             <div id="share-section" class="hidden drop-zone">
-                <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
-                    <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
-                </svg>
-                <p id="drop-text">Select a file to send</p>
-                <p id="drop-subtext">or drag and drop it here</p>
-                <input type="file" id="file-input">
+                <div id="drop-ui-elements">
+                    <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                        <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
+                    </svg>
+                    <p id="drop-text">Select a file to send</p>
+                    <p id="drop-subtext">or drag and drop it here</p>
+                    <input type="file" id="file-input">
+                </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
                     <progress id="progress-bar" value="0" max="100"></progress>
@@ -472,6 +472,7 @@
     let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     let peer, conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
     let transferStartTime = 0;
+    let isTransferring = false;
     let cancelTransfer = false; 
 
     // --- Utils: Toast & Formatters ---
@@ -502,6 +503,41 @@
 
     function handleModalClick(e, modalId, toggleFunction) {
         if (e.target.id === modalId) toggleFunction();
+    }
+
+    // --- UI Transfer Lock Logic ---
+    function setTransferState(active) {
+        isTransferring = active;
+        const dropUi = document.getElementById('drop-ui-elements');
+        const transferUi = document.getElementById('transfer-active-ui');
+        const sendBtn = document.getElementById('send-btn');
+        const dropZone = document.getElementById('share-section');
+        const fileInput = document.getElementById('file-input');
+
+        if (active) {
+            dropUi.classList.add('hidden');
+            sendBtn.classList.add('hidden');
+            transferUi.classList.remove('hidden');
+            dropZone.classList.remove('dragover');
+            dropZone.style.borderStyle = 'solid';
+            dropZone.style.borderColor = 'var(--accent)';
+            fileInput.style.display = 'none'; // Prevent clicking while transferring
+        } else {
+            dropUi.classList.remove('hidden');
+            // Only show send button if we are connected
+            if (conn && conn.open) { sendBtn.classList.remove('hidden'); }
+            transferUi.classList.add('hidden');
+            dropZone.style.borderStyle = 'dashed';
+            dropZone.style.borderColor = 'var(--border)';
+            fileInput.style.display = 'block';
+        }
+    }
+
+    function resetTransferUI() {
+        setTransferState(false);
+        document.getElementById('progress-bar').value = 0;
+        document.getElementById('file-input').value = '';
+        updateFileText();
     }
 
     // --- Profile Management ---
@@ -665,7 +701,6 @@
         qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
         qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
         
-        // BIGGER QR CODE
         new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
@@ -692,10 +727,24 @@
     const dropText = document.getElementById('drop-text'), dropSubtext = document.getElementById('drop-subtext');
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false));
-    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => dropZone.classList.add('dragover'), false));
-    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => dropZone.classList.remove('dragover'), false));
+    
+    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => {
+        if(isTransferring) return;
+        dropZone.classList.add('dragover');
+    }, false));
+    
+    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => {
+        if(isTransferring) return;
+        dropZone.classList.remove('dragover');
+    }, false));
 
-    dropZone.addEventListener('drop', (e) => { if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; updateFileText(); } });
+    dropZone.addEventListener('drop', (e) => { 
+        if(isTransferring) return;
+        if (e.dataTransfer.files.length > 0) { 
+            fileInput.files = e.dataTransfer.files; updateFileText(); 
+        } 
+    });
+    
     fileInput.addEventListener('change', updateFileText);
 
     function updateFileText() {
@@ -750,10 +799,10 @@
 
     function disconnectPeer() {
         if (conn) conn.close();
+        resetTransferUI();
         document.getElementById('active-connection').classList.add('hidden');
         document.getElementById('share-section').classList.add('hidden');
         document.getElementById('send-btn').classList.add('hidden');
-        resetTransferUI();
         
         connectSection.classList.remove('hidden');
         identitySection.classList.remove('hidden');
@@ -764,19 +813,13 @@
         connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     }
 
-    function resetTransferUI() {
-        document.getElementById('transfer-active-ui').classList.add('hidden');
-        document.getElementById('progress-bar').value = 0;
-        document.getElementById('file-input').value = '';
-        updateFileText();
-    }
-
     function abortTransfer(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
-        cancelTransfer = true; // Alerts the sender loop
-        if (conn && conn.open) {
-            conn.send({ type: 'abort' }); // Alerts the receiver
-        }
+        if (!isTransferring) return;
+        
+        cancelTransfer = true; // Signal local loop to stop
+        if (conn && conn.open) conn.send({ type: 'abort' }); // Signal remote peer
+        
         resetTransferUI();
         showToast("Transfer cancelled", "error");
         updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
@@ -815,40 +858,46 @@
                 }
 
             } else if (data.type === 'abort') {
-                cancelTransfer = true; // If we were sending
-                receivingFile = []; // If we were receiving
-                receivedSize = 0;
-                resetTransferUI();
-                showToast("Transfer cancelled by peer", "error");
-                updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                if (isTransferring) {
+                    cancelTransfer = true;
+                    receivingFile = []; // Flush memory
+                    resetTransferUI();
+                    showToast("Transfer cancelled by peer", "error");
+                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                }
 
             } else if (data.type === 'header') {
+                if (isTransferring) {
+                    // Reject incoming transfer if already transferring
+                    conn.send({ type: 'abort' });
+                    return;
+                }
                 cancelTransfer = false;
+                setTransferState(true);
                 receivingFile = []; receivedSize = 0; receivingFileSize = data.filesize; receivingFileName = data.filename; receivingFileType = data.filetype;
                 
-                document.getElementById('transfer-active-ui').classList.remove('hidden');
                 progressBar.value = 0;
                 transferStartTime = Date.now();
                 updateStatus(`Receiving: ${data.filename}...`, "var(--accent)");
 
             } else if (data.type === 'chunk') {
-                if (cancelTransfer) return; // Safety check
+                if (cancelTransfer) return;
                 receivingFile.push(data.data); receivedSize += data.data.byteLength;
                 progressBar.value = (receivedSize / receivingFileSize) * 100;
                 if (receivingFile.length % 10 === 0 || receivedSize === receivingFileSize) updateStats(receivedSize, receivingFileSize);
 
             } else if (data.type === 'done') {
+                if (cancelTransfer) return;
                 const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
-                
                 updateStatus(`Received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast(`Received ${receivingFileName}`, "success");
-                saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
                 
+                saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
                 setTimeout(() => { 
                     resetTransferUI();
-                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
                 }, 3000);
             }
         });
@@ -860,11 +909,14 @@
     }
 
     function sendFile() {
+        if (isTransferring) return showToast("Transfer already in progress.", "error");
+        
         const file = fileInput.files[0];
         if (!file) return showToast("Please select a file first.", "error");
+        
         if (conn && conn.open) {
             cancelTransfer = false;
-            document.getElementById('transfer-active-ui').classList.remove('hidden');
+            setTransferState(true);
             progressBar.value = 0;
             transferStartTime = Date.now();
             updateStatus(`Sending ${file.name}...`, "var(--accent)");
@@ -874,16 +926,13 @@
             let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
             
             function readSlice() {
-                if (cancelTransfer) {
-                    conn.send({ type: 'abort' });
-                    resetTransferUI();
-                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
-                    return; // Halt reading
-                }
+                if (cancelTransfer) return; // Exit loop if cancelled locally or by peer
 
                 const slice = file.slice(offset, offset + chunkSize);
                 const reader = new FileReader();
                 reader.onload = (e) => {
+                    if (cancelTransfer) return; // Double check before sending
+
                     conn.send({ type: 'chunk', data: e.target.result });
                     offset += slice.size; chunkCount++;
                     progressBar.value = (offset / file.size) * 100;
@@ -898,7 +947,6 @@
                         showToast("File sent successfully!");
                         
                         saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
-                        
                         setTimeout(() => { 
                             resetTransferUI();
                             updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 

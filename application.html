@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerDrop | Fast P2P Sharing</title>
+    <title>PeerDrop | Secure P2P Sharing</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -31,7 +31,6 @@
             --glow-opacity: 0.25;
         }
 
-        /* Global Reset for Mobile Tap Highlights */
         * { -webkit-tap-highlight-color: transparent; }
 
         body { 
@@ -78,7 +77,6 @@
             padding: 40px; position: relative; transition: var(--transition); overflow: hidden;
         }
 
-        /* Ambient Glow */
         .ambient-glow {
             position: absolute; width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
             background: radial-gradient(circle, rgba(10,132,255,var(--glow-opacity)) 0%, rgba(94,92,230,var(--glow-opacity)) 30%, rgba(191,90,242,0) 70%);
@@ -99,8 +97,7 @@
         .profile-avatar {
             width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
             border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2.2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
-            text-transform: uppercase;
+            color: white; font-size: 2.2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3); text-transform: uppercase;
         }
         .settings-avatar { margin-top: 10px; margin-bottom: 30px; width: 90px; height: 90px; font-size: 2.5rem;}
         
@@ -160,7 +157,7 @@
         .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
         .drop-zone:active { transform: scale(0.97); }
         .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: none; /* Handled via JS to prevent overlay clicks */ }
+        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: none; }
         
         #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
@@ -183,13 +180,13 @@
             color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
         }
-        .btn-icon svg { width: 22px; height: 22px; fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;}
+        .btn-icon svg { width: 22px; height: 22px; transition: transform 0.3s ease; }
         .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.95); }
 
         .qr-wrapper { padding: 20px; border-radius: 20px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
 
-        /* Transfer Stats UI (With Cancel) */
+        /* Transfer Stats UI */
         .transfer-active-ui { width: 100%; position: relative; z-index: 10; margin-top: 16px; }
         .transfer-stats {
             display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);
@@ -218,11 +215,9 @@
             background: var(--bg); width: 100%; height: 100%; border-radius: 0;
             padding: 40px; border: none; box-shadow: none; margin: 0;
             transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; box-sizing: border-box;
-            overflow-y: auto;
+            display: flex; flex-direction: column; box-sizing: border-box; overflow-y: auto;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
         .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;}
         
@@ -243,8 +238,7 @@
         
         .history-item {
             display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: var(--radius-lg);
-            background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
+            background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.2s ease;
         }
         .history-item:hover { transform: translateY(-2px); border-color: var(--text-muted); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
         .history-icon { 
@@ -261,7 +255,6 @@
         .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-family: 'Courier New', Courier, monospace; font-weight: 600;}
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
-        /* Settings Specifics */
         .settings-container { display: flex; flex-direction: column; align-items: center; max-width: 420px; margin: 0 auto; width: 100%;}
         
         /* Custom Toast Notification */
@@ -343,13 +336,13 @@
                 <h2>PeerDrop</h2>
                 <div class="header-controls">
                     <button class="btn-icon" onclick="toggleHistory()" aria-label="View History" title="Transfer History">
-                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </button>
                     <button class="btn-icon" onclick="toggleSettings()" aria-label="Settings" title="Profile Settings">
-                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
                     <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" title="Toggle Theme">
-                        <svg id="theme-icon" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"></path></svg>
+                        <svg id="theme-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </button>
                 </div>
             </div>
@@ -377,7 +370,7 @@
                     <div class="peer-email-display" id="peer-email-display">email@example.com</div>
                 </div>
                 <button class="btn-icon btn-disconnect" onclick="disconnectPeer()" title="Disconnect">
-                    <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
                 </button>
             </div>
 
@@ -408,6 +401,36 @@
             <div id="status">
                 <div class="status-dot" id="status-dot"></div>
                 <span id="status-text">Waiting for connection...</span>
+            </div>
+        </div>
+
+        <div id="incoming-modal" class="modal-overlay" style="z-index: 2000;">
+            <div class="modal-content" style="max-width: 400px; height: auto; border-radius: var(--radius-lg); padding: 30px; margin: 20px;">
+                <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 1.4rem; font-weight: 700; text-align: left;">Incoming Transfer</h3>
+                
+                <div class="active-connection" style="margin-bottom: 15px; box-shadow: none; border-color: var(--accent);">
+                    <div class="peer-avatar" id="incoming-avatar" style="background: linear-gradient(135deg, var(--accent), #5e5ce6);">?</div>
+                    <div class="peer-info">
+                        <div class="peer-status" style="color: var(--accent);">From</div>
+                        <div class="peer-name-display" id="incoming-name">Name</div>
+                        <div class="peer-email-display" id="incoming-email">Device & Email</div>
+                    </div>
+                </div>
+
+                <div class="history-item" style="margin-bottom: 25px; cursor: default; transform: none; box-shadow: none;">
+                    <div class="history-icon" style="background: var(--input-bg); color: var(--text-muted);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                    </div>
+                    <div class="history-details">
+                        <p class="history-name" id="incoming-filename">filename.ext</p>
+                        <p class="history-meta" id="incoming-filesize">0 MB</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="rejectTransfer()" style="background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); margin: 0; box-shadow: none;">Decline</button>
+                    <button onclick="acceptTransfer()" style="background: #34c759; color: #fff; margin: 0; box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);">Accept</button>
+                </div>
             </div>
         </div>
 
@@ -474,6 +497,7 @@
     let transferStartTime = 0;
     let isTransferring = false;
     let cancelTransfer = false; 
+    let pendingFileTransfer = null; 
 
     // --- Utils: Toast & Formatters ---
     function showToast(message, type = 'success') {
@@ -521,10 +545,9 @@
             dropZone.classList.remove('dragover');
             dropZone.style.borderStyle = 'solid';
             dropZone.style.borderColor = 'var(--accent)';
-            fileInput.style.display = 'none'; // Prevent clicking while transferring
+            fileInput.style.display = 'none'; 
         } else {
             dropUi.classList.remove('hidden');
-            // Only show send button if we are connected
             if (conn && conn.open) { sendBtn.classList.remove('hidden'); }
             transferUi.classList.add('hidden');
             dropZone.style.borderStyle = 'dashed';
@@ -817,12 +840,83 @@
         if(event) { event.preventDefault(); event.stopPropagation(); }
         if (!isTransferring) return;
         
-        cancelTransfer = true; // Signal local loop to stop
-        if (conn && conn.open) conn.send({ type: 'abort' }); // Signal remote peer
+        cancelTransfer = true; 
+        if (conn && conn.open) conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
         
         resetTransferUI();
         showToast("Transfer cancelled", "error");
         updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+    }
+
+    // Handshake Receivers
+    function acceptTransfer() {
+        document.getElementById('incoming-modal').classList.remove('active');
+        if (!pendingFileTransfer) return;
+
+        cancelTransfer = false;
+        setTransferState(true);
+        receivingFile = []; 
+        receivedSize = 0; 
+        receivingFileSize = pendingFileTransfer.filesize; 
+        receivingFileName = pendingFileTransfer.filename; 
+        receivingFileType = pendingFileTransfer.filetype;
+        
+        progressBar.value = 0;
+        transferStartTime = Date.now();
+        updateStatus(`Receiving: ${receivingFileName}...`, "var(--accent)");
+
+        conn.send({ type: 'transfer_response', accepted: true });
+    }
+
+    function rejectTransfer() {
+        document.getElementById('incoming-modal').classList.remove('active');
+        pendingFileTransfer = null;
+        conn.send({ type: 'transfer_response', accepted: false, reason: 'declined' });
+    }
+
+    function startSendingChunks() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        transferStartTime = Date.now();
+        let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
+        
+        function readSlice() {
+            if (cancelTransfer) {
+                conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' });
+                resetTransferUI();
+                updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                return; 
+            }
+
+            const slice = file.slice(offset, offset + chunkSize);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (cancelTransfer) return; 
+
+                conn.send({ type: 'chunk', data: e.target.result });
+                offset += slice.size; chunkCount++;
+                progressBar.value = (offset / file.size) * 100;
+                
+                if (chunkCount % 5 === 0 || offset >= file.size) updateStats(offset, file.size);
+
+                if (offset < file.size) {
+                    if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
+                } else {
+                    conn.send({ type: 'done' });
+                    updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
+                    showToast("File sent successfully!");
+                    
+                    saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
+                    setTimeout(() => { 
+                        resetTransferUI();
+                        updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
+                    }, 3000);
+                }
+            };
+            reader.readAsArrayBuffer(slice);
+        }
+        readSlice(); 
     }
 
     function setupConnection() {
@@ -857,28 +951,44 @@
                     emailEl.style.display = 'none';
                 }
 
-            } else if (data.type === 'abort') {
-                if (isTransferring) {
-                    cancelTransfer = true;
-                    receivingFile = []; // Flush memory
-                    resetTransferUI();
-                    showToast("Transfer cancelled by peer", "error");
-                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
-                }
-
             } else if (data.type === 'header') {
                 if (isTransferring) {
-                    // Reject incoming transfer if already transferring
-                    conn.send({ type: 'abort' });
+                    conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' });
                     return;
                 }
-                cancelTransfer = false;
-                setTransferState(true);
-                receivingFile = []; receivedSize = 0; receivingFileSize = data.filesize; receivingFileName = data.filename; receivingFileType = data.filetype;
                 
-                progressBar.value = 0;
-                transferStartTime = Date.now();
-                updateStatus(`Receiving: ${data.filename}...`, "var(--accent)");
+                // Security Protocol: Store details and wait for user acceptance
+                pendingFileTransfer = { filename: data.filename, filetype: data.filetype, filesize: data.filesize };
+
+                document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
+                document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
+                let deviceStr = connectedPeerProfile.device || 'Unknown Device';
+                let emailStr = connectedPeerProfile.email ? ` • ${connectedPeerProfile.email}` : '';
+                document.getElementById('incoming-email').innerText = `${deviceStr}${emailStr}`;
+                
+                document.getElementById('incoming-filename').innerText = data.filename;
+                document.getElementById('incoming-filesize').innerText = formatBytes(data.filesize);
+
+                document.getElementById('incoming-modal').classList.add('active');
+
+            } else if (data.type === 'transfer_response') {
+                if (data.accepted) {
+                    updateStatus(`Sending ${fileInput.files[0].name}...`, "var(--accent)");
+                    startSendingChunks();
+                } else {
+                    if (isTransferring) {
+                        cancelTransfer = true;
+                        receivingFile = []; 
+                    }
+                    resetTransferUI();
+                    
+                    let msg = "Transfer cancelled";
+                    if(data.reason === 'declined') msg = "Transfer declined by peer";
+                    if(data.reason === 'busy') msg = "Peer is busy receiving another file";
+                    
+                    showToast(msg, "error");
+                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                }
 
             } else if (data.type === 'chunk') {
                 if (cancelTransfer) return;
@@ -918,44 +1028,10 @@
             cancelTransfer = false;
             setTransferState(true);
             progressBar.value = 0;
-            transferStartTime = Date.now();
-            updateStatus(`Sending ${file.name}...`, "var(--accent)");
+            updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#f59e0b");
             
+            // Initiate Handshake
             conn.send({ type: 'header', filename: file.name, filetype: file.type, filesize: file.size });
-
-            let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
-            
-            function readSlice() {
-                if (cancelTransfer) return; // Exit loop if cancelled locally or by peer
-
-                const slice = file.slice(offset, offset + chunkSize);
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (cancelTransfer) return; // Double check before sending
-
-                    conn.send({ type: 'chunk', data: e.target.result });
-                    offset += slice.size; chunkCount++;
-                    progressBar.value = (offset / file.size) * 100;
-                    
-                    if (chunkCount % 5 === 0 || offset >= file.size) updateStats(offset, file.size);
-
-                    if (offset < file.size) {
-                        if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
-                    } else {
-                        conn.send({ type: 'done' });
-                        updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-                        showToast("File sent successfully!");
-                        
-                        saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
-                        setTimeout(() => { 
-                            resetTransferUI();
-                            updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
-                        }, 3000);
-                    }
-                };
-                reader.readAsArrayBuffer(slice);
-            }
-            readSlice(); 
         } else showToast("No active connection.", "error");
     }
 

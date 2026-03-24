@@ -230,7 +230,7 @@
         .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
         .history-details { flex: 1; overflow: hidden; text-align: left; }
         .history-name { font-weight: 600; font-size: 1.05rem; margin: 0 0 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
-        .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 4px 0; display: flex; align-items: center; gap: 4px;}
+        .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 4px 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;}
         .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8;}
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
@@ -298,10 +298,6 @@
                 <div class="input-group">
                     <label>Full Name</label>
                     <input type="text" id="setup-name" placeholder="e.g. Anurag Gautam" autocomplete="name">
-                </div>
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" id="setup-username" placeholder="e.g. anurag_g" autocomplete="username">
                 </div>
                 <div class="input-group">
                     <label>Device Name</label>
@@ -406,10 +402,6 @@
                             <input type="text" id="edit-name" placeholder="Your Name" autocomplete="name">
                         </div>
                         <div class="input-group">
-                            <label>Username</label>
-                            <input type="text" id="edit-username" placeholder="username" autocomplete="username">
-                        </div>
-                        <div class="input-group">
                             <label>Device Name</label>
                             <input type="text" id="edit-device" placeholder="e.g. Phantom S23 Ultra">
                         </div>
@@ -464,7 +456,7 @@
 
     // --- Profile Management (Initial Setup & Settings) ---
     let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
-    let connectedPeerProfile = { name: 'Unknown Peer', username: '', device: 'Unknown Device', email: '' };
+    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
 
     function initApp() {
         const welcomeScreen = document.getElementById('welcome-screen');
@@ -487,13 +479,12 @@
 
     function saveInitialProfile() {
         const name = document.getElementById('setup-name').value.trim();
-        const username = document.getElementById('setup-username').value.trim();
         const device = document.getElementById('setup-device').value.trim();
         const email = document.getElementById('setup-email').value.trim();
 
-        if (!name || !username || !device) return showToast("Name, Username, and Device are required.", "error");
+        if (!name || !device) return showToast("Name and Device are required.", "error");
 
-        myProfile = { name, username, device, email };
+        myProfile = { name, device, email };
         localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
         showToast("Profile created successfully!");
         
@@ -511,7 +502,6 @@
         if (!modal.classList.contains('active')) {
             // Populate data when opening
             document.getElementById('edit-name').value = myProfile.name || '';
-            document.getElementById('edit-username').value = myProfile.username || '';
             document.getElementById('edit-device').value = myProfile.device || '';
             document.getElementById('edit-email').value = myProfile.email || '';
             document.getElementById('settings-avatar-initial').innerText = myProfile.name ? myProfile.name.charAt(0).toUpperCase() : '?';
@@ -526,13 +516,12 @@
 
     function saveSettingsProfile() {
         const name = document.getElementById('edit-name').value.trim();
-        const username = document.getElementById('edit-username').value.trim();
         const device = document.getElementById('edit-device').value.trim();
         const email = document.getElementById('edit-email').value.trim();
 
-        if (!name || !username || !device) return showToast("Name, Username, and Device are required.", "error");
+        if (!name || !device) return showToast("Name and Device are required.", "error");
 
-        myProfile = { name, username, device, email };
+        myProfile = { name, device, email };
         localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
         
         // If actively connected, push the updated profile to the peer
@@ -549,7 +538,7 @@
         let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
         history.unshift({ 
             id: Date.now(), filename, filesize: formatBytes(filesize), 
-            type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', username: '' }
+            type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', email: '' }
         });
         if (history.length > 50) history.pop(); 
         localStorage.setItem('peerdrop_history', JSON.stringify(history));
@@ -574,10 +563,11 @@
                 `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
             
             const pName = item.peer && item.peer.name ? item.peer.name : 'Unknown';
-            const pUser = item.peer && item.peer.username ? `@${item.peer.username}` : '';
             const pDevice = item.peer && item.peer.device ? item.peer.device : '';
+            const pEmail = item.peer && item.peer.email ? item.peer.email : '';
             
-            const peerDisplay = pDevice ? `${pName} ${pUser} (${pDevice})` : `${pName} ${pUser}`;
+            const peerDisplay = pDevice ? `${pName} (${pDevice})` : `${pName}`;
+            const emailDisplay = pEmail ? `<span style="color: var(--accent); margin-left: 6px; font-weight: 500;">&lt;${pEmail}&gt;</span>` : '';
 
             list.innerHTML += `
                 <div class="history-item">
@@ -586,7 +576,7 @@
                         <p class="history-name" title="${item.filename}">${item.filename}</p>
                         <p class="history-peer">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            ${actionText} ${peerDisplay}
+                            ${actionText} ${peerDisplay} ${emailDisplay}
                         </p>
                         <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
                     </div>

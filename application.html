@@ -855,7 +855,7 @@
         updateFileText();
     }
 
-    // --- SMART LENS SELECTION SCANNER LOGIC (Upgraded 4k 60fps) ---
+    // --- SMART LENS SELECTION SCANNER LOGIC (With Fallback) ---
     function startScan() {
         triggerHaptic('light');
         const modal = document.getElementById('scanner-modal');
@@ -892,21 +892,24 @@
                     cameraId = primaryCam ? primaryCam.id : candidates[0].id;
                 }
 
-                // 1. Requesting 4K (3840x2160) and 60fps explicitly via video constraints
-                const cameraConstraints = {
+                const idealConstraints = {
                     deviceId: { exact: cameraId },
                     width: { ideal: 3840 },
-                    height: { ideal: 2160 },
                     frameRate: { ideal: 60 }
                 };
 
-                // 2. Ensuring the QR scanner logic operates at 60fps to match the video feed
-                const scannerConfig = { fps: 60 };
-
-                html5QrCode.start(cameraConstraints, scannerConfig, onScanSuccess).catch(err => {
-                    console.error("Error starting scanner:", err);
-                    showToast("Camera error.", "error");
-                    stopScan();
+                // Attempt 1: 4K 60fps
+                html5QrCode.start(idealConstraints, { fps: 60 }, onScanSuccess)
+                .catch(err => {
+                    console.log("High-res constraints rejected, falling back to standard resolution.", err);
+                    
+                    // Attempt 2: Standard Safe Config
+                    html5QrCode.start(cameraId, { fps: 30 }, onScanSuccess)
+                    .catch(fallbackErr => {
+                        console.error("Camera error:", fallbackErr);
+                        showToast("Camera error. Ensure permissions are granted.", "error");
+                        stopScan();
+                    });
                 });
             } else {
                 showToast("No cameras detected.", "error");

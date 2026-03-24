@@ -157,7 +157,8 @@
         .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
         .drop-zone:active { transform: scale(0.97); }
         .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: none; }
+        
+        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
         
         #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; pointer-events: none;}
         .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
@@ -569,9 +570,11 @@
                     <div class="transfer-progress-container">
                         <div class="transfer-progress-header">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
-                            <button class="btn-disconnect" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 59, 48, 0.1);" onclick="abortTransfer(event)" title="Cancel Transfer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            
+                            <button class="btn-disconnect" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 59, 48, 0.1); cursor: pointer;" onclick="abortTransfer(event)" title="Cancel Transfer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; pointer-events: none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
+
                         </div>
                         <div class="transfer-progress-track">
                             <div class="transfer-progress-fill" id="custom-progress-bar"></div>
@@ -733,6 +736,21 @@
     let pendingFileTransfer = null; 
     let html5QrCode = null; 
 
+    // --- Haptic Feedback Engine ---
+    function triggerHaptic(type = 'light') {
+        if (!navigator.vibrate) return;
+
+        try {
+            switch(type) {
+                case 'light': navigator.vibrate(15); break; 
+                case 'medium': navigator.vibrate(40); break; 
+                case 'heavy': navigator.vibrate(80); break; 
+                case 'success': navigator.vibrate([30, 60, 40]); break; 
+                case 'error': navigator.vibrate([50, 100, 50, 100, 50]); break; 
+            }
+        } catch (e) { }
+    }
+
     // --- Performance & Wake Lock Management ---
     let wakeLock = null;
 
@@ -757,6 +775,8 @@
 
     // --- Utils: Toast & Formatters ---
     function showToast(message, type = 'success') {
+        if (type === 'error') triggerHaptic('error'); 
+
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -806,7 +826,6 @@
             sendBtn.classList.add('hidden');
             transferUi.classList.remove('hidden');
             
-            // Totally strip border and padding to make the dashboard seamless
             dropZone.classList.remove('dragover');
             dropZone.style.border = 'none';
             dropZone.style.background = 'transparent';
@@ -819,7 +838,6 @@
             if (conn && conn.open) { sendBtn.classList.remove('hidden'); }
             transferUi.classList.add('hidden');
             
-            // Restore drop zone aesthetics
             dropZone.style.border = '2px dashed var(--border)';
             dropZone.style.background = 'var(--card-bg)';
             dropZone.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)';
@@ -837,8 +855,9 @@
         updateFileText();
     }
 
-    // --- SMART LENS SELECTION SCANNER LOGIC ---
+    // --- SMART LENS SELECTION SCANNER LOGIC (Upgraded 4k 60fps) ---
     function startScan() {
+        triggerHaptic('light');
         const modal = document.getElementById('scanner-modal');
         modal.classList.add('active');
         
@@ -846,13 +865,11 @@
         viewfinder.classList.remove('success');
 
         html5QrCode = new Html5Qrcode("reader-video");
-        const config = { fps: 30 };
 
         Html5Qrcode.getCameras().then(devices => {
             if (devices && devices.length) {
                 let cameraId = devices[0].id; 
                 
-                // 1. Isolate back-facing cameras
                 let backCameras = devices.filter(d => 
                     d.label.toLowerCase().includes("back") || 
                     d.label.toLowerCase().includes("environment") || 
@@ -860,7 +877,6 @@
                 );
 
                 if (backCameras.length > 0) {
-                    // 2. Filter out specialty lenses (ultrawide, telephoto, macro, depth)
                     let standardLenses = backCameras.filter(d => {
                         let l = d.label.toLowerCase();
                         return !l.includes("ultra") && !l.includes("wide") && 
@@ -868,17 +884,26 @@
                                !l.includes("depth");
                     });
 
-                    // If all back cameras got filtered out (unlikely), fall back to the raw list
                     let candidates = standardLenses.length > 0 ? standardLenses : backCameras;
 
-                    // 3. Most devices designate the primary main hardware sensor with an index of "0"
                     let primaryCam = candidates.find(d => d.label.includes("0,"));
                     if(!primaryCam) primaryCam = candidates.find(d => d.label.includes(" 0"));
                     
                     cameraId = primaryCam ? primaryCam.id : candidates[0].id;
                 }
 
-                html5QrCode.start(cameraId, config, onScanSuccess).catch(err => {
+                // 1. Requesting 4K (3840x2160) and 60fps explicitly via video constraints
+                const cameraConstraints = {
+                    deviceId: { exact: cameraId },
+                    width: { ideal: 3840 },
+                    height: { ideal: 2160 },
+                    frameRate: { ideal: 60 }
+                };
+
+                // 2. Ensuring the QR scanner logic operates at 60fps to match the video feed
+                const scannerConfig = { fps: 60 };
+
+                html5QrCode.start(cameraConstraints, scannerConfig, onScanSuccess).catch(err => {
                     console.error("Error starting scanner:", err);
                     showToast("Camera error.", "error");
                     stopScan();
@@ -895,6 +920,7 @@
     }
 
     function stopScan() {
+        triggerHaptic('light');
         document.getElementById('scanner-modal').classList.remove('active');
         if (html5QrCode && html5QrCode.isScanning) {
             html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => {});
@@ -903,7 +929,9 @@
 
     function onScanSuccess(decodedText) {
         if(html5QrCode.isScanning === false) return; 
-        if (navigator.vibrate) navigator.vibrate(50);
+        
+        triggerHaptic('success'); 
+        
         document.getElementById('viewfinder').classList.add('success');
         html5QrCode.pause();
 
@@ -944,6 +972,7 @@
     }
 
     function saveInitialProfile() {
+        triggerHaptic('light');
         const name = document.getElementById('setup-name').value.trim();
         const device = document.getElementById('setup-device').value.trim();
         const email = document.getElementById('setup-email').value.trim();
@@ -963,6 +992,7 @@
     }
 
     function toggleSettings() {
+        triggerHaptic('light');
         const modal = document.getElementById('settings-modal');
         if (!modal.classList.contains('active')) {
             document.getElementById('edit-name').value = myProfile.name || '';
@@ -978,6 +1008,7 @@
     });
 
     function saveSettingsProfile() {
+        triggerHaptic('light');
         const name = document.getElementById('edit-name').value.trim();
         const device = document.getElementById('edit-device').value.trim();
         const email = document.getElementById('edit-email').value.trim();
@@ -1046,12 +1077,14 @@
     }
 
     function toggleHistory() {
+        triggerHaptic('light');
         const modal = document.getElementById('history-modal');
         if (!modal.classList.contains('active')) renderHistory();
         modal.classList.toggle('active');
     }
 
     function clearHistory() {
+        triggerHaptic('medium');
         if(confirm("Are you sure you want to clear all your transfer history?")) {
             localStorage.removeItem('peerdrop_history');
             renderHistory();
@@ -1090,12 +1123,14 @@
     if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); updateThemeIcon(true); }
 
     function toggleDarkMode() {
+        triggerHaptic('light');
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', isDark); updateThemeIcon(isDark);
         if (currentShareUrl) renderQR(currentShareUrl);
     }
 
     function copyId() {
+        triggerHaptic('success');
         const idText = document.getElementById('my-id').innerText;
         navigator.clipboard.writeText(idText).then(() => {
             showToast("Device ID copied!");
@@ -1132,6 +1167,7 @@
 
     function updateFileText() {
         if (fileInput.files.length > 0) {
+            triggerHaptic('light');
             const file = fileInput.files[0];
             dropText.innerHTML = `<strong style="color: var(--text-main)">${file.name}</strong>`;
             dropSubtext.innerHTML = formatBytes(file.size); dropSubtext.classList.remove('hidden');
@@ -1182,6 +1218,7 @@
     }
 
     function connectToPeer() {
+        triggerHaptic('light');
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return showToast("Please enter a Device ID", "error");
         updateStatus("Connecting...", "#f59e0b");
@@ -1190,6 +1227,7 @@
     }
 
     function disconnectPeer() {
+        triggerHaptic('medium');
         if (conn) conn.close();
         resetTransferUI();
         document.getElementById('active-connection').classList.add('hidden');
@@ -1209,6 +1247,7 @@
         if(event) { event.preventDefault(); event.stopPropagation(); }
         if (!isTransferring) return;
         
+        triggerHaptic('error');
         cancelTransfer = true; 
         if (conn && conn.open) conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
         
@@ -1219,6 +1258,7 @@
 
     // Handshake Receivers
     function acceptTransfer() {
+        triggerHaptic('medium');
         document.getElementById('incoming-modal').classList.remove('active');
         if (!pendingFileTransfer) return;
 
@@ -1242,6 +1282,7 @@
     }
 
     function rejectTransfer() {
+        triggerHaptic('medium');
         document.getElementById('incoming-modal').classList.remove('active');
         pendingFileTransfer = null;
         conn.send({ type: 'transfer_response', accepted: false, reason: 'declined' });
@@ -1279,6 +1320,7 @@
                     if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
                 } else {
                     conn.send({ type: 'done' });
+                    triggerHaptic('success');
                     updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                     showToast("File sent successfully!");
                     
@@ -1313,6 +1355,7 @@
 
         conn.on('data', (data) => {
             if (data.type === 'profile_sync') {
+                triggerHaptic('success');
                 connectedPeerProfile = data.profile;
                 showToast(`Connected to ${connectedPeerProfile.name}`);
                 
@@ -1331,6 +1374,8 @@
                     conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' });
                     return;
                 }
+                
+                triggerHaptic('heavy'); 
                 
                 pendingFileTransfer = { filename: data.filename, filetype: data.filetype, filesize: data.filesize };
 
@@ -1373,6 +1418,7 @@
                 const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
+                triggerHaptic('success'); 
                 updateStatus(`Received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast(`Received ${receivingFileName}`, "success");
                 
@@ -1391,6 +1437,7 @@
     }
 
     function sendFile() {
+        triggerHaptic('light');
         if (isTransferring) return showToast("Transfer already in progress.", "error");
         
         const file = fileInput.files[0];

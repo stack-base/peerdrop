@@ -70,7 +70,10 @@
         .step-text p { margin: 0; opacity: 0.85; font-size: 1rem; line-height: 1.5; }
 
         /* App Pane (Right) */
-        .app-pane { flex: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; transition: var(--transition); }
+        .app-pane { 
+            flex: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; 
+            padding: 40px; position: relative; transition: var(--transition); overflow: hidden;
+        }
 
         /* Ambient Glow */
         .ambient-glow {
@@ -86,8 +89,20 @@
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
-        
         .header-controls { display: flex; gap: 10px; }
+
+        /* Setup / Welcome Screen Specifics */
+        .profile-avatar {
+            width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
+            border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
+        }
+        .welcome-text { margin-bottom: 30px; }
+        .welcome-text h2 { font-size: 1.8rem; margin: 0 0 10px 0; }
+        .welcome-text p { color: var(--text-muted); margin: 0; }
+        
+        .input-group { margin-bottom: 16px; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; margin-left: 4px; }
 
         .box { 
             background: var(--card-bg); padding: 28px; border-radius: var(--radius-lg); margin-bottom: 24px; 
@@ -101,12 +116,13 @@
         }
         .id-text { font-size: 1.15rem; font-weight: 600; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px;}
         
-        input[type="text"] { 
-            width: 100%; padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
+        input[type="text"], input[type="email"] { 
+            width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-md); 
             background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
             transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
+        #connect-section input { margin-bottom: 16px; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
         
         .drop-zone { 
             border: 2px dashed var(--border); padding: 40px 20px; border-radius: var(--radius-md); transition: var(--transition); 
@@ -126,7 +142,7 @@
         button { 
             background: var(--primary); color: var(--primary-text); border: none; padding: 18px 24px; width: 100%; 
             border-radius: var(--radius-md); font-weight: 600; font-size: 1.05rem; font-family: inherit; letter-spacing: 0.5px;
-            cursor: pointer; transition: var(--transition); margin-bottom: 12px; 
+            cursor: pointer; transition: var(--transition); margin-bottom: 12px; margin-top: 10px;
         }
         button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
         button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -161,8 +177,59 @@
 
         .hidden { display: none !important; }
 
+        /* Full Pane/Full Screen History Modal */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--bg); width: 100%; height: 100%; border-radius: 0;
+            padding: 40px; border: none; box-shadow: none; margin: 0;
+            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; box-sizing: border-box;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .modal-header h3 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.03em;}
+        
+        .close-btn { 
+            background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); 
+            cursor: pointer; padding: 0; width: 44px; height: 44px; border-radius: 50%; margin: 0;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .close-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .close-btn:hover { background: var(--input-bg); transform: scale(1.05); }
+        .close-btn:active { transform: scale(0.95); }
+
+        .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; margin-top: 10px;}
+        .history-list::-webkit-scrollbar { width: 6px; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .history-item {
+            display: flex; align-items: center; gap: 15px; padding: 18px; border-radius: var(--radius-lg);
+            background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease;
+        }
+        .history-item:hover { transform: translateX(4px); border-color: var(--text-muted); }
+        .history-icon { 
+            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            background: rgba(10, 132, 255, 0.1); color: var(--accent); flex-shrink: 0;
+        }
+        .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+        .history-details { flex: 1; overflow: hidden; text-align: left; }
+        .history-name { font-weight: 600; font-size: 1.05rem; margin: 0 0 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
+        .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 4px 0; display: flex; align-items: center; gap: 4px;}
+        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8;}
+        .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
+
         /* Custom Toast Notification */
-        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast {
             background: rgba(30, 30, 30, 0.95); color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 500;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -173,52 +240,13 @@
         .toast.success .toast-icon { color: #34c759; }
         .toast.error .toast-icon { color: #ff3b30; }
 
-        /* History Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            z-index: 1000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .modal-content {
-            background: var(--card-bg); width: 100%; max-width: 450px; border-radius: var(--radius-lg);
-            padding: 30px; box-shadow: var(--shadow); border: 1px solid var(--border);
-            transform: translateY(30px) scale(0.95); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 80vh; display: flex; flex-direction: column; box-sizing: border-box; margin: 20px;
-        }
-        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
-
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { margin: 0; font-size: 1.3rem; font-weight: 700; }
-        .close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 0; width: 30px; height: 30px; margin: 0;}
-        .close-btn:hover { color: var(--text-main); background: transparent; box-shadow: none; transform: none;}
-
-        .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;}
-        .history-list::-webkit-scrollbar { width: 6px; }
-        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        
-        .history-item {
-            display: flex; align-items: center; gap: 15px; padding: 16px; border-radius: var(--radius-md);
-            background: var(--input-bg); border: 1px solid var(--border);
-        }
-        .history-icon { 
-            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; 
-            background: rgba(10, 132, 255, 0.1); color: var(--accent); flex-shrink: 0;
-        }
-        .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
-        .history-details { flex: 1; overflow: hidden; text-align: left; }
-        .history-name { font-weight: 600; font-size: 0.95rem; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; }
-        .empty-history { text-align: center; color: var(--text-muted); padding: 30px 0; font-style: italic; }
-
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh;}
             .guide-pane { display: none; }
             .app-pane { padding: 20px; align-items: flex-start; min-height: 100vh;}
             .app-content { padding-top: 20px; }
             .ambient-glow { width: 100vw; height: 100vw; top: -10vw;}
+            .modal-content { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -248,8 +276,34 @@
     <div class="app-pane">
         <div class="ambient-glow"></div>
         
-        <div class="app-content">
-            <div class="header animate-enter">
+        <div id="welcome-screen" class="app-content">
+            <div class="profile-avatar animate-enter">
+                <span id="avatar-initial">?</span>
+            </div>
+            <div class="welcome-text animate-enter delay-1">
+                <h2>Welcome to PeerDrop</h2>
+                <p>Set up your device to start sharing.</p>
+            </div>
+            
+            <div class="box animate-enter delay-2" style="padding: 30px;">
+                <div class="input-group">
+                    <label>Your Name</label>
+                    <input type="text" id="setup-name" placeholder="e.g. Anurag Gautam" autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <label>Device Name</label>
+                    <input type="text" id="setup-device" placeholder="e.g. Phantom S23 Ultra" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>Email (Optional, for detailed history)</label>
+                    <input type="email" id="setup-email" placeholder="name@example.com" autocomplete="email">
+                </div>
+                <button onclick="saveProfile()">Get Started</button>
+            </div>
+        </div>
+
+        <div id="main-app-screen" class="app-content hidden">
+            <div class="header">
                 <h2>PeerDrop</h2>
                 <div class="header-controls">
                     <button class="btn-icon" onclick="toggleHistory()" aria-label="View History" title="Transfer History">
@@ -263,7 +317,7 @@
                 </div>
             </div>
             
-            <div id="identity-section" class="box animate-enter delay-1">
+            <div id="identity-section" class="box">
                 <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Your Device ID</p>
                 <div class="id-container">
                     <div class="id-text" id="my-id">Generating...</div>
@@ -273,12 +327,12 @@
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; margin-bottom: 0;">Scan to connect directly</p>
             </div>
 
-            <div id="connect-section" class="animate-enter delay-2">
-                <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off" autofocus>
+            <div id="connect-section">
+                <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off">
                 <button id="connect-btn" onclick="connectToPeer()">Connect</button>
             </div>
 
-            <div id="share-section" class="hidden drop-zone animate-enter delay-1">
+            <div id="share-section" class="hidden drop-zone">
                 <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
                 </svg>
@@ -293,24 +347,27 @@
                 </div>
             </div>
             
-            <button id="send-btn" class="hidden animate-enter delay-2" onclick="sendFile()">Send File</button>
+            <button id="send-btn" class="hidden" onclick="sendFile()">Send File</button>
 
-            <div id="status" class="animate-enter delay-3">
+            <div id="status">
                 <div class="status-dot" id="status-dot"></div>
                 <span id="status-text">Waiting for connection...</span>
             </div>
         </div>
-    </div>
-</div>
 
-<div id="history-modal" class="modal-overlay" onclick="handleModalClick(event)">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Transfer History</h3>
-            <button class="close-btn" onclick="toggleHistory()">&times;</button>
-        </div>
-        <div class="history-list" id="history-list">
+        <div id="history-modal" class="modal-overlay" onclick="handleModalClick(event)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Transfer History</h3>
+                    <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">
+                        <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="history-list" id="history-list">
+                    </div>
             </div>
+        </div>
+
     </div>
 </div>
 
@@ -343,14 +400,70 @@
         return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 
+    // --- Profile Management ---
+    let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
+    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
+
+    function initApp() {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const mainScreen = document.getElementById('main-app-screen');
+        
+        if (myProfile && myProfile.name && myProfile.device) {
+            welcomeScreen.classList.add('hidden');
+            mainScreen.classList.remove('hidden');
+            
+            // Re-trigger entrance animations for main screen
+            const animatedEls = mainScreen.querySelectorAll('.box, .header, #connect-section, #status');
+            animatedEls.forEach((el, index) => {
+                el.classList.add('animate-enter', `delay-${index+1}`);
+            });
+            
+            initPeerJS();
+        } else {
+            // Live update Avatar based on typing
+            document.getElementById('setup-name').addEventListener('input', (e) => {
+                const initial = e.target.value.charAt(0).toUpperCase() || '?';
+                document.getElementById('avatar-initial').innerText = initial;
+            });
+        }
+    }
+
+    function saveProfile() {
+        const name = document.getElementById('setup-name').value.trim();
+        const device = document.getElementById('setup-device').value.trim();
+        const email = document.getElementById('setup-email').value.trim();
+
+        if (!name || !device) {
+            return showToast("Please enter a name and device.", "error");
+        }
+
+        myProfile = { name, device, email };
+        localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
+        showToast("Profile saved successfully!");
+        
+        // Smooth transition to main app
+        const welcomeScreen = document.getElementById('welcome-screen');
+        welcomeScreen.style.opacity = '0';
+        welcomeScreen.style.transform = 'translateY(-20px)';
+        welcomeScreen.style.transition = 'all 0.4s ease';
+        
+        setTimeout(() => {
+            initApp();
+        }, 400);
+    }
+
     // --- History Management (localStorage) ---
-    function saveToHistory(filename, filesize, type) {
+    function saveToHistory(filename, filesize, type, peerInfo) {
         let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
         history.unshift({ 
-            id: Date.now(), filename, filesize: formatBytes(filesize), 
-            type, date: new Date().toISOString() 
+            id: Date.now(), 
+            filename, 
+            filesize: formatBytes(filesize), 
+            type, 
+            date: new Date().toISOString(),
+            peer: peerInfo || { name: 'Unknown', device: 'Unknown' }
         });
-        if (history.length > 50) history.pop(); // Keep array light
+        if (history.length > 50) history.pop(); 
         localStorage.setItem('peerdrop_history', JSON.stringify(history));
         renderHistory();
     }
@@ -367,15 +480,24 @@
 
         history.forEach(item => {
             const isSent = item.type === 'sent';
+            const actionText = isSent ? 'Sent to' : 'From';
             const iconSvg = isSent ? 
-                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : 
-                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+                `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : 
+                `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
             
+            const peerName = item.peer && item.peer.name ? item.peer.name : 'Unknown';
+            const peerDevice = item.peer && item.peer.device ? item.peer.device : '';
+            const peerDisplay = peerDevice ? `${peerName} (${peerDevice})` : peerName;
+
             list.innerHTML += `
                 <div class="history-item">
                     <div class="history-icon ${isSent ? '' : 'received'}">${iconSvg}</div>
                     <div class="history-details">
-                        <p class="history-name">${item.filename}</p>
+                        <p class="history-name" title="${item.filename}">${item.filename}</p>
+                        <p class="history-peer">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            ${actionText} ${peerDisplay}
+                        </p>
                         <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
                     </div>
                 </div>
@@ -389,11 +511,7 @@
         modal.classList.toggle('active');
     }
 
-    function handleModalClick(e) {
-        if (e.target.id === 'history-modal') toggleHistory();
-    }
-
-    // Initial render for history in background
+    function handleModalClick(e) { if (e.target.id === 'history-modal') toggleHistory(); }
     renderHistory();
 
     // --- UI & Theme Logic ---
@@ -461,10 +579,7 @@
     }
 
     // --- Core WebRTC Logic ---
-    const peer = new Peer({ config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }, debug: 1 });
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e => {}));
-    
-    let conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
+    let peer, conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
     let transferStartTime = 0;
 
     const statusTextEl = document.getElementById('status-text'), statusDotEl = document.getElementById('status-dot');
@@ -484,15 +599,19 @@
         amountText.innerText = `${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
     }
 
-    peer.on('open', (id) => {
-        document.getElementById('my-id').innerText = id; copyBtn.classList.remove('hidden'); 
-        const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
-        renderQR(shareUrl); 
-        const connectId = new URLSearchParams(window.location.search).get('connect');
-        if (connectId) { document.getElementById('target-id').value = connectId; setTimeout(connectToPeer, 500); }
-    });
+    function initPeerJS() {
+        peer = new Peer({ config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }, debug: 1 });
+        
+        peer.on('open', (id) => {
+            document.getElementById('my-id').innerText = id; copyBtn.classList.remove('hidden'); 
+            const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
+            renderQR(shareUrl); 
+            const connectId = new URLSearchParams(window.location.search).get('connect');
+            if (connectId) { document.getElementById('target-id').value = connectId; setTimeout(connectToPeer, 500); }
+        });
 
-    peer.on('connection', (connection) => { conn = connection; setupConnection(); });
+        peer.on('connection', (connection) => { conn = connection; setupConnection(); });
+    }
 
     function connectToPeer() {
         const targetId = document.getElementById('target-id').value.trim();
@@ -504,8 +623,10 @@
 
     function setupConnection() {
         conn.on('open', () => {
+            // Handshake: Send my profile immediately upon connection
+            conn.send({ type: 'profile_sync', profile: myProfile });
+            
             updateStatus("Connected! Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-            showToast("Connected to peer!");
             connectSection.style.opacity = '0'; identitySection.style.opacity = '0';
             setTimeout(() => {
                 connectSection.classList.add('hidden'); identitySection.classList.add('hidden'); 
@@ -515,7 +636,12 @@
         });
 
         conn.on('data', (data) => {
-            if (data.type === 'header') {
+            if (data.type === 'profile_sync') {
+                // Handshake Received: Store remote peer profile
+                connectedPeerProfile = data.profile;
+                showToast(`Connected to ${connectedPeerProfile.name}`);
+                updateStatus(`Connected with ${connectedPeerProfile.name}`, "#34c759", "rgba(52, 199, 89, 0.4)");
+            } else if (data.type === 'header') {
                 receivingFile = []; receivedSize = 0; receivingFileSize = data.filesize; receivingFileName = data.filename; receivingFileType = data.filetype;
                 progressBar.classList.remove('hidden'); progressBar.value = 0;
                 statsContainer.classList.add('active'); transferStartTime = Date.now();
@@ -523,15 +649,17 @@
             } else if (data.type === 'chunk') {
                 receivingFile.push(data.data); receivedSize += data.data.byteLength;
                 progressBar.value = (receivedSize / receivingFileSize) * 100;
-                // Update speed stats every 10 chunks to save performance
                 if (receivingFile.length % 10 === 0 || receivedSize === receivingFileSize) updateStats(receivedSize, receivingFileSize);
             } else if (data.type === 'done') {
                 const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
-                updateStatus("File received successfully!", "#34c759", "rgba(52, 199, 89, 0.4)");
+                updateStatus(`File received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast(`Received ${receivingFileName}`, "success");
-                saveToHistory(receivingFileName, receivingFileSize, 'received');
+                
+                // Save to history using the synced profile
+                saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
+                
                 setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
             }
         });
@@ -565,9 +693,12 @@
                         if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
                     } else {
                         conn.send({ type: 'done' });
-                        updateStatus("File sent successfully!", "#34c759", "rgba(52, 199, 89, 0.4)");
+                        updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                         showToast("File sent successfully!");
-                        saveToHistory(file.name, file.size, 'sent');
+                        
+                        // Save to history using the synced profile
+                        saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
+                        
                         setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
                         fileInput.value = ''; updateFileText();
                     }
@@ -577,6 +708,11 @@
             readSlice(); 
         } else showToast("No active connection.", "error");
     }
+
+    // Initialize App logic on load
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e => {}));
+    initApp();
+
 </script>
 
 </body>

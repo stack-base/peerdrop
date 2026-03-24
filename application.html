@@ -256,7 +256,76 @@
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
         .settings-container { display: flex; flex-direction: column; align-items: center; max-width: 420px; margin: 0 auto; width: 100%;}
+
+        /* ---------------------------------------------------- */
+        /* MODERN FULL-BLEED QR SCANNER MODAL                   */
+        /* ---------------------------------------------------- */
+        #scanner-modal .modal-content {
+            padding: 0; /* Full bleed */
+            overflow: hidden; display: flex; flex-direction: column;
+            background: #000; color: #fff; border-radius: 32px;
+            height: 80vh; max-height: 750px; position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .scanner-header {
+            padding: 24px; display: flex; justify-content: space-between; align-items: center; z-index: 10; 
+            position: absolute; top: 0; left: 0; right: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none;
+        }
+        .scanner-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;}
+        .scanner-header .close-btn { 
+            pointer-events: auto; background: rgba(255,255,255,0.15); color: #fff; border: none; 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
         
+        #reader-video-container {
+            width: 100%; flex: 1; position: absolute; inset: 0; background: #000; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        
+        /* Force high-res video to cover the screen beautifully */
+        #reader-video { width: 100% !important; height: 100% !important; position: absolute; inset: 0;}
+        #reader-video video { 
+            object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 0 !important;
+        }
+        
+        .scanner-overlay {
+            position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; pointer-events: none; overflow: hidden;
+        }
+        
+        /* Premium Viewfinder UI */
+        .viewfinder { 
+            width: 280px; height: 280px; position: relative; 
+            /* Creates the dark vignette around the clear center */
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45); 
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .viewfinder::before, .viewfinder::after, .viewfinder-inner::before, .viewfinder-inner::after {
+            content: ''; position: absolute; width: 48px; height: 48px; 
+            border-color: #ffffff; border-style: solid; border-width: 0;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+            transition: border-color 0.2s ease;
+        }
+        .viewfinder::before { top: 0; left: 0; border-top-width: 5px; border-left-width: 5px; border-top-left-radius: 24px; }
+        .viewfinder::after { top: 0; right: 0; border-top-width: 5px; border-right-width: 5px; border-top-right-radius: 24px; }
+        .viewfinder-inner { position: absolute; inset: 0; }
+        .viewfinder-inner::before { bottom: 0; left: 0; border-bottom-width: 5px; border-left-width: 5px; border-bottom-left-radius: 24px; }
+        .viewfinder-inner::after { bottom: 0; right: 0; border-bottom-width: 5px; border-right-width: 5px; border-bottom-right-radius: 24px; }
+        
+        /* Successful Lock-On State */
+        .viewfinder.success { transform: scale(0.92); }
+        .viewfinder.success::before, .viewfinder.success::after, 
+        .viewfinder.success .viewfinder-inner::before, .viewfinder.success .viewfinder-inner::after {
+            border-color: #34c759; /* Apple System Green */
+        }
+
+        .scanner-footer {
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 20px 30px; text-align: center; z-index: 10; 
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+
         /* ---------------------------------------------------- */
         /* INCOMING TRANSFER MODAL                              */
         /* ---------------------------------------------------- */
@@ -275,7 +344,6 @@
         }
         .incoming-overlay.active .incoming-content-wrapper { transform: translateY(0) scale(1); }
 
-        /* REPLACED BRAND ICON WITH TEXT */
         .incoming-brand-text {
             font-size: 1.1rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); 
             margin-bottom: 24px; text-transform: uppercase; user-select: none;
@@ -335,58 +403,6 @@
         }
         .btn-decline-huge:hover { background: var(--input-bg); }
 
-        /* ---------------------------------------------------- */
-        /* MODERN FULL-BLEED QR SCANNER MODAL                   */
-        /* ---------------------------------------------------- */
-        #scanner-modal .modal-content {
-            padding: 0; /* Remove padding for edge-to-edge video */
-            overflow: hidden; display: flex; flex-direction: column;
-            background: #000; color: #fff; border-radius: 32px;
-            height: 80vh; max-height: 700px; position: relative;
-        }
-        .scanner-header {
-            padding: 24px; display: flex; justify-content: space-between; align-items: center; z-index: 10; 
-            position: absolute; top: 0; left: 0; right: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); pointer-events: none;
-        }
-        .scanner-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;}
-        .scanner-header .close-btn { pointer-events: auto; background: rgba(255,255,255,0.2); color: #fff; border: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);}
-        
-        #reader-video-container {
-            width: 100%; flex: 1; position: relative; background: #000; display: flex; align-items: center; justify-content: center;
-        }
-        /* Override html5-qrcode video element styles to stretch beautifully */
-        #reader-video { width: 100% !important; height: 100% !important; }
-        #reader-video video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 0 !important;}
-        
-        .scanner-overlay {
-            position: absolute; inset: 0; z-index: 5;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
-        }
-        
-        /* Custom Corner Viewfinder */
-        .viewfinder { width: 260px; height: 260px; position: relative; }
-        .viewfinder::before, .viewfinder::after, .viewfinder-inner::before, .viewfinder-inner::after {
-            content: ''; position: absolute; width: 40px; height: 40px; border-color: var(--accent); border-style: solid; border-width: 0;
-        }
-        .viewfinder::before { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 20px; }
-        .viewfinder::after { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 20px; }
-        .viewfinder-inner { position: absolute; inset: 0; }
-        .viewfinder-inner::before { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 20px; }
-        .viewfinder-inner::after { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 20px; }
-        
-        /* Laser Animation */
-        .scan-laser {
-            position: absolute; width: 100%; height: 2px; background: var(--accent);
-            box-shadow: 0 0 15px var(--accent), 0 0 5px #fff; top: 0; animation: scan 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1) alternate;
-        }
-        @keyframes scan { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 95%; opacity: 0; } }
-
-        .scanner-footer {
-            position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 20px 30px; text-align: center; z-index: 10; 
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-        }
-
         /* Custom Toast Notification */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast {
@@ -406,6 +422,7 @@
             .app-content { padding-top: 20px; }
             .ambient-glow { width: 100vw; height: 100vw; top: -10vw;}
             .modal-content { padding: 30px 20px; }
+            
             #scanner-modal .modal-content { height: 100vh; max-height: none; border-radius: 0; }
         }
     </style>
@@ -556,15 +573,14 @@
                 <div id="reader-video-container">
                     <div id="reader-video"></div>
                     <div class="scanner-overlay">
-                        <div class="viewfinder">
+                        <div class="viewfinder" id="viewfinder">
                             <div class="viewfinder-inner"></div>
-                            <div class="scan-laser"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="scanner-footer">
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin: 0;">Point your camera at a friend's PeerDrop QR code.</p>
+                    <p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at a friend's PeerDrop QR code.</p>
                 </div>
             </div>
         </div>
@@ -673,7 +689,7 @@
     let isTransferring = false;
     let cancelTransfer = false; 
     let pendingFileTransfer = null; 
-    let html5QrCode = null; // Holds the scanner instance
+    let html5QrCode = null; 
 
     // --- Performance & Wake Lock Management ---
     let wakeLock = null;
@@ -761,17 +777,27 @@
         updateFileText();
     }
 
-    // --- QR Scanner Logic ---
+    // --- QR Scanner Logic (UPMARKET VERSION) ---
     function startScan() {
         const modal = document.getElementById('scanner-modal');
         modal.classList.add('active');
+        
+        const viewfinder = document.getElementById('viewfinder');
+        viewfinder.classList.remove('success'); // Reset UI state
 
-        // Initialize the scanner
         html5QrCode = new Html5Qrcode("reader-video");
-        const config = { fps: 15, qrbox: { width: 250, height: 250 } };
+        
+        // Push for 30fps smooth scanning
+        const config = { fps: 30 };
 
-        // Attempt to start the back camera
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        // Explicitly request higher resolution if the hardware supports it
+        const videoConstraints = {
+            facingMode: "environment",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        };
+
+        html5QrCode.start(videoConstraints, config, onScanSuccess)
         .catch(err => {
             console.error("Error starting scanner:", err);
             showToast("Could not access camera. Please allow permissions.", "error");
@@ -791,23 +817,35 @@
     }
 
     function onScanSuccess(decodedText) {
-        stopScan();
-        let targetId = decodedText;
+        if(html5QrCode.isScanning === false) return; // Prevent double trigger
         
-        // Check if the QR contains a full URL and parse the ID out
-        try {
-            const url = new URL(decodedText);
-            const urlParams = new URLSearchParams(url.search);
-            if (urlParams.has('connect')) targetId = urlParams.get('connect');
-        } catch (e) {
-            // It wasn't a valid URL, assume raw text is ID
-        }
+        // 1. Subtle Haptic Feedback (if supported)
+        if (navigator.vibrate) navigator.vibrate(50);
+        
+        // 2. Visual "Lock On" Feedback
+        document.getElementById('viewfinder').classList.add('success');
+        
+        // Pause scanning to lock the frame
+        html5QrCode.pause();
 
-        document.getElementById('target-id').value = targetId;
-        showToast("QR Code Scanned!");
-        
-        // Auto connect after a brief visual pause
-        setTimeout(connectToPeer, 400); 
+        // 3. Deliberate delay before closing the modal
+        setTimeout(() => {
+            stopScan();
+            
+            let targetId = decodedText;
+            try {
+                const url = new URL(decodedText);
+                const urlParams = new URLSearchParams(url.search);
+                if (urlParams.has('connect')) targetId = urlParams.get('connect');
+            } catch (e) {
+                // Not a URL, proceed with raw text
+            }
+
+            document.getElementById('target-id').value = targetId;
+            showToast("QR Code Scanned!");
+            
+            setTimeout(connectToPeer, 300); 
+        }, 400); 
     }
 
     // --- Profile Management ---

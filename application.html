@@ -85,29 +85,33 @@
 
         @keyframes pulseGlow { 0% { transform: scale(0.9) translate(-20px, 20px); } 100% { transform: scale(1.1) translate(20px, -20px); } }
 
-        .app-content { width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; }
+        .app-content { width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; max-height: 100vh; overflow-y: auto; padding-right: 5px;}
+        .app-content::-webkit-scrollbar { width: 0; display: none; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
-        .header-controls { display: flex; gap: 10px; }
+        .header-controls { display: flex; gap: 8px; }
 
-        /* Setup / Welcome Screen Specifics */
+        /* Setup / Welcome / Settings Screen Specifics */
         .profile-avatar {
             width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
             border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
+            color: white; font-size: 2.2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
+            text-transform: uppercase;
         }
+        .settings-avatar { margin-top: 10px; margin-bottom: 30px; width: 90px; height: 90px; font-size: 2.5rem;}
+        
         .welcome-text { margin-bottom: 30px; }
         .welcome-text h2 { font-size: 1.8rem; margin: 0 0 10px 0; }
         .welcome-text p { color: var(--text-muted); margin: 0; }
         
-        .input-group { margin-bottom: 16px; text-align: left; }
+        .input-group { margin-bottom: 18px; text-align: left; width: 100%;}
         .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; margin-left: 4px; }
 
         .box { 
             background: var(--card-bg); padding: 28px; border-radius: var(--radius-lg); margin-bottom: 24px; 
             display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); 
-            transition: var(--transition); box-shadow: var(--shadow);
+            transition: var(--transition); box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
         }
         
         .id-container { 
@@ -117,7 +121,7 @@
         .id-text { font-size: 1.15rem; font-weight: 600; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px;}
         
         input[type="text"], input[type="email"] { 
-            width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-md); 
+            width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
             background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
             transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
@@ -177,7 +181,7 @@
 
         .hidden { display: none !important; }
 
-        /* Full Pane/Full Screen History Modal */
+        /* Full Pane Modals (History & Settings) */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -191,22 +195,24 @@
             padding: 40px; border: none; box-shadow: none; margin: 0;
             transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; flex-direction: column; box-sizing: border-box;
+            overflow-y: auto;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
         .modal-header h3 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.03em;}
         
         .close-btn { 
             background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); 
             cursor: pointer; padding: 0; width: 44px; height: 44px; border-radius: 50%; margin: 0;
             display: flex; align-items: center; justify-content: center; transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
         }
         .close-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .close-btn:hover { background: var(--input-bg); transform: scale(1.05); }
         .close-btn:active { transform: scale(0.95); }
 
+        /* History Specifics */
         .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; margin-top: 10px;}
         .history-list::-webkit-scrollbar { width: 6px; }
         .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -228,6 +234,9 @@
         .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8;}
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
+        /* Settings Specifics */
+        .settings-container { display: flex; flex-direction: column; align-items: center; max-width: 420px; margin: 0 auto; width: 100%;}
+        
         /* Custom Toast Notification */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast {
@@ -287,18 +296,22 @@
             
             <div class="box animate-enter delay-2" style="padding: 30px;">
                 <div class="input-group">
-                    <label>Your Name</label>
+                    <label>Full Name</label>
                     <input type="text" id="setup-name" placeholder="e.g. Anurag Gautam" autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="setup-username" placeholder="e.g. anurag_g" autocomplete="username">
                 </div>
                 <div class="input-group">
                     <label>Device Name</label>
                     <input type="text" id="setup-device" placeholder="e.g. Phantom S23 Ultra" autocomplete="off">
                 </div>
                 <div class="input-group">
-                    <label>Email (Optional, for detailed history)</label>
+                    <label>Email (Optional)</label>
                     <input type="email" id="setup-email" placeholder="name@example.com" autocomplete="email">
                 </div>
-                <button onclick="saveProfile()">Get Started</button>
+                <button onclick="saveInitialProfile()">Get Started</button>
             </div>
         </div>
 
@@ -311,7 +324,13 @@
                             <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
                     </button>
-                    <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+                    <button class="btn-icon" onclick="toggleSettings()" aria-label="Settings" title="Profile Settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" title="Toggle Theme">
                         <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </button>
                 </div>
@@ -355,7 +374,7 @@
             </div>
         </div>
 
-        <div id="history-modal" class="modal-overlay" onclick="handleModalClick(event)">
+        <div id="history-modal" class="modal-overlay" onclick="handleModalClick(event, 'history-modal', toggleHistory)">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>Transfer History</h3>
@@ -365,6 +384,42 @@
                 </div>
                 <div class="history-list" id="history-list">
                     </div>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="modal-overlay" onclick="handleModalClick(event, 'settings-modal', toggleSettings)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Profile Settings</h3>
+                    <button class="close-btn" onclick="toggleSettings()" aria-label="Close Settings">
+                        <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="settings-container">
+                    <div class="profile-avatar settings-avatar">
+                        <span id="settings-avatar-initial">?</span>
+                    </div>
+                    
+                    <div class="box" style="padding: 30px; margin-bottom: 0;">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="edit-name" placeholder="Your Name" autocomplete="name">
+                        </div>
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" id="edit-username" placeholder="username" autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <label>Device Name</label>
+                            <input type="text" id="edit-device" placeholder="e.g. Phantom S23 Ultra">
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="edit-email" placeholder="name@example.com">
+                        </div>
+                        <button onclick="saveSettingsProfile()" style="margin-top: 10px; margin-bottom: 0;">Save Changes</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -400,9 +455,16 @@
         return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 
-    // --- Profile Management ---
+    // --- Universal Modal Click Handler ---
+    function handleModalClick(e, modalId, toggleFunction) {
+        if (e.target.id === modalId) {
+            toggleFunction();
+        }
+    }
+
+    // --- Profile Management (Initial Setup & Settings) ---
     let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
-    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
+    let connectedPeerProfile = { name: 'Unknown Peer', username: '', device: 'Unknown Device', email: '' };
 
     function initApp() {
         const welcomeScreen = document.getElementById('welcome-screen');
@@ -412,56 +474,82 @@
             welcomeScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             
-            // Re-trigger entrance animations for main screen
             const animatedEls = mainScreen.querySelectorAll('.box, .header, #connect-section, #status');
-            animatedEls.forEach((el, index) => {
-                el.classList.add('animate-enter', `delay-${index+1}`);
-            });
+            animatedEls.forEach((el, index) => el.classList.add('animate-enter', `delay-${index+1}`));
             
             initPeerJS();
         } else {
-            // Live update Avatar based on typing
             document.getElementById('setup-name').addEventListener('input', (e) => {
-                const initial = e.target.value.charAt(0).toUpperCase() || '?';
-                document.getElementById('avatar-initial').innerText = initial;
+                document.getElementById('avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';
             });
         }
     }
 
-    function saveProfile() {
+    function saveInitialProfile() {
         const name = document.getElementById('setup-name').value.trim();
+        const username = document.getElementById('setup-username').value.trim();
         const device = document.getElementById('setup-device').value.trim();
         const email = document.getElementById('setup-email').value.trim();
 
-        if (!name || !device) {
-            return showToast("Please enter a name and device.", "error");
-        }
+        if (!name || !username || !device) return showToast("Name, Username, and Device are required.", "error");
 
-        myProfile = { name, device, email };
+        myProfile = { name, username, device, email };
         localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
-        showToast("Profile saved successfully!");
+        showToast("Profile created successfully!");
         
-        // Smooth transition to main app
         const welcomeScreen = document.getElementById('welcome-screen');
         welcomeScreen.style.opacity = '0';
         welcomeScreen.style.transform = 'translateY(-20px)';
         welcomeScreen.style.transition = 'all 0.4s ease';
         
-        setTimeout(() => {
-            initApp();
-        }, 400);
+        setTimeout(() => initApp(), 400);
+    }
+
+    // --- Settings Logic ---
+    function toggleSettings() {
+        const modal = document.getElementById('settings-modal');
+        if (!modal.classList.contains('active')) {
+            // Populate data when opening
+            document.getElementById('edit-name').value = myProfile.name || '';
+            document.getElementById('edit-username').value = myProfile.username || '';
+            document.getElementById('edit-device').value = myProfile.device || '';
+            document.getElementById('edit-email').value = myProfile.email || '';
+            document.getElementById('settings-avatar-initial').innerText = myProfile.name ? myProfile.name.charAt(0).toUpperCase() : '?';
+        }
+        modal.classList.toggle('active');
+    }
+
+    // Live update settings avatar
+    document.getElementById('edit-name').addEventListener('input', (e) => {
+        document.getElementById('settings-avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';
+    });
+
+    function saveSettingsProfile() {
+        const name = document.getElementById('edit-name').value.trim();
+        const username = document.getElementById('edit-username').value.trim();
+        const device = document.getElementById('edit-device').value.trim();
+        const email = document.getElementById('edit-email').value.trim();
+
+        if (!name || !username || !device) return showToast("Name, Username, and Device are required.", "error");
+
+        myProfile = { name, username, device, email };
+        localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
+        
+        // If actively connected, push the updated profile to the peer
+        if (conn && conn.open) {
+            conn.send({ type: 'profile_sync', profile: myProfile });
+        }
+
+        showToast("Settings saved successfully!");
+        toggleSettings();
     }
 
     // --- History Management (localStorage) ---
     function saveToHistory(filename, filesize, type, peerInfo) {
         let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
         history.unshift({ 
-            id: Date.now(), 
-            filename, 
-            filesize: formatBytes(filesize), 
-            type, 
-            date: new Date().toISOString(),
-            peer: peerInfo || { name: 'Unknown', device: 'Unknown' }
+            id: Date.now(), filename, filesize: formatBytes(filesize), 
+            type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', username: '' }
         });
         if (history.length > 50) history.pop(); 
         localStorage.setItem('peerdrop_history', JSON.stringify(history));
@@ -485,9 +573,11 @@
                 `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : 
                 `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
             
-            const peerName = item.peer && item.peer.name ? item.peer.name : 'Unknown';
-            const peerDevice = item.peer && item.peer.device ? item.peer.device : '';
-            const peerDisplay = peerDevice ? `${peerName} (${peerDevice})` : peerName;
+            const pName = item.peer && item.peer.name ? item.peer.name : 'Unknown';
+            const pUser = item.peer && item.peer.username ? `@${item.peer.username}` : '';
+            const pDevice = item.peer && item.peer.device ? item.peer.device : '';
+            
+            const peerDisplay = pDevice ? `${pName} ${pUser} (${pDevice})` : `${pName} ${pUser}`;
 
             list.innerHTML += `
                 <div class="history-item">
@@ -511,10 +601,9 @@
         modal.classList.toggle('active');
     }
 
-    function handleModalClick(e) { if (e.target.id === 'history-modal') toggleHistory(); }
     renderHistory();
 
-    // --- UI & Theme Logic ---
+    // --- Theme & QR Logic ---
     const themeIcon = document.getElementById('theme-icon');
     let currentShareUrl = ""; 
     
@@ -623,7 +712,6 @@
 
     function setupConnection() {
         conn.on('open', () => {
-            // Handshake: Send my profile immediately upon connection
             conn.send({ type: 'profile_sync', profile: myProfile });
             
             updateStatus("Connected! Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
@@ -637,7 +725,6 @@
 
         conn.on('data', (data) => {
             if (data.type === 'profile_sync') {
-                // Handshake Received: Store remote peer profile
                 connectedPeerProfile = data.profile;
                 showToast(`Connected to ${connectedPeerProfile.name}`);
                 updateStatus(`Connected with ${connectedPeerProfile.name}`, "#34c759", "rgba(52, 199, 89, 0.4)");
@@ -657,9 +744,7 @@
                 updateStatus(`File received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast(`Received ${receivingFileName}`, "success");
                 
-                // Save to history using the synced profile
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
-                
                 setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
             }
         });
@@ -696,9 +781,7 @@
                         updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                         showToast("File sent successfully!");
                         
-                        // Save to history using the synced profile
                         saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
-                        
                         setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
                         fileInput.value = ''; updateFileText();
                     }

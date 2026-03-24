@@ -5,60 +5,284 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerDrop | Fast P2P Sharing</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#007bff">
+    <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* Base Light Theme */
+        /* Base Light Theme - Apple/Perplexity Aesthetic */
         :root { 
-            --primary: #007bff; 
-            --bg: #f4f7f6; 
-            --text: #333; 
-            --card: #fff; 
-            --input-bg: #fff;
-            --border: #ccc;
+            --bg: #f5f5f7; 
+            --card-bg: #ffffff; 
+            --text-main: #1d1d1f; 
+            --text-muted: #86868b;
+            --primary: #1d1d1f; /* High contrast black for buttons */
+            --primary-hover: #434344;
+            --primary-text: #ffffff;
+            --border: #e5e5ea;
+            --input-bg: #f5f5f7;
+            --accent: #0066cc; /* Apple-like blue */
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Dark Theme Overrides */
+        /* Deep Dark Mode Overrides (OLED Optimized) */
         body.dark-mode {
-            --bg: #121212;
-            --text: #e0e0e0;
-            --card: #1e1e1e;
-            --input-bg: #2d2d2d;
-            --border: #444;
+            --bg: #000000;
+            --card-bg: #0a0a0a;
+            --text-main: #f5f5f7;
+            --text-muted: #86868b;
+            --primary: #ffffff;
+            --primary-hover: #e5e5ea;
+            --primary-text: #000000;
+            --border: #2c2c2e;
+            --input-bg: #1c1c1e;
+            --accent: #0a84ff;
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; transition: background-color 0.3s; }
-        .container { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; transition: background-color 0.3s; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { margin: 0; color: var(--primary); }
-        
-        .box { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; transition: background-color 0.3s;}
-        
-        .id-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap;}
-        .id-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; color: var(--primary); word-break: break-all;}
-        
-        input[type="text"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); color: var(--text); }
-        
-        /* Drag and Drop Styles */
-        .drop-zone { border: 2px dashed var(--border); padding: 25px 20px; border-radius: 8px; transition: all 0.3s ease; background: var(--bg); margin-bottom: 15px; }
-        .drop-zone.dragover { border-color: var(--primary); background-color: rgba(0, 123, 255, 0.1); }
-        .drop-zone input[type="file"] { max-width: 100%; margin-top: 10px; }
-        #drop-text { margin-top: 0; color: var(--text); font-size: 0.95rem; word-break: break-all;}
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            transition: background-color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
-        button:hover { background: #0056b3; }
+        .container { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow); 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            box-sizing: border-box;
+            margin: 20px;
+        }
         
-        .btn-small { width: auto; padding: 6px 12px; margin: 0; font-size: 0.85rem; background: #6c757d; }
-        .btn-small:hover { background: #5a6268; }
-        .btn-icon { width: auto; padding: 8px; margin: 0; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
-        .btn-icon:hover { background: var(--bg); }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+        }
 
-        #qrcode { margin-top: 10px; padding: 10px; background: white; border-radius: 8px; }
-        progress { width: 100%; height: 20px; margin-top: 15px; border-radius: 5px; }
-        #status { font-size: 0.9rem; margin-top: 15px; font-weight: bold; color: #888; }
+        h1 { 
+            margin: 0; 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            letter-spacing: -0.03em;
+            color: var(--text-main); 
+        }
+        
+        /* Modern ID Badge */
+        .box { 
+            background: var(--input-bg); 
+            padding: 24px; 
+            border-radius: var(--radius-md); 
+            margin-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        
+        .id-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 20px; 
+            justify-content: center; 
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 10px 16px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .id-text { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-main); 
+            word-break: break-all;
+        }
+        
+        input[type="text"] { 
+            width: 100%; 
+            padding: 16px; 
+            margin-bottom: 16px; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius-md); 
+            background: var(--input-bg); 
+            color: var(--text-main); 
+            font-size: 1rem;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+        }
+        
+        /* Drop Zone */
+        .drop-zone { 
+            border: 2px dashed var(--border); 
+            padding: 40px 20px; 
+            border-radius: var(--radius-md); 
+            transition: var(--transition); 
+            background: var(--input-bg); 
+            margin-bottom: 20px; 
+            position: relative;
+            cursor: pointer;
+        }
+        .drop-zone:hover {
+            border-color: var(--text-muted);
+        }
+        .drop-zone.dragover { 
+            border-color: var(--accent); 
+            background-color: rgba(0, 102, 204, 0.05); 
+        }
+        .drop-zone input[type="file"] { 
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
+        
+        .drop-icon {
+            width: 48px; height: 48px;
+            margin-bottom: 12px;
+            fill: var(--text-muted);
+        }
+
+        #drop-text { 
+            margin: 0; 
+            color: var(--text-main); 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        #drop-subtext {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        button { 
+            background: var(--primary); 
+            color: var(--primary-text); 
+            border: none; 
+            padding: 16px 24px; 
+            width: 100%; 
+            border-radius: var(--radius-md); 
+            font-weight: 600; 
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer; 
+            transition: var(--transition); 
+            margin-bottom: 12px; 
+        }
+        button:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-small { 
+            width: auto; 
+            padding: 6px 14px; 
+            margin: 0; 
+            font-size: 0.85rem; 
+            border-radius: 20px;
+        }
+
+        .btn-icon { 
+            width: 40px; 
+            height: 40px; 
+            padding: 0; 
+            margin: 0; 
+            background: var(--input-bg); 
+            border: 1px solid var(--border); 
+            color: var(--text-main); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
+        .btn-icon:hover { background: var(--border); }
+
+        /* QR Code wrapper to ensure scannability in dark mode */
+        .qr-wrapper {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Custom Progress Bar */
+        progress { 
+            width: 100%; 
+            height: 8px; 
+            margin-top: 20px; 
+            border-radius: 10px; 
+            -webkit-appearance: none;
+            appearance: none;
+            overflow: hidden;
+        }
+        progress::-webkit-progress-bar {
+            background-color: var(--border);
+            border-radius: 10px;
+        }
+        progress::-webkit-progress-value {
+            background-color: var(--accent);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        #status { 
+            font-size: 0.9rem; 
+            margin-top: 20px; 
+            font-weight: 500; 
+            color: var(--text-muted); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -67,43 +291,78 @@
 <div class="container">
     <div class="header">
         <h1>PeerDrop</h1>
-        <button class="btn-icon" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌓</button>
+        <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+            <svg id="theme-icon" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
     </div>
     
     <div id="identity-section" class="box">
-        <p style="margin: 0 0 10px 0;">Your Device ID:</p>
+        <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Your Device ID</p>
         <div class="id-container">
             <div class="id-text" id="my-id">Generating...</div>
             <button id="copy-btn" class="btn-small hidden" onclick="copyId()">Copy</button>
         </div>
-        <div id="qrcode"></div>
-        <p style="font-size: 0.8rem; color: #888;">Scan to connect directly</p>
+        <div class="qr-wrapper">
+            <div id="qrcode"></div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; margin-bottom: 0;">Scan to connect directly</p>
     </div>
 
     <div id="connect-section">
-        <input type="text" id="target-id" placeholder="Enter friend's Device ID">
+        <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off">
         <button id="connect-btn" onclick="connectToPeer()">Connect</button>
     </div>
 
     <div id="share-section" class="hidden drop-zone">
-        <p id="drop-text">Drag & Drop file here<br>or</p>
+        <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
+        </svg>
+        <p id="drop-text">Select a file to send</p>
+        <p id="drop-subtext">or drag and drop it here</p>
         <input type="file" id="file-input">
         <progress id="progress-bar" value="0" max="100" class="hidden"></progress>
     </div>
+    
     <button id="send-btn" class="hidden" onclick="sendFile()">Send File</button>
 
-    <div id="status">Waiting for connection...</div>
+    <div id="status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Waiting for connection...</span>
+    </div>
 </div>
 
 <script>
     // --- UI Logic (Dark Mode & Copy) ---
+    const themeIcon = document.getElementById('theme-icon');
+    
+    function updateThemeIcon(isDark) {
+        if (isDark) {
+            // Sun icon
+            themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+            themeIcon.setAttribute('fill', 'none');
+            themeIcon.setAttribute('stroke', 'currentColor');
+            themeIcon.setAttribute('stroke-width', '2');
+            themeIcon.setAttribute('stroke-linecap', 'round');
+            themeIcon.setAttribute('stroke-linejoin', 'round');
+        } else {
+            // Moon icon
+            themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+            themeIcon.removeAttribute('stroke');
+            themeIcon.setAttribute('fill', 'currentColor');
+        }
+    }
+
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
+        updateThemeIcon(true);
     }
 
     function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        updateThemeIcon(isDark);
     }
 
     function copyId() {
@@ -111,10 +370,11 @@
         navigator.clipboard.writeText(idText).then(() => {
             const copyBtn = document.getElementById('copy-btn');
             copyBtn.innerText = 'Copied!';
-            copyBtn.style.background = '#28a745'; 
+            copyBtn.style.background = 'var(--accent)'; 
+            copyBtn.style.color = '#fff';
             setTimeout(() => {
                 copyBtn.innerText = 'Copy';
-                copyBtn.style.background = '#6c757d'; 
+                copyBtn.style.background = 'var(--primary)'; 
             }, 2000);
         }).catch(err => alert("Could not copy ID. Please copy manually."));
     }
@@ -123,8 +383,8 @@
     const dropZone = document.getElementById('share-section');
     const fileInput = document.getElementById('file-input');
     const dropText = document.getElementById('drop-text');
+    const dropSubtext = document.getElementById('drop-subtext');
 
-    // Prevent default browser behavior (opening the file in a new tab)
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
     });
@@ -134,7 +394,6 @@
         e.stopPropagation();
     }
 
-    // Add visual feedback
     ['dragenter', 'dragover'].forEach(eventName => {
         dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
     });
@@ -143,23 +402,23 @@
         dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
     });
 
-    // Handle dropped files
     dropZone.addEventListener('drop', (e) => {
         const files = e.dataTransfer.files;
         if (files.length > 0) {
-            fileInput.files = files; // Assign dropped file to the input
+            fileInput.files = files; 
             updateFileText();
         }
     });
 
-    // Handle manual file selection
     fileInput.addEventListener('change', updateFileText);
 
     function updateFileText() {
         if (fileInput.files.length > 0) {
-            dropText.innerHTML = `<strong>Selected:</strong> ${fileInput.files[0].name}`;
+            dropText.innerHTML = `<strong>Ready to send:</strong> ${fileInput.files[0].name}`;
+            dropSubtext.classList.add('hidden');
         } else {
-            dropText.innerHTML = `Drag & Drop file here<br>or`;
+            dropText.innerHTML = `Select a file to send`;
+            dropSubtext.classList.remove('hidden');
         }
     }
 
@@ -188,19 +447,32 @@
     let receivingFileType = '';
     let receivedSize = 0;
 
-    const statusEl = document.getElementById('status');
+    const statusTextEl = document.getElementById('status-text');
+    const statusDotEl = document.getElementById('status-dot');
     const connectSection = document.getElementById('connect-section');
     const identitySection = document.getElementById('identity-section');
     const progressBar = document.getElementById('progress-bar');
     const sendBtn = document.getElementById('send-btn');
     const copyBtn = document.getElementById('copy-btn');
 
+    function updateStatus(message, color = "var(--text-muted)") {
+        statusTextEl.innerText = message;
+        statusDotEl.style.backgroundColor = color;
+    }
+
     peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
         copyBtn.classList.remove('hidden'); 
         
         const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
-        new QRCode(document.getElementById("qrcode"), { text: shareUrl, width: 128, height: 128 });
+        new QRCode(document.getElementById("qrcode"), { 
+            text: shareUrl, 
+            width: 140, 
+            height: 140,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
 
         const connectId = new URLSearchParams(window.location.search).get('connect');
         if (connectId) {
@@ -218,15 +490,14 @@
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return alert("Please enter an ID");
         
-        statusEl.innerText = "Connecting...";
+        updateStatus("Connecting...", "#f59e0b");
         conn = peer.connect(targetId, { reliable: true });
         setupConnection();
     }
 
     function setupConnection() {
         conn.on('open', () => {
-            statusEl.innerText = "Connected! Ready to share.";
-            statusEl.style.color = "#28a745";
+            updateStatus("Connected! Ready to share.", "#10b981");
             connectSection.classList.add('hidden');
             identitySection.classList.add('hidden'); 
             dropZone.classList.remove('hidden');
@@ -243,7 +514,7 @@
                 
                 progressBar.classList.remove('hidden');
                 progressBar.value = 0;
-                statusEl.innerText = `Receiving: ${data.filename}...`;
+                updateStatus(`Receiving: ${data.filename}...`, "var(--accent)");
 
             } else if (data.type === 'chunk') {
                 receivingFile.push(data.data);
@@ -259,14 +530,13 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 
-                statusEl.innerText = "File received successfully!";
+                updateStatus("File received successfully!", "#10b981");
                 setTimeout(() => progressBar.classList.add('hidden'), 2000);
             }
         });
 
         conn.on('close', () => {
-            statusEl.innerText = "Connection lost. Refresh to reconnect.";
-            statusEl.style.color = "red";
+            updateStatus("Connection lost. Refresh to reconnect.", "#ef4444");
             dropZone.classList.add('hidden');
             sendBtn.classList.add('hidden');
         });
@@ -279,7 +549,7 @@
         if (conn && conn.open) {
             progressBar.classList.remove('hidden');
             progressBar.value = 0;
-            statusEl.innerText = `Sending ${file.name}...`;
+            updateStatus(`Sending ${file.name}...`, "var(--accent)");
             
             conn.send({ type: 'header', filename: file.name, filetype: file.type, filesize: file.size });
 
@@ -303,10 +573,9 @@
                         }
                     } else {
                         conn.send({ type: 'done' });
-                        statusEl.innerText = "File sent successfully!";
+                        updateStatus("File sent successfully!", "#10b981");
                         setTimeout(() => progressBar.classList.add('hidden'), 2000);
                         
-                        // Reset the file input area
                         fileInput.value = ''; 
                         updateFileText();
                     }

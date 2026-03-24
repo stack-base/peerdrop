@@ -13,295 +13,212 @@
     <style>
         /* Base Light Theme */
         :root { 
-            --bg: #f5f5f7; 
-            --card-bg: #ffffff; 
-            --text-main: #1d1d1f; 
-            --text-muted: #86868b;
-            --primary: #1d1d1f; 
-            --primary-hover: #434344;
-            --primary-text: #ffffff;
-            --border: #e5e5ea;
-            --input-bg: #f5f5f7;
-            --accent: #0a84ff; 
+            --bg: #f5f5f7; --card-bg: #ffffff; --text-main: #1d1d1f; --text-muted: #86868b;
+            --primary: #1d1d1f; --primary-hover: #434344; --primary-text: #ffffff;
+            --border: #e5e5ea; --input-bg: #f5f5f7; --accent: #0a84ff; 
             --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            --radius-lg: 24px;
-            --radius-md: 14px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --radius-lg: 24px; --radius-md: 14px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glow-opacity: 0.15;
         }
 
-        /* Deep Dark Mode Overrides (Perfect for AMOLED) */
+        /* Deep Dark Mode Overrides */
         body.dark-mode {
-            --bg: #000000;
-            --card-bg: #111111;
-            --text-main: #f5f5f7;
-            --text-muted: #86868b;
-            --primary: #ffffff;
-            --primary-hover: #e5e5ea;
-            --primary-text: #000000;
-            --border: #2c2c2e;
-            --input-bg: #1c1c1e;
-            --accent: #0a84ff;
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+            --bg: #000000; --card-bg: #0a0a0a; --text-main: #f5f5f7; --text-muted: #86868b;
+            --primary: #ffffff; --primary-hover: #e5e5ea; --primary-text: #000000;
+            --border: #2c2c2e; --input-bg: #1c1c1e; --accent: #0a84ff;
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
+            --glow-opacity: 0.25;
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 0;
-            transition: background-color 0.4s ease, color 0.4s ease;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); 
+            margin: 0; padding: 0; transition: background-color 0.5s ease, color 0.5s ease;
+            -webkit-font-smoothing: antialiased; overflow: hidden; 
         }
 
+        /* Animations */
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-enter { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } 
+        .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
+
         /* Full Screen Split Layout */
-        .layout-wrapper {
-            display: flex;
-            min-height: 100vh;
-            width: 100vw;
-        }
+        .layout-wrapper { display: flex; height: 100vh; width: 100vw; }
 
         /* Guide Pane (Left) */
         .guide-pane {
-            flex: 1.2;
-            background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
+            flex: 1.2; background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f);
+            background-size: 300% 300%; animation: gradientBG 15s ease infinite; color: white;
+            display: flex; flex-direction: column; justify-content: center; padding: 60px; position: relative;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .guide-content {
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
+        .guide-content { max-width: 500px; margin: 0 auto; z-index: 2; }
+        .guide-pane h1 { font-size: 4rem; font-weight: 700; letter-spacing: -0.05em; margin-bottom: 20px; color: #ffffff; line-height: 1.05; }
+        .guide-pane p.subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 50px; line-height: 1.5; font-weight: 400;}
 
-        .guide-pane h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            margin-bottom: 20px;
-            color: #ffffff;
-            line-height: 1.1;
-        }
-
-        .guide-pane p.subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 50px;
-            line-height: 1.5;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
+        .step { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 35px; }
         .step-number {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1.2rem; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .step-text h3 { margin: 0 0 6px 0; font-size: 1.25rem; font-weight: 600; }
+        .step-text p { margin: 0; opacity: 0.85; font-size: 1rem; line-height: 1.5; }
+
+        /* App Pane (Right) */
+        .app-pane { flex: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; transition: var(--transition); }
+
+        /* Ambient Glow */
+        .ambient-glow {
+            position: absolute; width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
+            background: radial-gradient(circle, rgba(10,132,255,var(--glow-opacity)) 0%, rgba(94,92,230,var(--glow-opacity)) 30%, rgba(191,90,242,0) 70%);
+            filter: blur(60px); border-radius: 50%; z-index: 0; pointer-events: none;
+            animation: pulseGlow 8s ease-in-out infinite alternate; transition: opacity 0.5s ease;
         }
 
-        .step-text h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.2rem;
-        }
+        @keyframes pulseGlow { 0% { transform: scale(0.9) translate(-20px, 20px); } 100% { transform: scale(1.1) translate(20px, -20px); } }
 
-        .step-text p {
-            margin: 0;
-            opacity: 0.8;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        /* App Pane (Right) - No restricting boundaries */
-        .app-pane {
-            flex: 1;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        /* Invisible wrapper just to align content */
-        .app-content { 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center; 
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
+        .app-content { width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; }
         
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-        }
-
-        .header h2 { 
-            margin: 0; 
-            font-size: 1.5rem; 
-            font-weight: 700; 
-            letter-spacing: -0.03em;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
         
-        /* Elevated Box for ID Section */
+        .header-controls { display: flex; gap: 10px; }
+
         .box { 
-            background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: var(--radius-md); 
-            margin-bottom: 24px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            border: 1px solid var(--border);
-            transition: var(--transition);
-            box-shadow: var(--shadow);
+            background: var(--card-bg); padding: 28px; border-radius: var(--radius-lg); margin-bottom: 24px; 
+            display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); 
+            transition: var(--transition); box-shadow: var(--shadow);
         }
         
         .id-container { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 20px; 
-            justify-content: center; 
-            flex-wrap: wrap;
-            background: var(--input-bg);
-            padding: 10px 16px;
-            border-radius: 30px;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;
+            background: var(--input-bg); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border);
         }
-
-        .id-text { 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            font-family: 'Courier New', Courier, monospace;
-            word-break: break-all;
-        }
+        .id-text { font-size: 1.15rem; font-weight: 600; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px;}
         
         input[type="text"] { 
-            width: 100%; 
-            padding: 16px; 
-            margin-bottom: 16px; 
-            border: 1px solid var(--border); 
-            border-radius: var(--radius-md); 
-            background: var(--card-bg); 
-            color: var(--text-main); 
-            font-size: 1rem;
-            font-family: inherit;
-            box-sizing: border-box;
-            transition: var(--transition);
-            outline: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            width: 100%; padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
+            background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
+            transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-
-        input[type="text"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
-        }
+        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
         
         .drop-zone { 
-            border: 2px dashed var(--border); 
-            padding: 40px 20px; 
-            border-radius: var(--radius-md); 
-            transition: var(--transition); 
-            background: var(--card-bg); 
-            margin-bottom: 20px; 
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 2px dashed var(--border); padding: 40px 20px; border-radius: var(--radius-md); transition: var(--transition); 
+            background: var(--card-bg); margin-bottom: 20px; position: relative; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        
-        .drop-zone:hover { border-color: var(--text-muted); }
-        .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); }
+        .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
+        .drop-zone:active { transform: scale(0.97); }
+        .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
         .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         
-        .drop-icon { width: 48px; height: 48px; margin-bottom: 12px; fill: var(--text-muted); }
-        #drop-text { margin: 0; font-size: 0.95rem; font-weight: 500; word-break: break-all; }
-        #drop-subtext { margin-top: 6px; font-size: 0.85rem; color: var(--text-muted); }
+        .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
+        .drop-zone.dragover .drop-icon { fill: var(--accent); }
+        #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4;}
+        #drop-subtext { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); }
 
         button { 
-            background: var(--primary); color: var(--primary-text); border: none; 
-            padding: 16px 24px; width: 100%; border-radius: var(--radius-md); 
-            font-weight: 600; font-size: 1rem; font-family: inherit;
+            background: var(--primary); color: var(--primary-text); border: none; padding: 18px 24px; width: 100%; 
+            border-radius: var(--radius-md); font-weight: 600; font-size: 1.05rem; font-family: inherit; letter-spacing: 0.5px;
             cursor: pointer; transition: var(--transition); margin-bottom: 12px; 
         }
-        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        button:active { transform: translateY(1px); }
+        button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        .btn-small { width: auto; padding: 6px 14px; margin: 0; font-size: 0.85rem; border-radius: 20px; }
+        .btn-small { width: auto; padding: 8px 16px; margin: 0; font-size: 0.85rem; border-radius: 20px; }
 
         .btn-icon { 
-            width: 40px; height: 40px; padding: 0; margin: 0; 
-            background: var(--card-bg); border: 1px solid var(--border); 
-            color: var(--text-main); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            width: 44px; height: 44px; padding: 0; margin: 0; background: var(--card-bg); border: 1px solid var(--border); 
+            color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
-        .btn-icon:hover { background: var(--border); }
+        .btn-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
+        .btn-icon:active { transform: scale(0.95); }
 
-        .qr-wrapper {
-            padding: 12px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 10px;
-            transition: var(--transition);
-            border: 1px solid var(--border);
-        }
+        .qr-wrapper { padding: 16px; border-radius: 16px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
 
-        progress { 
-            width: 100%; height: 8px; margin-top: 20px; 
-            border-radius: 10px; -webkit-appearance: none; appearance: none; overflow: hidden;
+        /* Transfer Stats UI */
+        .transfer-stats {
+            display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);
+            margin-top: 8px; font-family: 'Courier New', Courier, monospace; font-weight: 600;
+            opacity: 0; transition: opacity 0.3s ease;
         }
+        .transfer-stats.active { opacity: 1; }
+
+        progress { width: 100%; height: 8px; margin-top: 24px; border-radius: 10px; -webkit-appearance: none; appearance: none; overflow: hidden; }
         progress::-webkit-progress-bar { background-color: var(--border); border-radius: 10px; }
-        progress::-webkit-progress-value { background-color: var(--accent); border-radius: 10px; transition: width 0.3s ease; }
+        progress::-webkit-progress-value { background-color: var(--accent); border-radius: 10px; transition: width 0.1s linear; }
 
-        #status { 
-            font-size: 0.9rem; margin-top: 20px; font-weight: 500; 
-            color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .status-dot { width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; }
+        #status { font-size: 0.95rem; margin-top: 20px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .status-dot { width: 10px; height: 10px; background: var(--text-muted); border-radius: 50%; transition: background-color 0.3s ease; box-shadow: 0 0 8px currentColor;}
 
         .hidden { display: none !important; }
 
-        /* Responsive Design */
+        /* Custom Toast Notification */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast {
+            background: rgba(30, 30, 30, 0.95); color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success .toast-icon { color: #34c759; }
+        .toast.error .toast-icon { color: #ff3b30; }
+
+        /* History Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--card-bg); width: 100%; max-width: 450px; border-radius: var(--radius-lg);
+            padding: 30px; box-shadow: var(--shadow); border: 1px solid var(--border);
+            transform: translateY(30px) scale(0.95); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 80vh; display: flex; flex-direction: column; box-sizing: border-box; margin: 20px;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; font-weight: 700; }
+        .close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 0; width: 30px; height: 30px; margin: 0;}
+        .close-btn:hover { color: var(--text-main); background: transparent; box-shadow: none; transform: none;}
+
+        .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;}
+        .history-list::-webkit-scrollbar { width: 6px; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .history-item {
+            display: flex; align-items: center; gap: 15px; padding: 16px; border-radius: var(--radius-md);
+            background: var(--input-bg); border: 1px solid var(--border);
+        }
+        .history-icon { 
+            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            background: rgba(10, 132, 255, 0.1); color: var(--accent); flex-shrink: 0;
+        }
+        .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+        .history-details { flex: 1; overflow: hidden; text-align: left; }
+        .history-name { font-weight: 600; font-size: 0.95rem; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+        .empty-history { text-align: center; color: var(--text-muted); padding: 30px 0; font-style: italic; }
+
         @media (max-width: 900px) {
-            .layout-wrapper { flex-direction: column; }
+            .layout-wrapper { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh;}
             .guide-pane { display: none; }
-            .app-pane { padding: 20px; }
+            .app-pane { padding: 20px; align-items: flex-start; min-height: 100vh;}
             .app-content { padding-top: 20px; }
+            .ambient-glow { width: 100vw; height: 100vw; top: -10vw;}
         }
     </style>
 </head>
@@ -310,74 +227,75 @@
 <div class="layout-wrapper">
     <div class="guide-pane">
         <div class="guide-content">
-            <h1>Share freely.</h1>
-            <p class="subtitle">Secure, peer-to-peer file sharing directly from your browser. No servers, no limits.</p>
+            <h1 class="animate-enter">Share freely.</h1>
+            <p class="subtitle animate-enter delay-1">Secure, peer-to-peer file sharing directly from your browser. No servers, no limits.</p>
             
-            <div class="step">
+            <div class="step animate-enter delay-2">
                 <div class="step-number">1</div>
-                <div class="step-text">
-                    <h3>Get Connected</h3>
-                    <p>Share your Device ID or scan the QR code to pair instantly.</p>
-                </div>
+                <div class="step-text"><h3>Get Connected</h3><p>Share your Device ID or scan the QR code to pair instantly.</p></div>
             </div>
-            <div class="step">
+            <div class="step animate-enter delay-3">
                 <div class="step-number">2</div>
-                <div class="step-text">
-                    <h3>Drop a File</h3>
-                    <p>Select or drag and drop any file into the transfer zone.</p>
-                </div>
+                <div class="step-text"><h3>Drop a File</h3><p>Select or drag and drop any file into the transfer zone.</p></div>
             </div>
-            <div class="step">
+            <div class="step animate-enter delay-4">
                 <div class="step-number">3</div>
-                <div class="step-text">
-                    <h3>Lightning Fast</h3>
-                    <p>Files travel directly between devices via WebRTC.</p>
-                </div>
+                <div class="step-text"><h3>Lightning Fast</h3><p>Files travel directly between devices via WebRTC.</p></div>
             </div>
         </div>
     </div>
 
     <div class="app-pane">
+        <div class="ambient-glow"></div>
+        
         <div class="app-content">
-            <div class="header">
+            <div class="header animate-enter">
                 <h2>PeerDrop</h2>
-                <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
-                    <svg id="theme-icon" viewBox="0 0 24 24">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                </button>
+                <div class="header-controls">
+                    <button class="btn-icon" onclick="toggleHistory()" aria-label="View History" title="Transfer History">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+                        <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
             </div>
             
-            <div id="identity-section" class="box">
-                <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Your Device ID</p>
+            <div id="identity-section" class="box animate-enter delay-1">
+                <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Your Device ID</p>
                 <div class="id-container">
                     <div class="id-text" id="my-id">Generating...</div>
                     <button id="copy-btn" class="btn-small hidden" onclick="copyId()">Copy</button>
                 </div>
-                <div class="qr-wrapper" id="qr-wrapper">
-                    <div id="qrcode"></div>
-                </div>
+                <div class="qr-wrapper" id="qr-wrapper"><div id="qrcode"></div></div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; margin-bottom: 0;">Scan to connect directly</p>
             </div>
 
-            <div id="connect-section">
-                <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off">
+            <div id="connect-section" class="animate-enter delay-2">
+                <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off" autofocus>
                 <button id="connect-btn" onclick="connectToPeer()">Connect</button>
             </div>
 
-            <div id="share-section" class="hidden drop-zone">
+            <div id="share-section" class="hidden drop-zone animate-enter delay-1">
                 <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
                 </svg>
                 <p id="drop-text">Select a file to send</p>
                 <p id="drop-subtext">or drag and drop it here</p>
                 <input type="file" id="file-input">
+                
                 <progress id="progress-bar" value="0" max="100" class="hidden"></progress>
+                <div id="transfer-stats" class="transfer-stats">
+                    <span id="speed-text">0 MB/s</span>
+                    <span id="amount-text">0 / 0 MB</span>
+                </div>
             </div>
             
-            <button id="send-btn" class="hidden" onclick="sendFile()">Send File</button>
+            <button id="send-btn" class="hidden animate-enter delay-2" onclick="sendFile()">Send File</button>
 
-            <div id="status">
+            <div id="status" class="animate-enter delay-3">
                 <div class="status-dot" id="status-dot"></div>
                 <span id="status-text">Waiting for connection...</span>
             </div>
@@ -385,7 +303,99 @@
     </div>
 </div>
 
+<div id="history-modal" class="modal-overlay" onclick="handleModalClick(event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Transfer History</h3>
+            <button class="close-btn" onclick="toggleHistory()">&times;</button>
+        </div>
+        <div class="history-list" id="history-list">
+            </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
 <script>
+    // --- Utils: Toast & Formatters ---
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 
+            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : 
+            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 Bytes';
+        const k = 1024, dm = decimals < 0 ? 0 : decimals, sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+
+    // --- History Management (localStorage) ---
+    function saveToHistory(filename, filesize, type) {
+        let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
+        history.unshift({ 
+            id: Date.now(), filename, filesize: formatBytes(filesize), 
+            type, date: new Date().toISOString() 
+        });
+        if (history.length > 50) history.pop(); // Keep array light
+        localStorage.setItem('peerdrop_history', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        const history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
+        list.innerHTML = '';
+        
+        if (history.length === 0) {
+            list.innerHTML = '<div class="empty-history">No past transfers found.</div>';
+            return;
+        }
+
+        history.forEach(item => {
+            const isSent = item.type === 'sent';
+            const iconSvg = isSent ? 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+            
+            list.innerHTML += `
+                <div class="history-item">
+                    <div class="history-icon ${isSent ? '' : 'received'}">${iconSvg}</div>
+                    <div class="history-details">
+                        <p class="history-name">${item.filename}</p>
+                        <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function toggleHistory() {
+        const modal = document.getElementById('history-modal');
+        if (!modal.classList.contains('active')) renderHistory();
+        modal.classList.toggle('active');
+    }
+
+    function handleModalClick(e) {
+        if (e.target.id === 'history-modal') toggleHistory();
+    }
+
+    // Initial render for history in background
+    renderHistory();
+
     // --- UI & Theme Logic ---
     const themeIcon = document.getElementById('theme-icon');
     let currentShareUrl = ""; 
@@ -393,15 +403,10 @@
     function updateThemeIcon(isDark) {
         if (isDark) {
             themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
-            themeIcon.setAttribute('fill', 'none');
-            themeIcon.setAttribute('stroke', 'currentColor');
-            themeIcon.setAttribute('stroke-width', '2');
-            themeIcon.setAttribute('stroke-linecap', 'round');
-            themeIcon.setAttribute('stroke-linejoin', 'round');
+            themeIcon.setAttribute('fill', 'none'); themeIcon.setAttribute('stroke', 'currentColor'); themeIcon.setAttribute('stroke-width', '2');
         } else {
             themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
-            themeIcon.removeAttribute('stroke');
-            themeIcon.setAttribute('fill', 'currentColor');
+            themeIcon.removeAttribute('stroke'); themeIcon.setAttribute('fill', 'currentColor');
         }
     }
 
@@ -410,127 +415,88 @@
         const qrContainer = document.getElementById("qrcode");
         const qrWrapper = document.getElementById("qr-wrapper");
         qrContainer.innerHTML = ""; 
-        
         const isDark = document.body.classList.contains('dark-mode');
-        qrWrapper.style.backgroundColor = isDark ? '#111111' : '#ffffff';
-
-        new QRCode(qrContainer, { 
-            text: url, 
-            width: 140, 
-            height: 140,
-            colorDark : isDark ? "#ffffff" : "#000000",
-            colorLight : isDark ? "#111111" : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
+        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
+        qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
+        new QRCode(qrContainer, { text: url, width: 150, height: 150, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-        updateThemeIcon(true);
-    }
+    if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); updateThemeIcon(true); }
 
     function toggleDarkMode() {
         const isDark = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', isDark);
-        updateThemeIcon(isDark);
-        if (currentShareUrl) {
-            renderQR(currentShareUrl);
-        }
+        localStorage.setItem('darkMode', isDark); updateThemeIcon(isDark);
+        if (currentShareUrl) renderQR(currentShareUrl);
     }
 
     function copyId() {
         const idText = document.getElementById('my-id').innerText;
         navigator.clipboard.writeText(idText).then(() => {
+            showToast("Device ID copied!");
             const copyBtn = document.getElementById('copy-btn');
-            copyBtn.innerText = 'Copied!';
-            copyBtn.style.background = 'var(--accent)'; 
-            copyBtn.style.color = '#fff';
-            setTimeout(() => {
-                copyBtn.innerText = 'Copy';
-                copyBtn.style.background = 'var(--primary)'; 
-            }, 2000);
-        }).catch(err => alert("Could not copy ID. Please copy manually."));
+            copyBtn.innerText = 'Copied!'; copyBtn.style.background = 'var(--accent)'; copyBtn.style.color = '#fff';
+            setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.background = 'transparent'; copyBtn.style.color = 'var(--text-main)'; }, 2000);
+        }).catch(() => showToast("Could not copy ID.", "error"));
     }
 
     // --- Drag and Drop Logic ---
-    const dropZone = document.getElementById('share-section');
-    const fileInput = document.getElementById('file-input');
-    const dropText = document.getElementById('drop-text');
-    const dropSubtext = document.getElementById('drop-subtext');
+    const dropZone = document.getElementById('share-section'), fileInput = document.getElementById('file-input');
+    const dropText = document.getElementById('drop-text'), dropSubtext = document.getElementById('drop-subtext');
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
-    });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false));
+    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => dropZone.classList.add('dragover'), false));
+    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => dropZone.classList.remove('dragover'), false));
 
-    ['dragenter', 'dragover'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false));
-    ['dragleave', 'drop'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false));
-
-    dropZone.addEventListener('drop', (e) => {
-        const files = e.dataTransfer.files;
-        if (files.length > 0) { fileInput.files = files; updateFileText(); }
-    });
-
+    dropZone.addEventListener('drop', (e) => { if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; updateFileText(); } });
     fileInput.addEventListener('change', updateFileText);
 
     function updateFileText() {
         if (fileInput.files.length > 0) {
-            dropText.innerHTML = `<strong>Ready to send:</strong> ${fileInput.files[0].name}`;
-            dropSubtext.classList.add('hidden');
+            const file = fileInput.files[0];
+            dropText.innerHTML = `<strong style="color: var(--text-main)">${file.name}</strong>`;
+            dropSubtext.innerHTML = formatBytes(file.size); dropSubtext.classList.remove('hidden');
         } else {
-            dropText.innerHTML = `Select a file to send`;
-            dropSubtext.classList.remove('hidden');
+            dropText.innerHTML = `Select a file to send`; dropSubtext.innerHTML = `or drag and drop it here`; dropSubtext.classList.remove('hidden');
         }
     }
 
     // --- Core WebRTC Logic ---
-    const peer = new Peer({
-        config: {
-            'iceServers': [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        },
-        debug: 1 
-    });
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.error(err)));
-    }
+    const peer = new Peer({ config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }, debug: 1 });
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e => {}));
     
     let conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
+    let transferStartTime = 0;
 
-    const statusTextEl = document.getElementById('status-text');
-    const statusDotEl = document.getElementById('status-dot');
-    const connectSection = document.getElementById('connect-section');
-    const identitySection = document.getElementById('identity-section');
-    const progressBar = document.getElementById('progress-bar');
-    const sendBtn = document.getElementById('send-btn');
-    const copyBtn = document.getElementById('copy-btn');
+    const statusTextEl = document.getElementById('status-text'), statusDotEl = document.getElementById('status-dot');
+    const connectSection = document.getElementById('connect-section'), identitySection = document.getElementById('identity-section');
+    const progressBar = document.getElementById('progress-bar'), sendBtn = document.getElementById('send-btn'), copyBtn = document.getElementById('copy-btn');
+    const statsContainer = document.getElementById('transfer-stats'), speedText = document.getElementById('speed-text'), amountText = document.getElementById('amount-text');
 
-    function updateStatus(message, color = "var(--text-muted)") {
-        statusTextEl.innerText = message;
-        statusDotEl.style.backgroundColor = color;
+    function updateStatus(message, color = "var(--text-muted)", shadowColor = "transparent") {
+        statusTextEl.innerText = message; statusDotEl.style.backgroundColor = color;
+        statusDotEl.style.boxShadow = `0 0 8px ${shadowColor === "transparent" ? color : shadowColor}`;
+    }
+
+    function updateStats(loadedBytes, totalBytes) {
+        const elapsedSeconds = (Date.now() - transferStartTime) / 1000;
+        const speedBps = elapsedSeconds > 0 ? loadedBytes / elapsedSeconds : 0;
+        speedText.innerText = `${formatBytes(speedBps)}/s`;
+        amountText.innerText = `${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
     }
 
     peer.on('open', (id) => {
-        document.getElementById('my-id').innerText = id;
-        copyBtn.classList.remove('hidden'); 
-        
+        document.getElementById('my-id').innerText = id; copyBtn.classList.remove('hidden'); 
         const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
         renderQR(shareUrl); 
-
         const connectId = new URLSearchParams(window.location.search).get('connect');
-        if (connectId) {
-            document.getElementById('target-id').value = connectId;
-            setTimeout(connectToPeer, 500); 
-        }
+        if (connectId) { document.getElementById('target-id').value = connectId; setTimeout(connectToPeer, 500); }
     });
 
     peer.on('connection', (connection) => { conn = connection; setupConnection(); });
 
     function connectToPeer() {
         const targetId = document.getElementById('target-id').value.trim();
-        if (!targetId) return alert("Please enter an ID");
+        if (!targetId) return showToast("Please enter a Device ID", "error");
         updateStatus("Connecting...", "#f59e0b");
         conn = peer.connect(targetId, { reliable: true });
         setupConnection();
@@ -538,66 +504,78 @@
 
     function setupConnection() {
         conn.on('open', () => {
-            updateStatus("Connected! Ready to share.", "#10b981");
-            connectSection.classList.add('hidden');
-            identitySection.classList.add('hidden'); 
-            dropZone.classList.remove('hidden');
-            sendBtn.classList.remove('hidden');
+            updateStatus("Connected! Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+            showToast("Connected to peer!");
+            connectSection.style.opacity = '0'; identitySection.style.opacity = '0';
+            setTimeout(() => {
+                connectSection.classList.add('hidden'); identitySection.classList.add('hidden'); 
+                dropZone.classList.remove('hidden'); sendBtn.classList.remove('hidden');
+                void dropZone.offsetWidth; dropZone.classList.add('animate-enter'); sendBtn.classList.add('animate-enter');
+            }, 300);
         });
 
         conn.on('data', (data) => {
             if (data.type === 'header') {
                 receivingFile = []; receivedSize = 0; receivingFileSize = data.filesize; receivingFileName = data.filename; receivingFileType = data.filetype;
                 progressBar.classList.remove('hidden'); progressBar.value = 0;
+                statsContainer.classList.add('active'); transferStartTime = Date.now();
                 updateStatus(`Receiving: ${data.filename}...`, "var(--accent)");
             } else if (data.type === 'chunk') {
                 receivingFile.push(data.data); receivedSize += data.data.byteLength;
                 progressBar.value = (receivedSize / receivingFileSize) * 100;
+                // Update speed stats every 10 chunks to save performance
+                if (receivingFile.length % 10 === 0 || receivedSize === receivingFileSize) updateStats(receivedSize, receivingFileSize);
             } else if (data.type === 'done') {
                 const blob = new Blob(receivingFile, { type: receivingFileType });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
+                const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
-                updateStatus("File received successfully!", "#10b981");
-                setTimeout(() => progressBar.classList.add('hidden'), 2000);
+                updateStatus("File received successfully!", "#34c759", "rgba(52, 199, 89, 0.4)");
+                showToast(`Received ${receivingFileName}`, "success");
+                saveToHistory(receivingFileName, receivingFileSize, 'received');
+                setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
             }
         });
 
         conn.on('close', () => {
-            updateStatus("Connection lost. Refresh to reconnect.", "#ef4444");
-            dropZone.classList.add('hidden'); sendBtn.classList.add('hidden');
+            updateStatus("Connection lost. Refresh.", "#ff3b30", "rgba(255, 59, 48, 0.4)");
+            showToast("Connection lost", "error"); dropZone.classList.add('hidden'); sendBtn.classList.add('hidden');
         });
     }
 
     function sendFile() {
         const file = fileInput.files[0];
-        if (!file) return alert("Please select a file first.");
+        if (!file) return showToast("Please select a file first.", "error");
         if (conn && conn.open) {
             progressBar.classList.remove('hidden'); progressBar.value = 0;
+            statsContainer.classList.add('active'); transferStartTime = Date.now();
             updateStatus(`Sending ${file.name}...`, "var(--accent)");
             conn.send({ type: 'header', filename: file.name, filetype: file.type, filesize: file.size });
 
-            let offset = 0; const chunkSize = 64 * 1024; 
+            let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
             function readSlice() {
                 const slice = file.slice(offset, offset + chunkSize);
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     conn.send({ type: 'chunk', data: e.target.result });
-                    offset += slice.size; progressBar.value = (offset / file.size) * 100;
+                    offset += slice.size; chunkCount++;
+                    progressBar.value = (offset / file.size) * 100;
+                    if (chunkCount % 5 === 0 || offset >= file.size) updateStats(offset, file.size);
+
                     if (offset < file.size) {
-                        if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); 
-                        else readSlice();
+                        if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
                     } else {
                         conn.send({ type: 'done' });
-                        updateStatus("File sent successfully!", "#10b981");
-                        setTimeout(() => progressBar.classList.add('hidden'), 2000);
+                        updateStatus("File sent successfully!", "#34c759", "rgba(52, 199, 89, 0.4)");
+                        showToast("File sent successfully!");
+                        saveToHistory(file.name, file.size, 'sent');
+                        setTimeout(() => { progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); }, 2000);
                         fileInput.value = ''; updateFileText();
                     }
                 };
                 reader.readAsArrayBuffer(slice);
             }
             readSlice(); 
-        } else alert("No active connection.");
+        } else showToast("No active connection.", "error");
     }
 </script>
 

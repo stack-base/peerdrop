@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         /* Base Light Theme */
         :root { 
@@ -125,7 +126,6 @@
             background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
             transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        #connect-section input { margin-bottom: 16px; }
         input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
         
         /* Active Connection UI */
@@ -262,8 +262,7 @@
         /* ---------------------------------------------------- */
         .incoming-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg); /* Opaque takeover background */
-            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             overflow-y: auto; padding: 24px; box-sizing: border-box;
         }
@@ -285,7 +284,6 @@
 
         .incoming-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; margin: 0 0 32px 0; color: var(--text-main); line-height: 1.2;}
 
-        /* Dedicated User Box */
         .incoming-user-box { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 32px; width: 100%; }
         
         .pulsing-avatar-container { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
@@ -304,7 +302,6 @@
         #incoming-name { font-weight: 700; font-size: 1.4rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #incoming-device { font-size: 1rem; color: var(--text-muted); }
 
-        /* File List Container */
         .incoming-file-list {
             background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
             width: 100%; padding: 8px; margin-bottom: 32px; box-shadow: var(--shadow); box-sizing: border-box;
@@ -326,7 +323,6 @@
         #incoming-filename { font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
         #incoming-filesize { font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600; }
 
-        /* Actions */
         .incoming-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .btn-accept-huge {
             background: var(--primary); color: var(--primary-text); border-radius: 100px;
@@ -339,6 +335,18 @@
             padding: 20px; font-weight: 600; width: 100%; border: none; cursor: pointer; transition: background 0.2s; margin: 0;
         }
         .btn-decline-huge:hover { background: var(--input-bg); }
+
+        /* QR Scanner Camera Box */
+        #reader-video-container {
+            width: 100%; border-radius: 20px; overflow: hidden; background: #000;
+            box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px;
+            aspect-ratio: 1/1; position: relative;
+        }
+        #reader-video-container video { object-fit: cover !important; }
+        .scanner-overlay-guide {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60%; height: 60%; border: 2px dashed rgba(255,255,255,0.6); border-radius: 20px; z-index: 10; pointer-events: none;
+        }
 
         /* Custom Toast Notification */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -441,8 +449,17 @@
             </div>
 
             <div id="connect-section">
-                <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off">
-                <button id="connect-btn" onclick="connectToPeer()">Connect</button>
+                <div style="display: flex; gap: 12px; margin-bottom: 16px; width: 100%;">
+                    <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off" style="margin-bottom: 0; flex: 1;">
+                    <button id="scan-trigger-btn" class="btn-icon" onclick="startScan()" aria-label="Scan QR Code" title="Scan QR Code" style="margin: 0; width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--card-bg);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect>
+                            <rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect>
+                        </svg>
+                    </button>
+                </div>
+                <button id="connect-btn" onclick="connectToPeer()" style="margin-top: 0;">Connect</button>
             </div>
 
             <div id="active-connection" class="active-connection hidden">
@@ -487,6 +504,23 @@
             </div>
         </div>
 
+        <div id="scanner-modal" class="modal-overlay" onclick="handleModalClick(event, 'scanner-modal', stopScan)">
+            <div class="modal-content" style="max-width: 440px; border-radius: 32px; padding: 30px; margin: auto; height: auto;">
+                <div class="modal-header" style="margin-bottom: 24px;">
+                    <h3>Scan QR Code</h3>
+                    <button class="close-btn" onclick="stopScan()" aria-label="Close Scanner">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Point your camera at a friend's PeerDrop QR code to connect instantly.</p>
+                <div id="reader-video-container">
+                    <div id="reader-video" style="width: 100%; height: 100%;"></div>
+                    <div class="scanner-overlay-guide"></div>
+                </div>
+                <button onclick="stopScan()" style="background: var(--input-bg); color: var(--text-main);">Cancel</button>
+            </div>
+        </div>
+
         <div id="incoming-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
                 
@@ -517,7 +551,7 @@
                             <div id="incoming-filesize">0 MB</div>
                         </div>
                     </div>
-                    </div>
+                </div>
 
                 <div class="incoming-actions">
                     <button class="btn-accept-huge" onclick="acceptTransfer()">Accept</button>
@@ -591,6 +625,7 @@
     let isTransferring = false;
     let cancelTransfer = false; 
     let pendingFileTransfer = null; 
+    let html5QrCode = null; // Holds the scanner instance
 
     // --- Performance & Wake Lock Management ---
     let wakeLock = null;
@@ -676,6 +711,59 @@
         document.getElementById('progress-bar').value = 0;
         document.getElementById('file-input').value = '';
         updateFileText();
+    }
+
+    // --- QR Scanner Logic ---
+    function startScan() {
+        const modal = document.getElementById('scanner-modal');
+        modal.classList.add('active');
+
+        // Initialize the scanner on the empty div
+        html5QrCode = new Html5Qrcode("reader-video");
+
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        // Attempt to start the back camera
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(err => {
+            console.error("Error starting scanner:", err);
+            showToast("Could not access camera. Please allow permissions.", "error");
+            stopScan();
+        });
+    }
+
+    function stopScan() {
+        document.getElementById('scanner-modal').classList.remove('active');
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+            }).catch(err => {
+                console.error("Failed to stop scanner", err);
+            });
+        }
+    }
+
+    function onScanSuccess(decodedText) {
+        stopScan();
+        
+        let targetId = decodedText;
+        
+        // Check if the QR contains a full URL and parse the ID out
+        try {
+            const url = new URL(decodedText);
+            const urlParams = new URLSearchParams(url.search);
+            if (urlParams.has('connect')) {
+                targetId = urlParams.get('connect');
+            }
+        } catch (e) {
+            // It wasn't a valid URL, so we assume the raw text is the ID.
+        }
+
+        document.getElementById('target-id').value = targetId;
+        showToast("QR Code Scanned!");
+        
+        // Auto connect after a brief visual pause
+        setTimeout(connectToPeer, 400); 
     }
 
     // --- Profile Management ---
@@ -1079,7 +1167,6 @@
                 document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
                 document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
                 
-                // Set Device distinctly
                 document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
                 
                 document.getElementById('incoming-filename').innerText = data.filename;

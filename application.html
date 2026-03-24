@@ -32,9 +32,7 @@
         }
 
         /* Global Reset for Mobile Tap Highlights */
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { -webkit-tap-highlight-color: transparent; }
 
         body { 
             font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); 
@@ -61,8 +59,6 @@
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .guide-content { max-width: 460px; margin: 0 auto; z-index: 2; }
-        
-        /* Reduced Guide Pane Fonts */
         .guide-pane h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 16px; color: #ffffff; line-height: 1.05; }
         .guide-pane p.subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 40px; line-height: 1.5; font-weight: 400;}
 
@@ -92,14 +88,14 @@
 
         @keyframes pulseGlow { 0% { transform: scale(0.9) translate(-20px, 20px); } 100% { transform: scale(1.1) translate(20px, -20px); } }
 
-        .app-content { width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; max-height: 100vh; overflow-y: auto; padding-right: 5px;}
+        .app-content { width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; max-height: 100vh; overflow-y: auto; padding-right: 5px;}
         .app-content::-webkit-scrollbar { width: 0; display: none; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em; } /* Brand Font Size Increased */
+        .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em; }
         .header-controls { display: flex; gap: 8px; }
 
-        /* Setup / Welcome / Settings Screen Specifics */
+        /* Welcome Screen Specifics */
         .profile-avatar {
             width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
             border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
@@ -142,23 +138,18 @@
             text-align: left; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             position: relative; overflow: hidden;
         }
-        .active-connection::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #34c759;
-        }
+        .active-connection::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #34c759; }
         .peer-avatar {
             width: 46px; height: 46px; background: linear-gradient(135deg, #34c759, #30b053);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.3rem; font-weight: bold; flex-shrink: 0; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3);
-            text-transform: uppercase;
+            color: white; font-size: 1.3rem; font-weight: bold; flex-shrink: 0; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); text-transform: uppercase;
         }
         .peer-info { flex: 1; overflow: hidden; }
         .peer-status { font-size: 0.75rem; color: #34c759; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;}
         .peer-name-display { font-size: 1.05rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;}
         .peer-email-display { font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .btn-disconnect {
-            margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none;
-        }
+        .btn-disconnect { margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none; }
         .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); transform: scale(1.05); }
 
         .drop-zone { 
@@ -173,8 +164,8 @@
         
         .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
         .drop-zone.dragover .drop-icon { fill: var(--accent); }
-        #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4;}
-        #drop-subtext { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); }
+        #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4; z-index: 2;}
+        #drop-subtext { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); z-index: 2;}
 
         button { 
             background: var(--primary); color: var(--primary-text); border: none; padding: 18px 24px; width: 100%; 
@@ -195,17 +186,19 @@
         .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.95); }
 
-        .qr-wrapper { padding: 16px; border-radius: 16px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
+        /* Bigger QR Code */
+        .qr-wrapper { padding: 20px; border-radius: 20px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
 
-        /* Transfer Stats UI */
-        .transfer-stats {
-            display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);
-            margin-top: 8px; font-family: 'Courier New', Courier, monospace; font-weight: 600;
-            opacity: 0; transition: opacity 0.3s ease;
+        /* Transfer Stats UI (With Cancel Button) */
+        .transfer-active-ui {
+            width: 100%; position: relative; z-index: 10; margin-top: 16px;
         }
-        .transfer-stats.active { opacity: 1; }
-
-        progress { width: 100%; height: 8px; margin-top: 24px; border-radius: 10px; -webkit-appearance: none; appearance: none; overflow: hidden; }
+        .transfer-stats {
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);
+            margin-top: 12px; font-family: 'Courier New', Courier, monospace; font-weight: 600; text-align: left;
+        }
+        
+        progress { width: 100%; height: 8px; border-radius: 10px; -webkit-appearance: none; appearance: none; overflow: hidden; margin: 0;}
         progress::-webkit-progress-bar { background-color: var(--border); border-radius: 10px; }
         progress::-webkit-progress-value { background-color: var(--accent); border-radius: 10px; transition: width 0.1s linear; }
 
@@ -214,7 +207,7 @@
 
         .hidden { display: none !important; }
 
-        /* Full Pane Modals (History & Settings) */
+        /* Full Pane Modals */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -233,7 +226,7 @@
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
-        .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;} /* Pane Heading Size Reduced */
+        .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;}
         
         .close-btn { 
             background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); 
@@ -245,7 +238,7 @@
         .close-btn:hover { background: var(--input-bg); transform: scale(1.05); }
         .close-btn:active { transform: scale(0.95); }
 
-        /* Highly Improved History Specifics */
+        /* History Specifics */
         .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; padding-right: 5px; margin-top: 10px;}
         .history-list::-webkit-scrollbar { width: 6px; }
         .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -398,10 +391,15 @@
                 <p id="drop-subtext">or drag and drop it here</p>
                 <input type="file" id="file-input">
                 
-                <progress id="progress-bar" value="0" max="100" class="hidden"></progress>
-                <div id="transfer-stats" class="transfer-stats">
-                    <span id="speed-text">0 MB/s</span>
-                    <span id="amount-text">0 / 0 MB</span>
+                <div id="transfer-active-ui" class="transfer-active-ui hidden">
+                    <progress id="progress-bar" value="0" max="100"></progress>
+                    <div class="transfer-stats">
+                        <div>
+                            <div id="speed-text" style="color: var(--text-main); font-size: 1rem;">0 MB/s</div>
+                            <div id="amount-text" style="font-size: 0.75rem; margin-top: 2px;">0 / 0 MB</div>
+                        </div>
+                        <button class="btn-small" style="background: rgba(255, 59, 48, 0.1); color: #ff3b30; margin: 0; padding: 8px 16px; font-size: 0.9rem;" onclick="abortTransfer(event)">Cancel</button>
+                    </div>
                 </div>
             </div>
             
@@ -417,9 +415,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>Transfer History</h3>
-                    <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">
-                        <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-icon" onclick="clearHistory()" aria-label="Clear History" title="Clear History" style="color: var(--text-muted); background: transparent; box-shadow: none; border: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                        <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">
+                            <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="history-list" id="history-list">
                     </div>
@@ -464,6 +467,13 @@
 <div id="toast-container"></div>
 
 <script>
+    // --- Global State ---
+    let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
+    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
+    let peer, conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
+    let transferStartTime = 0;
+    let cancelTransfer = false; 
+
     // --- Utils: Toast & Formatters ---
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
@@ -490,17 +500,11 @@
         return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 
-    // --- Universal Modal Click Handler ---
     function handleModalClick(e, modalId, toggleFunction) {
-        if (e.target.id === modalId) {
-            toggleFunction();
-        }
+        if (e.target.id === modalId) toggleFunction();
     }
 
-    // --- Profile Management (Initial Setup & Settings) ---
-    let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
-    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
-
+    // --- Profile Management ---
     function initApp() {
         const welcomeScreen = document.getElementById('welcome-screen');
         const mainScreen = document.getElementById('main-app-screen');
@@ -539,7 +543,6 @@
         setTimeout(() => initApp(), 400);
     }
 
-    // --- Settings Logic ---
     function toggleSettings() {
         const modal = document.getElementById('settings-modal');
         if (!modal.classList.contains('active')) {
@@ -571,7 +574,7 @@
         toggleSettings();
     }
 
-    // --- History Management (localStorage) ---
+    // --- History Management ---
     function saveToHistory(filename, filesize, type, peerInfo) {
         let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
         history.unshift({ 
@@ -629,6 +632,14 @@
         modal.classList.toggle('active');
     }
 
+    function clearHistory() {
+        if(confirm("Are you sure you want to clear all your transfer history?")) {
+            localStorage.removeItem('peerdrop_history');
+            renderHistory();
+            showToast("History cleared successfully!");
+        }
+    }
+
     renderHistory();
 
     // --- Theme & QR Logic ---
@@ -653,7 +664,9 @@
         const isDark = document.body.classList.contains('dark-mode');
         qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
         qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
-        new QRCode(qrContainer, { text: url, width: 150, height: 150, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+        
+        // BIGGER QR CODE
+        new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
     if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); updateThemeIcon(true); }
@@ -696,13 +709,10 @@
     }
 
     // --- Core WebRTC Logic ---
-    let peer, conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
-    let transferStartTime = 0;
-
     const statusTextEl = document.getElementById('status-text'), statusDotEl = document.getElementById('status-dot');
     const connectSection = document.getElementById('connect-section'), identitySection = document.getElementById('identity-section');
     const progressBar = document.getElementById('progress-bar'), sendBtn = document.getElementById('send-btn'), copyBtn = document.getElementById('copy-btn');
-    const statsContainer = document.getElementById('transfer-stats'), speedText = document.getElementById('speed-text'), amountText = document.getElementById('amount-text');
+    const speedText = document.getElementById('speed-text'), amountText = document.getElementById('amount-text');
 
     function updateStatus(message, color = "var(--text-muted)", shadowColor = "transparent") {
         statusTextEl.innerText = message; statusDotEl.style.backgroundColor = color;
@@ -740,13 +750,11 @@
 
     function disconnectPeer() {
         if (conn) conn.close();
-        
-        // Hide active interface
         document.getElementById('active-connection').classList.add('hidden');
         document.getElementById('share-section').classList.add('hidden');
         document.getElementById('send-btn').classList.add('hidden');
+        resetTransferUI();
         
-        // Show connect interface
         connectSection.classList.remove('hidden');
         identitySection.classList.remove('hidden');
         connectSection.style.opacity = '1';
@@ -754,6 +762,24 @@
         
         updateStatus("Waiting for connection...", "var(--text-muted)");
         connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
+    }
+
+    function resetTransferUI() {
+        document.getElementById('transfer-active-ui').classList.add('hidden');
+        document.getElementById('progress-bar').value = 0;
+        document.getElementById('file-input').value = '';
+        updateFileText();
+    }
+
+    function abortTransfer(event) {
+        if(event) { event.preventDefault(); event.stopPropagation(); }
+        cancelTransfer = true; // Alerts the sender loop
+        if (conn && conn.open) {
+            conn.send({ type: 'abort' }); // Alerts the receiver
+        }
+        resetTransferUI();
+        showToast("Transfer cancelled", "error");
+        updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
     }
 
     function setupConnection() {
@@ -778,7 +804,6 @@
                 connectedPeerProfile = data.profile;
                 showToast(`Connected to ${connectedPeerProfile.name}`);
                 
-                // Update Badge UI
                 document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
                 document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
                 const emailEl = document.getElementById('peer-email-display');
@@ -789,25 +814,40 @@
                     emailEl.style.display = 'none';
                 }
 
+            } else if (data.type === 'abort') {
+                cancelTransfer = true; // If we were sending
+                receivingFile = []; // If we were receiving
+                receivedSize = 0;
+                resetTransferUI();
+                showToast("Transfer cancelled by peer", "error");
+                updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+
             } else if (data.type === 'header') {
+                cancelTransfer = false;
                 receivingFile = []; receivedSize = 0; receivingFileSize = data.filesize; receivingFileName = data.filename; receivingFileType = data.filetype;
-                progressBar.classList.remove('hidden'); progressBar.value = 0;
-                statsContainer.classList.add('active'); transferStartTime = Date.now();
+                
+                document.getElementById('transfer-active-ui').classList.remove('hidden');
+                progressBar.value = 0;
+                transferStartTime = Date.now();
                 updateStatus(`Receiving: ${data.filename}...`, "var(--accent)");
+
             } else if (data.type === 'chunk') {
+                if (cancelTransfer) return; // Safety check
                 receivingFile.push(data.data); receivedSize += data.data.byteLength;
                 progressBar.value = (receivedSize / receivingFileSize) * 100;
                 if (receivingFile.length % 10 === 0 || receivedSize === receivingFileSize) updateStats(receivedSize, receivingFileSize);
+
             } else if (data.type === 'done') {
                 const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
+                
                 updateStatus(`Received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast(`Received ${receivingFileName}`, "success");
-                
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
+                
                 setTimeout(() => { 
-                    progressBar.classList.add('hidden'); statsContainer.classList.remove('active'); 
+                    resetTransferUI();
                     updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
                 }, 3000);
             }
@@ -823,19 +863,31 @@
         const file = fileInput.files[0];
         if (!file) return showToast("Please select a file first.", "error");
         if (conn && conn.open) {
-            progressBar.classList.remove('hidden'); progressBar.value = 0;
-            statsContainer.classList.add('active'); transferStartTime = Date.now();
+            cancelTransfer = false;
+            document.getElementById('transfer-active-ui').classList.remove('hidden');
+            progressBar.value = 0;
+            transferStartTime = Date.now();
             updateStatus(`Sending ${file.name}...`, "var(--accent)");
+            
             conn.send({ type: 'header', filename: file.name, filetype: file.type, filesize: file.size });
 
             let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
+            
             function readSlice() {
+                if (cancelTransfer) {
+                    conn.send({ type: 'abort' });
+                    resetTransferUI();
+                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                    return; // Halt reading
+                }
+
                 const slice = file.slice(offset, offset + chunkSize);
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     conn.send({ type: 'chunk', data: e.target.result });
                     offset += slice.size; chunkCount++;
                     progressBar.value = (offset / file.size) * 100;
+                    
                     if (chunkCount % 5 === 0 || offset >= file.size) updateStats(offset, file.size);
 
                     if (offset < file.size) {
@@ -846,11 +898,11 @@
                         showToast("File sent successfully!");
                         
                         saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
+                        
                         setTimeout(() => { 
-                            progressBar.classList.add('hidden'); statsContainer.classList.remove('active');
+                            resetTransferUI();
                             updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
                         }, 3000);
-                        fileInput.value = ''; updateFileText();
                     }
                 };
                 reader.readAsArrayBuffer(slice);

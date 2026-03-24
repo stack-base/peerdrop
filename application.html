@@ -787,20 +787,38 @@
 
         html5QrCode = new Html5Qrcode("reader-video");
         
-        // Push for 30fps smooth scanning
-        const config = { fps: 30 };
+        // FIX: Removed 'qrbox' so the library doesn't draw its own ugly square.
+        // It will now just use our custom CSS overlay.
+        const config = { fps: 30 }; 
 
-        // Explicitly request higher resolution if the hardware supports it
-        const videoConstraints = {
-            facingMode: "environment",
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        };
-
-        html5QrCode.start(videoConstraints, config, onScanSuccess)
-        .catch(err => {
-            console.error("Error starting scanner:", err);
-            showToast("Could not access camera. Please allow permissions.", "error");
+        // 1. Try finding all available cameras
+        Html5Qrcode.getCameras().then(devices => {
+            if (devices && devices.length) {
+                let cameraId = devices[0].id; // Default to the first camera
+                
+                // Try to find the back/environment camera for mobile devices
+                for (let i = 0; i < devices.length; i++) {
+                    if (devices[i].label.toLowerCase().includes("back") || 
+                        devices[i].label.toLowerCase().includes("environment")) {
+                        cameraId = devices[i].id;
+                        break;
+                    }
+                }
+                
+                // 2. Start the scanner with the found camera
+                html5QrCode.start(cameraId, config, onScanSuccess)
+                .catch(err => {
+                    console.error("Error starting scanner on selected camera:", err);
+                    showToast("Camera error. Ensure no other app is using it.", "error");
+                    stopScan();
+                });
+            } else {
+                showToast("No cameras detected on this device.", "error");
+                stopScan();
+            }
+        }).catch(err => {
+            console.error("Camera permission error:", err);
+            showToast("Camera blocked. Please use localhost or HTTPS.", "error");
             stopScan();
         });
     }

@@ -361,8 +361,8 @@
         .incoming-overlay.active .incoming-content-wrapper { transform: translateY(0) scale(1); }
 
         .incoming-brand-text {
-            font-size: 1.1rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); 
-            margin-bottom: 24px; text-transform: uppercase; user-select: none;
+            font-size: 1.5rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); 
+            margin-bottom: 24px; user-select: none;
         }
 
         .incoming-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; margin: 0 0 32px 0; color: var(--text-main); line-height: 1.2;}
@@ -449,7 +449,7 @@
     <div class="guide-pane">
         <div class="guide-content">
             <h1 class="animate-enter">Share freely.</h1>
-            <p class="subtitle animate-enter delay-1">Secure, peer-to-peer file sharing directly from your browser. No servers, no limits.</p>
+            <p class="subtitle animate-enter delay-1">Peer-to-peer file sharing directly from your browser. No servers, no limits.</p>
             
             <div class="step animate-enter delay-2">
                 <div class="step-number">1</div>
@@ -481,11 +481,11 @@
             <div class="box animate-enter delay-2" style="padding: 30px;">
                 <div class="input-group">
                     <label>Full Name</label>
-                    <input type="text" id="setup-name" placeholder="e.g. Anurag Gautam" autocomplete="name">
+                    <input type="text" id="setup-name" placeholder="e.g. Anthony" autocomplete="name">
                 </div>
                 <div class="input-group">
                     <label>Device Name</label>
-                    <input type="text" id="setup-device" placeholder="e.g. Phantom S23 Ultra" autocomplete="off">
+                    <input type="text" id="setup-device" placeholder="e.g. Lightyear" autocomplete="off">
                 </div>
                 <div class="input-group">
                     <label>Email (Optional)</label>
@@ -523,7 +523,7 @@
 
             <div id="connect-section">
                 <div style="display: flex; gap: 12px; margin-bottom: 16px; width: 100%;">
-                    <input type="text" id="target-id" placeholder="Enter friend's Device ID" autocomplete="off" style="margin-bottom: 0; flex: 1;">
+                    <input type="text" id="target-id" placeholder="Enter recipient's Device ID" autocomplete="off" style="margin-bottom: 0; flex: 1;">
                     <button id="scan-trigger-btn" class="btn-icon" onclick="startScan()" aria-label="Scan QR Code" title="Scan QR Code" style="margin: 0; width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--card-bg);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -538,7 +538,7 @@
             <div id="active-connection" class="active-connection hidden">
                 <div class="peer-avatar" id="peer-avatar">?</div>
                 <div class="peer-info">
-                    <div class="peer-status">Securely Connected</div>
+                    <div class="peer-status">Connected To</div>
                     <div class="peer-name-display" id="peer-name-display">Name's Device</div>
                     <div class="peer-email-display" id="peer-email-display">email@example.com</div>
                 </div>
@@ -626,7 +626,7 @@
                 </div>
 
                 <div class="scanner-footer">
-                    <p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at a friend's PeerDrop QR code.</p>
+                    <p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at a recipient's PeerDrop QR code.</p>
                 </div>
             </div>
         </div>
@@ -692,7 +692,7 @@
         <div id="settings-modal" class="modal-overlay" onclick="handleModalClick(event, 'settings-modal', toggleSettings)">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Profile Settings</h3>
+                    <h3>Settings</h3>
                     <button class="close-btn" onclick="toggleSettings()" aria-label="Close Settings">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
@@ -704,7 +704,7 @@
                     
                     <div class="box" style="padding: 30px; margin-bottom: 0;">
                         <div class="input-group">
-                            <label>Full Name</label>
+                            <label>Name</label>
                             <input type="text" id="edit-name" placeholder="Your Name" autocomplete="name">
                         </div>
                         <div class="input-group">
@@ -1244,7 +1244,7 @@
         
         resetTransferUI();
         showToast("Transfer cancelled", "error");
-        updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
     }
 
     // Handshake Receivers
@@ -1293,7 +1293,7 @@
             if (cancelTransfer) {
                 conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' });
                 resetTransferUI();
-                updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
                 return; 
             }
 
@@ -1318,7 +1318,7 @@
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
                     setTimeout(() => { 
                         resetTransferUI();
-                        updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
+                        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
                     }, 3000);
                 }
             };
@@ -1331,7 +1331,7 @@
         conn.on('open', () => {
             conn.send({ type: 'profile_sync', profile: myProfile });
             
-            updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
             connectSection.style.opacity = '0'; identitySection.style.opacity = '0';
             setTimeout(() => {
                 connectSection.classList.add('hidden'); identitySection.classList.add('hidden'); 
@@ -1396,7 +1396,7 @@
                     if(data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
                     
                     showToast(msg, "error");
-                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
                 }
 
             } else if (data.type === 'chunk') {
@@ -1416,7 +1416,7 @@
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
                 setTimeout(() => { 
                     resetTransferUI();
-                    updateStatus("Ready to share securely.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
+                    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
                 }, 3000);
             }
         });

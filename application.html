@@ -203,7 +203,7 @@
         .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.95); }
 
-        .qr-wrapper { padding: 20px; border-radius: 20px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
+        .qr-wrapper { display: inline-block; margin-top: 10px; transition: var(--transition); background: #fff;}
 
         .transfer-active-ui { width: 100%; display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
         .transfer-file-item { 
@@ -1121,7 +1121,7 @@
         qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
         qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
         
-        new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+        new QRCode(qrContainer, { text: url, width: 240, height: 240, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
     if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); updateThemeIcon(true); }

@@ -1346,7 +1346,7 @@
 
         conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
 
-        let offset = 0; const chunkSize = 64 * 1024;
+        let offset = 0; const chunkSize = 256 * 1024; // Maximize chunk size based on SDP limits
         
         // Configure the buffer drain threshold (e.g., 1MB)
         if (conn.dataChannel) {

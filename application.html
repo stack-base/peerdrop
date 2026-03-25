@@ -871,6 +871,9 @@
     let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     let peer, conn;
     let transferStartTime = 0;
+    let lastUpdateTime = 0;
+    let lastLoadedBytes = 0;
+    let smoothedSpeedBps = 0;
     let isTransferring = false;
     let cancelTransfer = false; 
     let pendingFileTransfer = null; 
@@ -1242,19 +1245,52 @@
     }
 
     function updateStats(loadedBytes, totalBytes) {
-        const elapsedSeconds = (Date.now() - transferStartTime) / 1000;
-        const speedBps = elapsedSeconds > 0 ? loadedBytes / elapsedSeconds : 0;
+        const now = Date.now();
         
-        speedText.innerText = `${formatBytes(speedBps)}/s`;
+        // Reset the trackers when a new transfer starts
+        if (loadedBytes === 0) {
+            lastUpdateTime = now;
+            lastLoadedBytes = 0;
+            smoothedSpeedBps = 0;
+            speedText.innerText = `0 B/s`;
+            amountText.innerText = `0 B / ${formatBytes(totalBytes)}`;
+            document.getElementById('transfer-percentage').innerText = `0%`;
+            document.getElementById('custom-progress-bar').style.width = `0%`;
+            document.getElementById('eta-text').innerText = "--:--";
+            return;
+        }
+
+        const elapsedSinceLastUpdate = (now - lastUpdateTime) / 1000; 
+
+        // Update the speed math only every 250ms for visual smoothness
+        if (elapsedSinceLastUpdate >= 0.25 || loadedBytes === totalBytes) {
+            const bytesSinceLast = loadedBytes - lastLoadedBytes;
+            const currentInstantSpeed = elapsedSinceLastUpdate > 0 ? bytesSinceLast / elapsedSinceLastUpdate : 0;
+            
+            // Exponential Moving Average: Blend 30% of the new speed with 70% of the old speed
+            if (smoothedSpeedBps === 0) {
+                smoothedSpeedBps = currentInstantSpeed;
+            } else {
+                smoothedSpeedBps = (currentInstantSpeed * 0.3) + (smoothedSpeedBps * 0.7);
+            }
+            
+            speedText.innerText = `${formatBytes(smoothedSpeedBps)}/s`;
+            
+            // ETA is now based on current smoothed speed, not the overall average
+            const remainingBytes = totalBytes - loadedBytes;
+            const etaSeconds = smoothedSpeedBps > 0 ? remainingBytes / smoothedSpeedBps : 0;
+            document.getElementById('eta-text').innerText = formatTime(etaSeconds);
+
+            // Save state for the next tick
+            lastUpdateTime = now;
+            lastLoadedBytes = loadedBytes;
+        }
+
+        // Always update the progress bar and raw byte count immediately
         amountText.innerText = `${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
-        
         const percent = totalBytes > 0 ? Math.min(100, Math.floor((loadedBytes / totalBytes) * 100)) : 0;
         document.getElementById('transfer-percentage').innerText = `${percent}%`;
         document.getElementById('custom-progress-bar').style.width = `${percent}%`;
-
-        const remainingBytes = totalBytes - loadedBytes;
-        const etaSeconds = speedBps > 0 ? remainingBytes / speedBps : 0;
-        document.getElementById('eta-text').innerText = formatTime(etaSeconds);
     }
 
     function initPeerJS() {

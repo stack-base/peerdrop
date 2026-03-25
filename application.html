@@ -934,6 +934,19 @@
             animatedEls.forEach((el, index) => el.classList.add('animate-enter', `delay-${index+1}`));
             requestWakeLock();
             initPeerJS();
+
+            // --- ADD THIS SHORTCUT LISTENER BLOCK ---
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'scan') {
+                // Wait 600ms for the UI animations to finish, then launch scanner
+                setTimeout(() => {
+                    startScan();
+                    // Clean the URL so refreshing doesn't re-trigger the scanner
+                    window.history.replaceState(null, '', window.location.pathname);
+                }, 600); 
+            }
+            // ----------------------------------------
+
         } else {
             document.getElementById('setup-name').addEventListener('input', (e) => {
                 document.getElementById('avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';

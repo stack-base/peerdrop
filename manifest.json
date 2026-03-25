@@ -24,9 +24,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Receive File",
-      "short_name": "Receive",
-      "description": "Open scanner to receive files",
+      "name": "Share Files",
+      "short_name": "Share",
+      "description": "Open scanner to share files",
       "url": "./application.html?action=scan",
       "icons": [
         {

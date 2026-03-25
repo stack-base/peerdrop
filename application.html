@@ -22,7 +22,7 @@
         :root { 
             --bg: #f5f5f7; --card-bg: #ffffff; --text-main: #1d1d1f; --text-muted: #86868b;
             --primary: #1d1d1f; --primary-hover: #434344; --primary-text: #ffffff;
-            --border: #e5e5ea; --input-bg: #f5f5f7; --accent: #0a84ff; 
+            --border: #e5e5ea; --input-bg: #f5f5f7; --accent: #007AFF; 
             --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
             --radius-lg: 24px; --radius-md: 14px;
             --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -30,9 +30,9 @@
         }
 
         body.dark-mode {
-            --bg: #000000; --card-bg: #0a0a0a; --text-main: #f5f5f7; --text-muted: #86868b;
+            --bg: #000000; --card-bg: #1c1c1e; --text-main: #f5f5f7; --text-muted: #86868b;
             --primary: #ffffff; --primary-hover: #e5e5ea; --primary-text: #000000;
-            --border: #2c2c2e; --input-bg: #1c1c1e; --accent: #0a84ff;
+            --border: #2c2c2e; --input-bg: #2c2c2e; --accent: #0a84ff;
             --shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
             --glow-opacity: 0.25;
         }
@@ -40,7 +40,7 @@
         * { -webkit-tap-highlight-color: transparent; }
 
         html, body { 
-            height: 100dvh; /* Updated for proper mobile height */
+            height: 100dvh;
             overflow: hidden; 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg); color: var(--text-main); 
@@ -106,7 +106,6 @@
         .app-content { 
             width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; 
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; 
-            /* Updated with safe-area env variables */
             padding: calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)) 20px; 
             min-height: 100vh;
         }
@@ -165,8 +164,8 @@
         .peer-name-display { font-size: 1.05rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;}
         .peer-email-display { font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .btn-disconnect { margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none; }
-        .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); transform: scale(1.05); }
+        .btn-disconnect { margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
+        .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); transform: scale(1.05); cursor: pointer;}
 
         .drop-zone { 
             border: 2px dashed var(--border); padding: 40px 20px; border-radius: var(--radius-md); transition: var(--transition); 
@@ -210,28 +209,144 @@
 
         .qr-wrapper { display: inline-block; margin-top: 10px; transition: var(--transition); background: #fff;}
 
-        .transfer-active-ui { width: 100%; display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
-        .transfer-file-item { 
-            display: flex; align-items: center; gap: 14px; padding: 16px; 
-            border-radius: 16px; background: var(--card-bg); text-align: left; 
-            border: 1px solid var(--border); box-shadow: var(--shadow);
+        /* --- Apple Premium Transfer UI --- */
+
+        .transfer-active-ui {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 32px 20px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-sizing: border-box;
+            margin-bottom: 20px;
         }
-        .transfer-progress-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-        .transfer-progress-header { display: flex; justify-content: space-between; align-items: flex-end; }
-        .transfer-percentage { font-size: 3rem; font-weight: 800; letter-spacing: -0.04em; color: var(--text-main); line-height: 1; }
-        .transfer-progress-track { width: 100%; height: 14px; background: var(--border); border-radius: 20px; overflow: hidden; position: relative; }
-        .transfer-progress-fill { 
-            height: 100%; background: linear-gradient(90deg, var(--accent), #bf5af2); 
-            border-radius: 20px; width: 0%; transition: width 0.15s linear;
-            box-shadow: 0 0 15px rgba(10, 132, 255, 0.4);
+
+        body.dark-mode .transfer-active-ui {
+            background: #1c1c1e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .stat-box { 
-            background: var(--input-bg); border: 1px solid var(--border); padding: 14px 12px; 
-            border-radius: 16px; text-align: left; display: flex; flex-direction: column; gap: 6px; 
+
+        .apple-file-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, #f2f2f7 0%, #e5e5ea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007AFF;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
         }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-value { font-size: 0.95rem; font-weight: 700; color: var(--text-main); font-family: 'Courier New', Courier, monospace; letter-spacing: -0.5px;}
+
+        body.dark-mode .apple-file-icon {
+            background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .transfer-file-details {
+            text-align: center;
+            margin-bottom: 28px;
+            width: 100%;
+        }
+
+        .transfer-file-details h4 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .transfer-file-details p {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .transfer-progress-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transfer-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .transfer-percentage {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .btn-cancel-apple {
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            background: rgba(120, 120, 128, 0.16);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s, background 0.2s;
+            margin: 0;
+        }
+
+        .btn-cancel-apple svg {
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+        }
+
+        .btn-cancel-apple:hover {
+            background: rgba(120, 120, 128, 0.24);
+            transform: scale(1.05);
+        }
+
+        .transfer-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(120, 120, 128, 0.16);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .transfer-progress-fill {
+            height: 100%;
+            background: #007AFF;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .apple-stats-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: center;
+            margin-top: 6px;
+            font-variant-numeric: tabular-nums; 
+        }
 
         #status { font-size: 0.95rem; margin-top: 20px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .status-dot { width: 10px; height: 10px; background: var(--text-muted); border-radius: 50%; transition: background-color 0.3s ease; box-shadow: 0 0 8px currentColor;}
@@ -252,7 +367,6 @@
         
         .modal-content {
             background: var(--bg); width: 100%; height: 100%; border-radius: 0;
-            /* Updated with safe-area env variables */
             padding: calc(40px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
             border: none; box-shadow: none; margin: 0;
             transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -391,6 +505,7 @@
         .incoming-avatar {
             width: 100%; height: 100%; font-size: 2.4rem; position: relative; z-index: 2; margin: 0;
             background: linear-gradient(135deg, var(--accent), #5e5ce6); box-shadow: 0 10px 30px rgba(10, 132, 255, 0.25);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-transform: uppercase;
         }
         .pulse-ring {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -435,7 +550,6 @@
         }
         .btn-decline-huge:hover { background: var(--input-bg); }
 
-        /* Updated with safe-area env variable */
         #toast-container { position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast {
             background: rgba(30, 30, 30, 0.95); color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 500;
@@ -456,24 +570,19 @@
             #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
             .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
 
-            /* --- ADD THESE NEW RULES BELOW --- */
-
-            /* 1. Re-enable native scrolling on the body */
             html, body {
                 height: auto !important;
                 min-height: 100dvh;
                 overflow: visible !important;
-                overscroll-behavior-y: auto; /* Re-allows native pull-to-refresh if desired, or keep 'none' */
+                overscroll-behavior-y: auto; 
             }
 
-            /* 2. Un-constrain the wrapper */
             .layout-wrapper {
                 height: auto;
                 min-height: 100dvh;
                 overflow: visible;
             }
 
-            /* 3. Disable internal scrolling on the app-pane so it pushes the body */
             .app-pane {
                 height: auto;
                 min-height: 100dvh;
@@ -598,45 +707,38 @@
                 </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
-                    <div class="transfer-file-item">
-                        <div class="file-preview-icon" style="width: 42px; height: 42px; border-radius: 12px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        </div>
-                        <div class="file-details">
-                            <div id="active-filename" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">file.txt</div>
-                            <div id="active-filesize" style="font-size: 0.8rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600;">0 MB</div>
-                        </div>
+                    <div class="apple-file-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    
+                    <div class="transfer-file-details">
+                        <h4 id="active-filename">file.txt</h4>
+                        <p id="active-filesize">0 MB</p>
                     </div>
 
-                    <div class="transfer-progress-container">
+                    <div class="transfer-progress-wrapper">
                         <div class="transfer-progress-header">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
                             
-                            <button class="btn-disconnect" style="display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;" onclick="abortTransfer(event)" title="Cancel Transfer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; pointer-events: none;">
+                            <button class="btn-cancel-apple" onclick="abortTransfer(event)" title="Cancel Transfer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
                                 </svg>
                             </button>
-
                         </div>
+                        
                         <div class="transfer-progress-track">
                             <div class="transfer-progress-fill" id="custom-progress-bar"></div>
                         </div>
-                    </div>
 
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <span class="stat-label">Speed</span>
-                            <span class="stat-value" id="speed-text">0 MB/s</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Time Left</span>
-                            <span class="stat-value" id="eta-text">--:--</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Sent</span>
-                            <span class="stat-value" id="amount-text">0/0 MB</span>
+                        <div class="apple-stats-text">
+                            <span id="amount-text">0/0 MB</span> &nbsp;&bull;&nbsp; 
+                            <span id="speed-text">0 MB/s</span> &nbsp;&bull;&nbsp; 
+                            <span id="eta-text">--:--</span> left
                         </div>
                     </div>
                 </div>
@@ -935,17 +1037,13 @@
             requestWakeLock();
             initPeerJS();
 
-            // --- ADD THIS SHORTCUT LISTENER BLOCK ---
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('action') === 'scan') {
-                // Wait 600ms for the UI animations to finish, then launch scanner
                 setTimeout(() => {
                     startScan();
-                    // Clean the URL so refreshing doesn't re-trigger the scanner
                     window.history.replaceState(null, '', window.location.pathname);
                 }, 600); 
             }
-            // ----------------------------------------
 
         } else {
             document.getElementById('setup-name').addEventListener('input', (e) => {
@@ -1068,7 +1166,6 @@
         new QRCode(qrContainer, { text: url, width: 240, height: 240, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
-    // UPDATED: Sync meta tag on initial load
     if (localStorage.getItem('darkMode') === 'true') { 
         document.body.classList.add('dark-mode'); 
         updateThemeIcon(true); 
@@ -1080,7 +1177,6 @@
         const isDark = document.body.classList.toggle('dark-mode');
         try { localStorage.setItem('darkMode', isDark); } catch (e) {}
         updateThemeIcon(isDark); if (currentShareUrl) renderQR(currentShareUrl);
-        // UPDATED: Sync meta tag during toggle
         document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#f5f5f7');
     }
 

@@ -889,6 +889,11 @@
     let batchSentSize = 0;
     let batchReceivedSize = 0;
 
+    // The new ACK Flow Control Variables
+    let unackedChunks = 0;
+    const MAX_IN_FLIGHT = 32; // Allow max 8MB in the network pipe at once
+    let resumeReading = null; // Global reference to wake up the file reader
+
     let receivingFile = []; 
     let fileHandle = null;
     let fileWritable = null;
@@ -1387,43 +1392,35 @@
 
         conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
 
-        let offset = 0; const chunkSize = 256 * 1024; // Maximize chunk size based on SDP limits
+        let offset = 0; 
+        const chunkSize = 256 * 1024;
         
-        // Configure the buffer drain threshold (e.g., 1MB)
-        if (conn.dataChannel) {
-            conn.dataChannel.bufferedAmountLowThreshold = 8 * 1024 * 1024;
-        }
-
-        function readSlice() {
-            if (cancelTransfer) {
-                conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' });
-                resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); return; 
-            }
-
+        unackedChunks = 0; // Reset traffic counter for the new file
+        let isReading = false; // Prevent multiple FileReader instances from overlapping
+        
+        resumeReading = () => {
+            // Stop if cancelled, already reading, file is done, or the network pipe is full
+            if (cancelTransfer || isReading || offset >= file.size || unackedChunks >= MAX_IN_FLIGHT) return;
+            
+            isReading = true;
             const slice = file.slice(offset, offset + chunkSize);
             const reader = new FileReader();
             
             reader.onload = (e) => {
+                isReading = false; // Unlock reader
                 if (cancelTransfer) return; 
 
                 conn.send({ type: 'chunk', data: e.target.result });
                 offset += slice.size; 
                 batchSentSize += slice.size;
+                unackedChunks++; // Mark a chunk as "in flight"
                 
                 if (offset % (chunkSize * 5) === 0 || offset >= file.size) {
                     updateStats(batchSentSize, batchTotalSize);
                 }
 
                 if (offset < file.size) {
-                    // Backpressure logic: Pause if we've buffered more than 16MB
-                    if (conn.dataChannel && conn.dataChannel.bufferedAmount > 16 * 1024 * 1024) {
-                        conn.dataChannel.onbufferedamountlow = () => {
-                            conn.dataChannel.onbufferedamountlow = null; // Clear the listener
-                            readSlice();
-                        };
-                    } else {
-                        readSlice(); // Buffer is healthy, keep blasting data immediately
-                    }
+                    resumeReading(); // Loop: Instantly check if we have permission to send the next chunk
                 } else {
                     conn.send({ type: 'file_done' });
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
@@ -1432,8 +1429,9 @@
                 }
             };
             reader.readAsArrayBuffer(slice);
-        }
-        readSlice(); 
+        };
+        
+        resumeReading(); // Kick off the process
     }
 
     function setupConnection() {
@@ -1537,11 +1535,14 @@
                 batchReceivedSize += data.data.byteLength;
 
                 if (fileWritable) {
-                    // Chain the write promises to guarantee correct file assembly order
-                    writeQueue = writeQueue.then(() => fileWritable.write(data.data));
+                    // Chain the write, THEN send the ACK back to the sender
+                    writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(() => {
+                        conn.send({ type: 'ack' });
+                    });
                 } else {
                     // Fallback RAM method
                     receivingFile.push(data.data); 
+                    conn.send({ type: 'ack' });
                 }
 
                 // Update UI slightly less often to save CPU cycles
@@ -1594,6 +1595,11 @@
                 updateStatus(`Received ${receiveQueue.length} files from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
                 showToast("All files received", "success");
                 setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
+            
+            // --- ADD THIS NEW BLOCK ---
+            } else if (data.type === 'ack') {
+                unackedChunks--; // A chunk arrived safely! Free up a slot.
+                if (resumeReading) resumeReading(); // Wake up the file reader
             }
         });
 

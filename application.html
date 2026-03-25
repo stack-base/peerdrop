@@ -1348,6 +1348,11 @@
 
         let offset = 0; const chunkSize = 64 * 1024;
         
+        // Configure the buffer drain threshold (e.g., 1MB)
+        if (conn.dataChannel) {
+            conn.dataChannel.bufferedAmountLowThreshold = 1024 * 1024;
+        }
+
         function readSlice() {
             if (cancelTransfer) {
                 conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' });
@@ -1369,7 +1374,15 @@
                 }
 
                 if (offset < file.size) {
-                    if (conn.dataChannel.bufferedAmount > 1024 * 1024 * 2) setTimeout(readSlice, 50); else readSlice();
+                    // Backpressure logic: Wait exactly until the buffer has room, then instantly resume
+                    if (conn.dataChannel && conn.dataChannel.bufferedAmount > 1024 * 1024 * 2) {
+                        conn.dataChannel.onbufferedamountlow = () => {
+                            conn.dataChannel.onbufferedamountlow = null; // Clear the listener
+                            readSlice();
+                        };
+                    } else {
+                        readSlice(); // Buffer is healthy, keep blasting data immediately
+                    }
                 } else {
                     conn.send({ type: 'file_done' });
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);

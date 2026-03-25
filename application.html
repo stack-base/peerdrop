@@ -1386,7 +1386,7 @@
         
         // Configure the buffer drain threshold (e.g., 1MB)
         if (conn.dataChannel) {
-            conn.dataChannel.bufferedAmountLowThreshold = 1024 * 1024;
+            conn.dataChannel.bufferedAmountLowThreshold = 8 * 1024 * 1024;
         }
 
         function readSlice() {
@@ -1410,8 +1410,8 @@
                 }
 
                 if (offset < file.size) {
-                    // Backpressure logic: Wait exactly until the buffer has room, then instantly resume
-                    if (conn.dataChannel && conn.dataChannel.bufferedAmount > 1024 * 1024 * 2) {
+                    // Backpressure logic: Pause if we've buffered more than 16MB
+                    if (conn.dataChannel && conn.dataChannel.bufferedAmount > 16 * 1024 * 1024) {
                         conn.dataChannel.onbufferedamountlow = () => {
                             conn.dataChannel.onbufferedamountlow = null; // Clear the listener
                             readSlice();

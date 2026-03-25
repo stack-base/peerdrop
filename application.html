@@ -33,11 +33,14 @@
 
         * { -webkit-tap-highlight-color: transparent; }
 
-        body { 
-            font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); 
+        /* --- SCROLL ARCHITECTURE UPDATES --- */
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); color: var(--text-main); 
             margin: 0; padding: 0; transition: background-color 0.5s ease, color 0.5s ease;
-            -webkit-font-smoothing: antialiased; overflow-x: hidden;
-            overscroll-behavior-y: none;
+            -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
         }
 
         /* Custom Dynamic Scrollbars */
@@ -57,7 +60,7 @@
         .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } 
         .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
 
-        .layout-wrapper { display: flex; min-height: 100dvh; width: 100%; overflow-x: hidden; }
+        .layout-wrapper { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
 
         .guide-pane {
             flex: 1.2; background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f);
@@ -80,21 +83,28 @@
         .step-text h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 600; }
         .step-text p { margin: 0; opacity: 0.85; font-size: 0.95rem; line-height: 1.4; }
 
+        /* --- SCROLL ARCHITECTURE UPDATES --- */
         .app-pane { 
-            flex: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; 
-            padding: 40px 20px; position: relative; transition: var(--transition); box-sizing: border-box;
-            min-height: 100dvh; overflow-x: hidden;
+            flex: 1; background: var(--bg); display: flex; align-items: center; flex-direction: column;
+            padding: 0; position: relative; transition: var(--transition); box-sizing: border-box;
+            height: 100dvh; overflow-y: auto; overflow-x: hidden;
         }
+        .app-pane::before, .app-pane::after { content: ''; flex: auto; }
 
         .ambient-glow {
-            position: absolute; width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
+            position: fixed; top: 50%; left: 70%; transform: translate(-50%, -50%);
+            width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
             background: radial-gradient(circle, rgba(10,132,255,var(--glow-opacity)) 0%, rgba(94,92,230,var(--glow-opacity)) 30%, rgba(191,90,242,0) 70%);
             filter: blur(60px); border-radius: 50%; z-index: 0; pointer-events: none;
             animation: pulseGlow 8s ease-in-out infinite alternate; transition: opacity 0.5s ease;
         }
-        @keyframes pulseGlow { 0% { transform: scale(0.9) translate(-20px, 20px); } 100% { transform: scale(1.1) translate(20px, -20px); } }
+        @keyframes pulseGlow { 0% { transform: translate(-50%, -50%) scale(0.9) translate(-20px, 20px); } 100% { transform: translate(-50%, -50%) scale(1.1) translate(20px, -20px); } }
 
-        .app-content { width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; }
+        /* --- SCROLL ARCHITECTURE UPDATES --- */
+        .app-content { 
+            width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; 
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; padding: 40px 20px;
+        }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em; }
@@ -188,37 +198,28 @@
         .btn-icon svg { 
             width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; 
             stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; 
-            pointer-events: none; /* Prevents SVG from swallowing mobile taps */
+            pointer-events: none;
         }
         .btn-icon:hover { background: var(--input-bg); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.95); }
 
         .qr-wrapper { padding: 20px; border-radius: 20px; display: inline-block; margin-top: 10px; transition: var(--transition); border: 1px solid var(--border); background: #fff;}
 
-        .transfer-active-ui { 
-            width: 100%; display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;
-        }
-        
+        .transfer-active-ui { width: 100%; display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
         .transfer-file-item { 
             display: flex; align-items: center; gap: 14px; padding: 16px; 
             border-radius: 16px; background: var(--card-bg); text-align: left; 
             border: 1px solid var(--border); box-shadow: var(--shadow);
         }
-        
         .transfer-progress-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .transfer-progress-header { display: flex; justify-content: space-between; align-items: flex-end; }
         .transfer-percentage { font-size: 3rem; font-weight: 800; letter-spacing: -0.04em; color: var(--text-main); line-height: 1; }
-        
-        .transfer-progress-track { 
-            width: 100%; height: 14px; background: var(--border); 
-            border-radius: 20px; overflow: hidden; position: relative;
-        }
+        .transfer-progress-track { width: 100%; height: 14px; background: var(--border); border-radius: 20px; overflow: hidden; position: relative; }
         .transfer-progress-fill { 
             height: 100%; background: linear-gradient(90deg, var(--accent), #bf5af2); 
             border-radius: 20px; width: 0%; transition: width 0.15s linear;
             box-shadow: 0 0 15px rgba(10, 132, 255, 0.4);
         }
-
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         .stat-box { 
             background: var(--input-bg); border: 1px solid var(--border); padding: 14px 12px; 
@@ -234,22 +235,22 @@
 
         /* MODAL AND OVERLAY UPDATES */
         .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             z-index: 1000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            opacity: 0; pointer-events: none; visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
         }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-overlay.active { 
+            opacity: 1; pointer-events: auto; visibility: visible; 
+            transition: opacity 0.4s ease, visibility 0s linear 0s;
+        }
         
         .modal-content {
             background: var(--bg); width: 100%; height: 100%; border-radius: 0;
             padding: 40px; border: none; box-shadow: none; margin: 0;
             transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; box-sizing: border-box; overflow-y: auto;
+            display: flex; flex-direction: column; box-sizing: border-box; overflow-y: hidden;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
@@ -288,7 +289,10 @@
         .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-family: 'Courier New', Courier, monospace; font-weight: 600;}
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
-        .settings-container { display: flex; flex-direction: column; align-items: center; max-width: 420px; margin: 0 auto; width: 100%;}
+        .settings-container { 
+            display: flex; flex-direction: column; align-items: center; max-width: 420px; 
+            margin: 0 auto; width: 100%; overflow-y: auto; flex: 1; padding-right: 5px;
+        }
 
         #scanner-modal .modal-content {
             padding: 0; overflow: hidden; display: flex; flex-direction: column;
@@ -349,15 +353,16 @@
         }
 
         .incoming-overlay {
-            position: absolute;
-            top: 0; left: 0; 
-            width: 100%; 
-            height: 100%; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0; pointer-events: none; visibility: hidden;
+            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.5s;
             overflow-y: auto; padding: 24px; box-sizing: border-box;
         }
-        .incoming-overlay.active { opacity: 1; pointer-events: auto; }
+        .incoming-overlay.active { 
+            opacity: 1; pointer-events: auto; visibility: visible; 
+            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0s;
+        }
         
         .incoming-content-wrapper {
             max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center;
@@ -436,29 +441,22 @@
         .toast.success .toast-icon { color: #34c759; fill: none; }
         .toast.error .toast-icon { color: #ff3b30; fill: none; }
 
+        /* --- SCROLL ARCHITECTURE UPDATES FOR MOBILE --- */
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column; }
             .guide-pane { display: none; }
-            .app-pane { 
-                align-items: flex-start; 
-                padding-top: max(6vh, 40px);
-                padding-bottom: 40px;
-            }
+            
+            .app-content { padding-top: max(6vh, 40px); padding-bottom: 40px; }
+            
             .ambient-glow { 
-                width: 150vw; 
-                height: 150vw; 
-                top: -30vw; 
-                left: -25vw; 
+                width: 150vw; height: 150vw; 
+                top: 50%; left: 50%; 
             }
             .modal-content { padding: 30px 20px; }
             
             #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
             
-            .modal-overlay, .incoming-overlay {
-                position: fixed;
-                width: 100vw;
-                height: 100dvh;
-            }
+            .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
         }
     </style>
 </head>

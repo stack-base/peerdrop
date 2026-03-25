@@ -450,13 +450,35 @@
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column; }
             .guide-pane { display: none; }
-            /* Updated with safe-area env variables */
             .app-content { padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
             .ambient-glow { width: 150vw; height: 150vw; top: 50%; left: 50%; }
-            /* Updated with safe-area env variables */
             .modal-content { padding: calc(30px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom)) 20px; }
             #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
             .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
+
+            /* --- ADD THESE NEW RULES BELOW --- */
+
+            /* 1. Re-enable native scrolling on the body */
+            html, body {
+                height: auto !important;
+                min-height: 100dvh;
+                overflow: visible !important;
+                overscroll-behavior-y: auto; /* Re-allows native pull-to-refresh if desired, or keep 'none' */
+            }
+
+            /* 2. Un-constrain the wrapper */
+            .layout-wrapper {
+                height: auto;
+                min-height: 100dvh;
+                overflow: visible;
+            }
+
+            /* 3. Disable internal scrolling on the app-pane so it pushes the body */
+            .app-pane {
+                height: auto;
+                min-height: 100dvh;
+                overflow-y: visible;
+            }
         }
     </style>
 </head>

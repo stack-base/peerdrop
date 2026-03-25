@@ -4,18 +4,53 @@
   "description": "Fast, P2P file sharing from StackBase",
   "start_url": "./application.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "categories": ["utilities", "productivity"],
   "icons": [
     {
       "src": "https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Receive File",
+      "short_name": "Receive",
+      "description": "Open scanner to receive files",
+      "url": "./application.html?action=scan",
+      "icons": [
+        {
+          "src": "https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://stack-base.github.io/media/brand/peerdrop/screenshot-mobile-1.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Connect and share files instantly"
+    },
+    {
+      "src": "https://stack-base.github.io/media/brand/peerdrop/screenshot-desktop-1.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Works on desktop too"
     }
   ]
 }

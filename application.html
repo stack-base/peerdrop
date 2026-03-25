@@ -1050,7 +1050,6 @@
     
     fileInput.addEventListener('change', updateFileText);
 
-    // DYNAMIC FILE TEXT HANDLER
     function updateFileText() {
         if (fileInput.files.length === 1) {
             triggerHaptic('light');
@@ -1166,7 +1165,6 @@
     function sendNextFile() {
         if (cancelTransfer) return;
         
-        // Check if batch is entirely complete
         if (currentSendIndex >= sendQueue.length) {
             conn.send({ type: 'batch_done' });
             triggerHaptic('success');
@@ -1180,7 +1178,8 @@
         document.getElementById('active-filename').innerText = `(${currentSendIndex + 1}/${sendQueue.length}) ${file.name}`;
         document.getElementById('active-filesize').innerText = formatBytes(file.size);
 
-        conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, type: file.type, size: file.size });
+        // FIX 1: Send 'filetype' instead of 'type' to prevent message overwriting
+        conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
 
         let offset = 0; const chunkSize = 64 * 1024;
         
@@ -1210,7 +1209,7 @@
                     conn.send({ type: 'file_done' });
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
                     currentSendIndex++;
-                    sendNextFile(); // Recursive loop for next file
+                    sendNextFile();
                 }
             };
             reader.readAsArrayBuffer(slice);
@@ -1287,7 +1286,10 @@
                 receivingFile = [];
                 receivingFileSize = data.size;
                 receivingFileName = data.name;
-                receivingFileType = data.filetype;
+                
+                // FIX 2: Correctly pull 'data.filetype' from the header
+                receivingFileType = data.filetype; 
+                
                 currentReceiveIndex = data.index;
 
                 document.getElementById('active-filename').innerText = `(${currentReceiveIndex + 1}/${receiveQueue.length}) ${data.name}`;
@@ -1304,10 +1306,28 @@
 
             } else if (data.type === 'file_done') {
                 if (cancelTransfer) return;
-                const blob = new Blob(receivingFile, { type: receivingFileType });
+                
+                // Force an octet-stream default to prevent browser from guessing it's text
+                const safeType = receivingFileType || 'application/octet-stream';
+                const blob = new Blob(receivingFile, { type: safeType });
                 const url = URL.createObjectURL(blob); 
-                const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
-                URL.revokeObjectURL(url);
+                
+                // FIX 3: Robust download creation for mobile browsers
+                const a = document.createElement('a'); 
+                a.style.display = 'none'; // Keep it hidden
+                a.href = url; 
+                a.download = receivingFileName; 
+                
+                // Append it to the body (required by Firefox and some mobile engines to register clicks properly)
+                document.body.appendChild(a);
+                a.click();
+                
+                // FIX 4: The Android Download Manager delay
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 2000); 
+                
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
 
             } else if (data.type === 'batch_done') {

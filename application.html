@@ -1334,12 +1334,32 @@
         connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     }
 
-    function abortTransfer(event) {
+    async function abortTransfer(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
         if (!isTransferring) return;
-        triggerHaptic('error'); cancelTransfer = true; 
-        if (conn && conn.open) conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
-        resetTransferUI(); showToast("Transfer cancelled", "error"); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+        
+        triggerHaptic('error'); 
+        cancelTransfer = true; 
+        
+        // CRITICAL: If we are the receiver, safely abort the disk write and delete the incomplete file
+        if (fileWritable) {
+            try { 
+                await fileWritable.abort(); // .abort() closes the stream AND deletes the temporary file
+            } catch(e) {
+                console.warn("Failed to abort OPFS write:", e);
+            }
+            fileWritable = null;
+            fileHandle = null;
+        }
+        receivingFile = []; // Clear RAM fallback just in case
+
+        if (conn && conn.open) {
+            conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
+        }
+        
+        resetTransferUI(); 
+        showToast("Transfer cancelled", "error"); 
+        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
     }
 
     function acceptTransfer() {
@@ -1447,6 +1467,31 @@
                 document.getElementById('active-connection').classList.add('animate-enter');
                 dropZone.classList.add('animate-enter'); sendBtn.classList.add('animate-enter');
             }, 300);
+        });
+
+        // Listen directly to the raw WebRTC connection state for instant drop detection
+        conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
+            const state = conn.peerConnection.iceConnectionState;
+            
+            if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+                console.log("WebRTC Connection Lost:", state);
+                
+                if (isTransferring) {
+                    cancelTransfer = true;
+                    // Clean up the disk if a file was mid-download
+                    if (fileWritable) {
+                        try { await fileWritable.abort(); } catch(e) {}
+                        fileWritable = null;
+                        fileHandle = null;
+                    }
+                    receivingFile = [];
+                    showToast("Transfer failed: Wi-Fi dropped", "error");
+                } else {
+                    showToast("Connection lost", "error");
+                }
+                
+                disconnectPeer(); // Reset the UI to the QR scanner screen
+            }
         });
 
         conn.on('data', async (data) => {
@@ -1603,9 +1648,20 @@
             }
         });
 
-        conn.on('close', () => { 
+        conn.on('close', async () => { 
             if (pulseInterval) clearInterval(pulseInterval);
-            showToast("Connection ended", "error"); 
+            
+            // Failsafe cleanup
+            if (isTransferring && !cancelTransfer) {
+                cancelTransfer = true;
+                if (fileWritable) {
+                    try { await fileWritable.abort(); } catch(e) {}
+                    fileWritable = null;
+                    fileHandle = null;
+                }
+                showToast("Connection ended abruptly", "error"); 
+            }
+            
             disconnectPeer(); 
         });
     }

@@ -889,7 +889,12 @@
     let batchSentSize = 0;
     let batchReceivedSize = 0;
 
-    let receivingFile = [];
+    let receivingFile = []; 
+    let fileHandle = null;
+    let fileWritable = null;
+    // We use a queue to ensure chunks write to disk in the exact order they arrive
+    let writeQueue = Promise.resolve();
+
     let receivingFileSize = 0;
     let receivingFileName = '';
     let receivingFileType = '';
@@ -1446,7 +1451,7 @@
             }, 300);
         });
 
-        conn.on('data', (data) => {
+        conn.on('data', async (data) => {
             if (data.type === 'profile_sync') {
                 triggerHaptic('success'); connectedPeerProfile = data.profile; showToast(`Connected to ${connectedPeerProfile.name}`);
                 document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
@@ -1503,12 +1508,24 @@
                 }
 
             } else if (data.type === 'file_header') {
-                receivingFile = [];
                 receivingFileSize = data.size;
                 receivingFileName = data.name;
                 receivingFileType = data.filetype; 
-                
                 currentReceiveIndex = data.index;
+
+                // Try to use the modern Disk-direct OPFS API
+                try {
+                    const root = await navigator.storage.getDirectory();
+                    // Delete old file if it exists to avoid appending to previous failed transfers
+                    try { await root.removeEntry(data.name); } catch(e){} 
+                    
+                    fileHandle = await root.getFileHandle(data.name, { create: true });
+                    fileWritable = await fileHandle.createWritable();
+                } catch (e) {
+                    console.warn("OPFS Disk Write not supported. Falling back to RAM.", e);
+                    fileWritable = null;
+                    receivingFile = []; // Fallback
+                }
 
                 document.getElementById('active-filename').innerText = `(${currentReceiveIndex + 1}/${receiveQueue.length}) ${data.name}`;
                 document.getElementById('active-filesize').innerText = formatBytes(data.size);
@@ -1516,19 +1533,47 @@
 
             } else if (data.type === 'chunk') {
                 if (cancelTransfer) return;
-                receivingFile.push(data.data); 
+                
                 batchReceivedSize += data.data.byteLength;
-                if (receivingFile.length % 10 === 0 || batchReceivedSize >= batchTotalSize) {
+
+                if (fileWritable) {
+                    // Chain the write promises to guarantee correct file assembly order
+                    writeQueue = writeQueue.then(() => fileWritable.write(data.data));
+                } else {
+                    // Fallback RAM method
+                    receivingFile.push(data.data); 
+                }
+
+                // Update UI slightly less often to save CPU cycles
+                if (batchReceivedSize % (256 * 1024 * 5) === 0 || batchReceivedSize >= batchTotalSize) {
                     updateStats(batchReceivedSize, batchTotalSize);
                 }
 
             } else if (data.type === 'file_done') {
                 if (cancelTransfer) return;
                 
-                const safeType = receivingFileType || 'application/octet-stream';
-                const blob = new Blob(receivingFile, { type: safeType });
-                const url = URL.createObjectURL(blob); 
+                let url;
                 
+                if (fileWritable) {
+                    // Wait for all queued writes to finish, then close the disk stream
+                    await writeQueue;
+                    await fileWritable.close();
+                    
+                    // Get the finished file from disk and create a download link
+                    const diskFile = await fileHandle.getFile();
+                    url = URL.createObjectURL(diskFile);
+                    
+                    // Clean up
+                    fileWritable = null;
+                    fileHandle = null;
+                } else {
+                    // Fallback RAM method
+                    const safeType = receivingFileType || 'application/octet-stream';
+                    const blob = new Blob(receivingFile, { type: safeType });
+                    url = URL.createObjectURL(blob); 
+                }
+                
+                // Trigger the browser download
                 const a = document.createElement('a'); 
                 a.style.display = 'none'; 
                 a.href = url; 

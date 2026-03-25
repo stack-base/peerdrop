@@ -386,7 +386,7 @@
         .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;}
         
         .close-btn { 
-            background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); 
+            background: var(--card-bg); color: var(--text-main); 
             cursor: pointer; padding: 0; width: 44px; height: 44px; border-radius: 50%; margin: 0;
             display: flex; align-items: center; justify-content: center; transition: var(--transition);
             box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
@@ -875,6 +875,7 @@
     let cancelTransfer = false; 
     let pendingFileTransfer = null; 
     let html5QrCode = null; 
+    let pulseInterval = null; 
 
     // QUEUE SYSTEM VARIABLES
     let sendQueue = [];
@@ -899,6 +900,7 @@
                 case 'heavy': navigator.vibrate(80); break; 
                 case 'success': navigator.vibrate([30, 60, 40]); break; 
                 case 'error': navigator.vibrate([50, 100, 50, 100, 50]); break; 
+                case 'pulse': navigator.vibrate([30, 60, 30]); break;
             }
         } catch (e) { }
     }
@@ -1295,6 +1297,7 @@
     }
 
     function acceptTransfer() {
+        if (pulseInterval) clearInterval(pulseInterval);
         triggerHaptic('medium');
         document.getElementById('incoming-modal').classList.remove('active');
         if (!pendingFileTransfer) return;
@@ -1318,6 +1321,7 @@
     }
 
     function rejectTransfer() {
+        if (pulseInterval) clearInterval(pulseInterval);
         triggerHaptic('medium');
         document.getElementById('incoming-modal').classList.remove('active');
         pendingFileTransfer = null;
@@ -1403,7 +1407,13 @@
 
             } else if (data.type === 'batch_header') {
                 if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
+                
                 triggerHaptic('heavy'); 
+
+                if (pulseInterval) clearInterval(pulseInterval);
+                pulseInterval = setInterval(() => {
+                    triggerHaptic('pulse');
+                }, 2000); 
                 
                 pendingFileTransfer = data; 
                 document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
@@ -1493,7 +1503,11 @@
             }
         });
 
-        conn.on('close', () => { showToast("Connection ended", "error"); disconnectPeer(); });
+        conn.on('close', () => { 
+            if (pulseInterval) clearInterval(pulseInterval);
+            showToast("Connection ended", "error"); 
+            disconnectPeer(); 
+        });
     }
 
     function sendFile() {

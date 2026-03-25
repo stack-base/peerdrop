@@ -565,13 +565,14 @@
             </div>
 
             <div id="share-section" class="hidden drop-zone">
+                <input type="file" id="file-input">
+
                 <div id="drop-ui-elements">
                     <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
                         <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
                     </svg>
                     <p id="drop-text">Select a file to send</p>
                     <p id="drop-subtext">or drag and drop it here</p>
-                    <input type="file" id="file-input">
                 </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
@@ -589,8 +590,11 @@
                         <div class="transfer-progress-header">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
                             
-                            <button class="btn-disconnect" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 59, 48, 0.1); cursor: pointer;" onclick="abortTransfer(event)" title="Cancel Transfer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; pointer-events: none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <button class="btn-disconnect" style="display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;" onclick="abortTransfer(event)" title="Cancel Transfer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; pointer-events: none;">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
                             </button>
 
                         </div>

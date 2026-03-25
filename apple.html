@@ -19,77 +19,93 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
+        /* --- Premium Apple/Google Root Variables --- */
         :root { 
-            --bg: #f5f5f7; --card-bg: #ffffff; --text-main: #1d1d1f; --text-muted: #86868b;
-            --primary: #1d1d1f; --primary-hover: #434344; --primary-text: #ffffff;
-            --border: #e5e5ea; --input-bg: #f5f5f7; --accent: #007AFF; 
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            --radius-lg: 24px; --radius-md: 14px;
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --bg: #f2f2f7; /* iOS System Gray 6 */
+            --card-bg: #ffffff; 
+            --text-main: #1d1d1f; 
+            --text-muted: #86868b;
+            --primary: #007AFF; /* Apple System Blue */
+            --primary-hover: #0062cc; 
+            --primary-text: #ffffff;
+            --border: rgba(60, 60, 67, 0.08); /* Transparent borders */
+            --input-bg: rgba(118, 118, 128, 0.08); /* iOS Search Bar / Input fill */
+            --accent: #007AFF; 
+            --shadow: 0 8px 30px rgba(0,0,0,0.04);
+            --radius-lg: 24px; 
+            --radius-md: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             --glow-opacity: 0.15;
+            --overlay-bg: rgba(0, 0, 0, 0.4);
         }
 
+        /* --- Dark Mode (Optimized for OLED / S23 Ultra Phantom Black) --- */
         body.dark-mode {
-            --bg: #000000; --card-bg: #1c1c1e; --text-main: #f5f5f7; --text-muted: #86868b;
-            --primary: #ffffff; --primary-hover: #e5e5ea; --primary-text: #000000;
-            --border: #2c2c2e; --input-bg: #2c2c2e; --accent: #0a84ff;
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
-            --glow-opacity: 0.25;
+            --bg: #000000; 
+            --card-bg: #1c1c1e; /* iOS System Gray 6 (Dark) */
+            --text-main: #f5f5f7; 
+            --text-muted: #ebebf599; /* 60% opacity white */
+            --primary: #0a84ff; 
+            --primary-hover: #007AFF; 
+            --primary-text: #ffffff;
+            --border: rgba(255, 255, 255, 0.1); 
+            --input-bg: rgba(118, 118, 128, 0.24); 
+            --accent: #0a84ff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.5);
+            --glow-opacity: 0.2;
+            --overlay-bg: rgba(0, 0, 0, 0.6);
         }
 
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
         html, body { 
             height: 100dvh;
             overflow: hidden; 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg); color: var(--text-main); 
-            margin: 0; padding: 0; transition: background-color 0.5s ease, color 0.5s ease;
+            margin: 0; padding: 0; transition: background-color 0.4s ease, color 0.4s ease;
             -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
         }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
-            background: var(--border); 
+            background: rgba(120, 120, 128, 0.2); 
             border-radius: 10px; 
-            border: 2px solid var(--bg); 
-            transition: background 0.3s ease; 
         }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-        * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(120, 120, 128, 0.4); }
 
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-enter { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } 
-        .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
+        .animate-enter { opacity: 0; animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-1 { animation-delay: 0.05s; } .delay-2 { animation-delay: 0.1s; } 
+        .delay-3 { animation-delay: 0.15s; } .delay-4 { animation-delay: 0.2s; }
 
         .layout-wrapper { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
 
+        /* Guide Pane (Keeping the fluid gradient but softening it) */
         .guide-pane {
-            flex: 1.2; background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f);
+            flex: 1.2; background: linear-gradient(-45deg, #007AFF, #5856D6, #AF52DE, #FF2D55);
             background-size: 300% 300%; animation: gradientBG 15s ease infinite; color: white;
             display: flex; flex-direction: column; justify-content: center; padding: 60px; position: relative;
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .guide-content { max-width: 460px; margin: 0 auto; z-index: 2; }
-        .guide-pane h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 16px; color: #ffffff; line-height: 1.05; }
-        .guide-pane p.subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 40px; line-height: 1.5; font-weight: 400;}
+        .guide-pane h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 16px; color: #ffffff; line-height: 1.05; }
+        .guide-pane p.subtitle { font-size: 1.15rem; opacity: 0.9; margin-bottom: 40px; line-height: 1.5; font-weight: 400;}
 
-        .step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+        .step { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 30px; }
         .step-number {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 1.05rem; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .step-text h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 600; }
-        .step-text p { margin: 0; opacity: 0.85; font-size: 0.95rem; line-height: 1.4; }
+        .step-text h3 { margin: 0 0 6px 0; font-size: 1.15rem; font-weight: 600; }
+        .step-text p { margin: 0; opacity: 0.85; font-size: 0.95rem; line-height: 1.5; }
 
         .app-pane { 
             flex: 1; background: var(--bg); display: flex; align-items: center; flex-direction: column;
-            padding: 0; position: relative; transition: var(--transition); box-sizing: border-box;
+            padding: 0; position: relative; transition: var(--transition);
             height: 100dvh; overflow-y: auto; overflow-x: hidden;
         }
         .app-pane::before, .app-pane::after { content: ''; flex: auto; }
@@ -97,91 +113,50 @@
         .ambient-glow {
             position: fixed; top: 50%; left: 70%; transform: translate(-50%, -50%);
             width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
-            background: radial-gradient(circle, rgba(10,132,255,var(--glow-opacity)) 0%, rgba(94,92,230,var(--glow-opacity)) 30%, rgba(191,90,242,0) 70%);
+            background: radial-gradient(circle, rgba(0,122,255,var(--glow-opacity)) 0%, rgba(88,86,214,var(--glow-opacity)) 30%, rgba(175,82,222,0) 70%);
             filter: blur(60px); border-radius: 50%; z-index: 0; pointer-events: none;
             animation: pulseGlow 8s ease-in-out infinite alternate; transition: opacity 0.5s ease;
         }
-        @keyframes pulseGlow { 0% { transform: translate(-50%, -50%) scale(0.9) translate(-20px, 20px); } 100% { transform: translate(-50%, -50%) scale(1.1) translate(20px, -20px); } }
 
         .app-content { 
-            width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; 
+            width: 100%; max-width: 440px; text-align: center; 
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; 
             padding: calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)) 20px; 
             min-height: 100vh;
         }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+        .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em;}
         .header-controls { display: flex; gap: 8px; }
 
         .profile-avatar {
-            width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
+            width: 88px; height: 88px; background: linear-gradient(135deg, var(--accent), #5856D6);
             border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2.2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3); text-transform: uppercase;
+            color: white; font-size: 2.4rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25); text-transform: uppercase;
         }
-        .settings-avatar { margin-top: 10px; margin-bottom: 30px; width: 90px; height: 90px; font-size: 2.5rem;}
+        .settings-avatar { margin-top: 10px; margin-bottom: 24px; width: 96px; height: 96px; font-size: 2.6rem;}
         
         .welcome-text { margin-bottom: 30px; }
-        .welcome-text h2 { font-size: 1.8rem; margin: 0 0 10px 0; font-weight: 700;}
-        .welcome-text p { color: var(--text-muted); margin: 0; }
-        
-        .input-group { margin-bottom: 18px; text-align: left; width: 100%;}
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; margin-left: 4px; }
+        .welcome-text h2 { font-size: 1.8rem; margin: 0 0 8px 0; font-weight: 700; letter-spacing: -0.02em;}
+        .welcome-text p { color: var(--text-muted); margin: 0; font-size: 1.05rem;}
 
+        /* Premium Forms & Inputs */
         .box { 
-            background: var(--card-bg); padding: 28px; border-radius: var(--radius-lg); margin-bottom: 24px; 
+            background: var(--card-bg); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 20px; 
             display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); 
-            transition: var(--transition); box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
+            box-shadow: var(--shadow); width: 100%;
         }
         
-        .id-container { 
-            display: flex; align-items: center; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;
-            background: var(--input-bg); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border);
-        }
-        .id-text { font-size: 1.15rem; font-weight: 600; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px;}
-        
-        input[type="text"], input[type="email"] { 
-            width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
-            background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
-            transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
-        
-        .active-connection {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
-            text-align: left; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            position: relative; overflow: hidden;
-        }
-        .peer-avatar {
-            width: 46px; height: 46px; background: linear-gradient(135deg, #34c759, #30b053);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.3rem; font-weight: bold; flex-shrink: 0; text-transform: uppercase;
-        }
-        .peer-info { flex: 1; overflow: hidden; }
-        .peer-status { font-size: 0.75rem; color: #34c759; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;}
-        .peer-name-display { font-size: 1.05rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;}
-        .peer-email-display { font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        
-        .btn-disconnect { margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
-        .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); transform: scale(1.05); cursor: pointer;}
+        .input-group { margin-bottom: 16px; text-align: left; width: 100%;}
+        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
 
-        .drop-zone { 
-            border: 2px dashed var(--border); padding: 40px 20px; border-radius: var(--radius-md); transition: var(--transition); 
-            background: var(--card-bg); margin-bottom: 20px; position: relative; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        input[type="text"], input[type="email"] { 
+            width: 100%; padding: 16px 20px; border: 2px solid transparent; border-radius: var(--radius-md); 
+            background: var(--input-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; 
+            transition: var(--transition); outline: none; font-weight: 500;
         }
-        .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
-        .drop-zone:active { transform: scale(0.97); }
-        .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
-        
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
-        
-        #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; pointer-events: none;}
-        .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
-        .drop-zone.dragover .drop-icon { fill: var(--accent); }
-        #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4; z-index: 2;}
-        #drop-subtext { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); z-index: 2;}
+        input::placeholder { color: var(--text-muted); font-weight: 400; }
+        input:focus { background: var(--card-bg); border-color: var(--accent); box-shadow: 0 4px 20px rgba(0, 122, 255, 0.1); }
 
         /* Pill Buttons */
         button { 
@@ -191,24 +166,12 @@
             cursor: pointer; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s; margin-bottom: 12px; margin-top: 10px;
         }
         button:hover { background: var(--primary-hover); }
-        button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button:active { transform: scale(0.96); } /* Fluid squeeze effect */
         
-        /* .btn-small { width: auto; padding: 8px 16px; margin: 0; font-size: 0.85rem; border-radius: 20px; }
+        .btn-small { width: auto; padding: 10px 20px; margin: 0; font-size: 0.9rem; }
 
         .btn-icon { 
-            width: 44px; height: 44px; padding: 0; margin: 0; background: var(--card-bg); border: 1px solid var(--border); 
-            color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
-        }
-        .btn-icon svg { 
-            width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; 
-            stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; 
-            pointer-events: none;
-        } */
-         .btn-small { width: auto; padding: 10px 20px; margin: 0; font-size: 0.9rem; }
-
-        .btn-icon { 
-            width: 44px; height: 44px; padding: 0; margin: 0; background: var(--card-bg); border: none; 
+            width: 44px; height: 44px; padding: 0; margin: 0; background: var(--input-bg); border: none; 
             color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center;
             flex-shrink: 0; transition: transform 0.2s, background 0.2s;
         }
@@ -216,387 +179,206 @@
         .btn-icon:hover { background: rgba(120, 120, 128, 0.16); }
         .btn-icon:active { transform: scale(0.92); }
 
-        .qr-wrapper { display: inline-block; margin-top: 10px; transition: var(--transition); background: #fff;}
+        /* Device ID Layout */
+        .id-container { 
+            display: flex; align-items: center; gap: 12px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap;
+            background: var(--input-bg); padding: 14px 24px; border-radius: 100px;
+        }
+        .id-text { font-size: 1.2rem; font-weight: 600; font-family: 'SF Mono', 'Courier New', monospace; letter-spacing: 1px; color: var(--text-main);}
+        .qr-wrapper { display: inline-block; padding: 12px; border-radius: 20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: var(--transition);}
+
+        /* Connection Bar */
+        .active-connection {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px;
+            text-align: left; width: 100%; box-shadow: var(--shadow); position: relative; overflow: hidden;
+        }
+        .peer-avatar {
+            width: 48px; height: 48px; background: linear-gradient(135deg, #34c759, #30b053);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.4rem; font-weight: 600; flex-shrink: 0; text-transform: uppercase;
+        }
+        .peer-info { flex: 1; overflow: hidden; }
+        .peer-status { font-size: 0.75rem; color: #34c759; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .peer-name-display { font-size: 1.1rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;}
+        .peer-email-display { font-size: 0.9rem; color: var(--text-muted); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .btn-disconnect { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+        .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); }
+
+        /* Drop Zone */
+        .drop-zone { 
+            border: 2px dashed rgba(120, 120, 128, 0.3); padding: 48px 20px; border-radius: var(--radius-lg); transition: var(--transition); 
+            background: var(--card-bg); margin-bottom: 20px; position: relative; cursor: pointer; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .drop-zone:hover { border-color: var(--accent); background-color: rgba(0, 122, 255, 0.02); }
+        .drop-zone:active { transform: scale(0.98); }
+        .drop-zone.dragover { border-color: var(--accent); background-color: rgba(0, 122, 255, 0.08); border-style: solid; transform: scale(1.02);}
+        
+        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
+        
+        #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; pointer-events: none;}
+        .drop-icon { width: 56px; height: 56px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
+        .drop-zone.dragover .drop-icon { fill: var(--accent); }
+        #drop-text { margin: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.4; z-index: 2;}
+        #drop-subtext { margin-top: 8px; font-size: 0.9rem; color: var(--text-muted); z-index: 2;}
 
         /* --- Apple Premium Transfer UI --- */
-
         .transfer-active-ui {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding: 32px 20px;
-            background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-sizing: border-box;
-            margin-bottom: 20px;
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+            padding: 32px 24px; background: var(--card-bg); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px;
         }
-
-        body.dark-mode .transfer-active-ui {
-            background: #1c1c1e;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
         .apple-file-icon {
-            width: 76px;
-            height: 76px;
-            border-radius: 20px;
-            background: linear-gradient(180deg, #f2f2f7 0%, #e5e5ea 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #007AFF;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-            margin-bottom: 16px;
+            width: 80px; height: 80px; border-radius: 20px;
+            background: linear-gradient(180deg, rgba(120,120,128,0.05) 0%, rgba(120,120,128,0.1) 100%);
+            display: flex; align-items: center; justify-content: center; color: var(--accent);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02); margin-bottom: 20px;
         }
+        body.dark-mode .apple-file-icon { background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%); }
+        .apple-file-icon svg { width: 36px; height: 36px; }
 
-        body.dark-mode .apple-file-icon {
-            background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-        }
+        .transfer-file-details { text-align: center; margin-bottom: 32px; width: 100%; }
+        .transfer-file-details h4 { font-size: 1.2rem; font-weight: 600; margin: 0 0 6px 0; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .transfer-file-details p { font-size: 0.95rem; font-weight: 400; color: var(--text-muted); margin: 0; }
 
-        .transfer-file-details {
-            text-align: center;
-            margin-bottom: 28px;
-            width: 100%;
-        }
+        .transfer-progress-wrapper { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .transfer-progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
+        .transfer-percentage { font-size: 2rem; font-weight: 600; color: var(--text-main); letter-spacing: -0.04em; line-height: 1; }
+        
+        .btn-cancel-apple { width: 32px; height: 32px; border-radius: 16px; background: var(--input-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; padding: 0; transition: transform 0.2s; margin: 0;}
+        .btn-cancel-apple svg { width: 16px; height: 16px; pointer-events: none; stroke-width: 2.5;}
+        .btn-cancel-apple:hover { background: rgba(120, 120, 128, 0.24); transform: scale(1.05); }
 
-        .transfer-file-details h4 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-            color: var(--text-main);
-            letter-spacing: -0.01em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .transfer-progress-track { width: 100%; height: 8px; background: var(--input-bg); border-radius: 10px; overflow: hidden; position: relative; }
+        .transfer-progress-fill { height: 100%; background: var(--accent); border-radius: 10px; width: 0%; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
 
-        .transfer-file-details p {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: var(--text-muted);
-            margin: 0;
-        }
+        .apple-stats-text { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-align: center; margin-top: 8px; font-variant-numeric: tabular-nums; }
 
-        .transfer-progress-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .transfer-progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 4px;
-        }
-
-        .transfer-percentage {
-            font-size: 1.6rem;
-            font-weight: 500;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
-            line-height: 1;
-        }
-
-        .btn-cancel-apple {
-            width: 28px;
-            height: 28px;
-            border-radius: 14px;
-            background: rgba(120, 120, 128, 0.16);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            transition: transform 0.2s, background 0.2s;
-            margin: 0;
-        }
-
-        .btn-cancel-apple svg {
-            width: 14px;
-            height: 14px;
-            pointer-events: none;
-        }
-
-        .btn-cancel-apple:hover {
-            background: rgba(120, 120, 128, 0.24);
-            transform: scale(1.05);
-        }
-
-        .transfer-progress-track {
-            width: 100%;
-            height: 6px;
-            background: rgba(120, 120, 128, 0.16);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .transfer-progress-fill {
-            height: 100%;
-            background: #007AFF;
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .apple-stats-text {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-align: center;
-            margin-top: 6px;
-            font-variant-numeric: tabular-nums; 
-        }
-
-        #status { font-size: 0.95rem; margin-top: 20px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .status-dot { width: 10px; height: 10px; background: var(--text-muted); border-radius: 50%; transition: background-color 0.3s ease; box-shadow: 0 0 8px currentColor;}
+        #status { font-size: 1rem; margin-top: 24px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .status-dot { width: 10px; height: 10px; background: var(--text-muted); border-radius: 50%; transition: background-color 0.3s ease; box-shadow: 0 0 10px currentColor;}
 
         .hidden { display: none !important; }
 
+        /* --- Modals (iOS Sheet / Google Bottom Sheet Style) --- */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: var(--overlay-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             z-index: 1000; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; visibility: hidden;
             transition: opacity 0.4s ease, visibility 0s linear 0.4s;
         }
-        .modal-overlay.active { 
-            opacity: 1; pointer-events: auto; visibility: visible; 
-            transition: opacity 0.4s ease, visibility 0s linear 0s;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 0.4s ease, visibility 0s linear 0s; }
         
         .modal-content {
             background: var(--bg); width: 100%; height: 100%; border-radius: 0;
-            padding: calc(40px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
-            border: none; box-shadow: none; margin: 0;
-            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: calc(40px + env(safe-area-inset-top)) 24px calc(40px + env(safe-area-inset-bottom)) 24px; 
+            border: none; margin: 0; transform: translateY(100px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; box-sizing: border-box; overflow-y: hidden;
         }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
-        .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;}
-        
-        .close-btn { 
-            background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); 
-            cursor: pointer; padding: 0; width: 44px; height: 44px; border-radius: 50%; margin: 0;
-            display: flex; align-items: center; justify-content: center; transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
+        @media (min-width: 600px) {
+            .modal-content { max-width: 480px; height: auto; max-height: 85vh; border-radius: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
         }
-        .close-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; pointer-events: none;}
-        .close-btn:hover { background: var(--input-bg); transform: scale(1.05); }
-        .close-btn:active { transform: scale(0.95); }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-shrink: 0; padding: 0 8px;}
+        .modal-header h3 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em;}
+        .close-btn { background: var(--input-bg); }
 
-        .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; padding-right: 5px; margin-top: 10px;}
-        .history-list::-webkit-scrollbar { width: 6px; }
-        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        /* --- List Styles (Settings & History) --- */
+        .history-list, .settings-list {
+            overflow-y: auto; flex: 1; display: flex; flex-direction: column; 
+            background: var(--card-bg); border-radius: var(--radius-lg); padding: 8px 0;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+        }
         
         .history-item {
-            display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: var(--radius-lg);
-            background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+            background: transparent; border-bottom: 1px solid var(--border); transition: background 0.2s;
         }
-        .history-item:hover { transform: translateY(-2px); border-color: var(--text-muted); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+        .history-item:last-child { border-bottom: none; }
+        .history-item:active { background: var(--input-bg); }
+        
         .history-icon { 
-            width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; 
-            background: rgba(10, 132, 255, 0.1); color: var(--accent); flex-shrink: 0;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            background: rgba(0, 122, 255, 0.1); color: var(--accent); flex-shrink: 0;
         }
         .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
-        .history-icon svg { fill: none; }
         
         .history-details { flex: 1; overflow: hidden; text-align: left; display: flex; flex-direction: column; gap: 4px; }
         .history-name { font-weight: 600; font-size: 1.05rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
-        .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
-        .history-peer svg { fill: none; }
-        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-family: 'Courier New', Courier, monospace; font-weight: 600;}
-        .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
+        .history-peer { font-size: 0.9rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 6px; }
+        .history-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin: 0;}
+        .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 1.05rem;}
 
-        .settings-container { 
-            display: flex; flex-direction: column; align-items: center; max-width: 420px; 
-            margin: 0 auto; width: 100%; overflow-y: auto; flex: 1; padding-right: 5px;
-        }
+        .settings-container { display: flex; flex-direction: column; width: 100%; overflow-y: auto; flex: 1; }
 
+        /* Scanner Modal Specifics */
         #scanner-modal .modal-content {
-            padding: 0; overflow: hidden; display: flex; flex-direction: column;
-            background: #000; color: #fff; border-radius: 32px;
-            height: 80vh; max-height: 750px; position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            padding: 0; background: #000; color: #fff; border-radius: 0;
         }
-        .scanner-header {
-            padding: calc(24px + env(safe-area-inset-top)) 24px 24px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 10; 
-            position: absolute; top: 0; left: 0; right: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none;
-        }
-        .scanner-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;}
-        .scanner-header .close-btn { 
-            pointer-events: auto; background: rgba(255,255,255,0.15); color: #fff; border: none; 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        }
-        
-        #reader-video-container {
-            width: 100%; flex: 1; position: absolute; inset: 0; background: #000; 
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
-        
+        @media (min-width: 600px) { #scanner-modal .modal-content { border-radius: 32px; } }
+        .scanner-header { padding: calc(24px + env(safe-area-inset-top)) 24px 24px 24px; position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); pointer-events: none; display: flex; justify-content: space-between; align-items: center;}
+        .scanner-header .close-btn { pointer-events: auto; background: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(10px); }
+        #reader-video-container { width: 100%; flex: 1; position: absolute; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #reader-video { width: 100% !important; height: 100% !important; position: absolute; inset: 0;}
-        #reader-video video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 0 !important; }
-        
-        .scanner-overlay {
-            position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; pointer-events: none; overflow: hidden;
-        }
-        
-        .viewfinder { 
-            width: 280px; height: 280px; position: relative; 
-            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45); 
-            border-radius: 24px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .viewfinder::before, .viewfinder::after, .viewfinder-inner::before, .viewfinder-inner::after {
-            content: ''; position: absolute; width: 48px; height: 48px; 
-            border-color: #ffffff; border-style: solid; border-width: 0;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-            transition: border-color 0.2s ease;
-        }
+        #reader-video video { object-fit: cover !important; width: 100% !important; height: 100% !important; }
+        .scanner-overlay { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+        .viewfinder { width: 280px; height: 280px; position: relative; box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.5); border-radius: 24px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .viewfinder::before, .viewfinder::after, .viewfinder-inner::before, .viewfinder-inner::after { content: ''; position: absolute; width: 48px; height: 48px; border-color: #ffffff; border-style: solid; border-width: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); transition: border-color 0.2s ease; }
         .viewfinder::before { top: 0; left: 0; border-top-width: 5px; border-left-width: 5px; border-top-left-radius: 24px; }
         .viewfinder::after { top: 0; right: 0; border-top-width: 5px; border-right-width: 5px; border-top-right-radius: 24px; }
         .viewfinder-inner { position: absolute; inset: 0; }
         .viewfinder-inner::before { bottom: 0; left: 0; border-bottom-width: 5px; border-left-width: 5px; border-bottom-left-radius: 24px; }
         .viewfinder-inner::after { bottom: 0; right: 0; border-bottom-width: 5px; border-right-width: 5px; border-bottom-right-radius: 24px; }
-        
         .viewfinder.success { transform: scale(0.92); }
-        .viewfinder.success::before, .viewfinder.success::after, 
-        .viewfinder.success .viewfinder-inner::before, .viewfinder.success .viewfinder-inner::after {
-            border-color: #34c759;
-        }
+        .viewfinder.success::before, .viewfinder.success::after, .viewfinder.success .viewfinder-inner::before, .viewfinder.success .viewfinder-inner::after { border-color: #34c759; }
 
-        .scanner-footer {
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            padding: 40px 20px calc(30px + env(safe-area-inset-bottom)); text-align: center; z-index: 10; 
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-        }
-
+        /* Incoming Transfer Overlay (Full Screen Takeover) */
         .incoming-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
+            background: rgba(255, 255, 255, 0.85); z-index: 99999; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             opacity: 0; pointer-events: none; visibility: hidden;
-            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.5s;
-            overflow-y: auto; padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom)) 24px; box-sizing: border-box;
+            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+            padding: 24px; box-sizing: border-box;
         }
-        .incoming-overlay.active { 
-            opacity: 1; pointer-events: auto; visibility: visible; 
-            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0s;
-        }
+        body.dark-mode .incoming-overlay { background: rgba(0, 0, 0, 0.85); }
+        .incoming-overlay.active { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 0.4s ease, visibility 0s linear 0s; }
         
-        .incoming-content-wrapper {
-            max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center;
-            text-align: center; transform: translateY(40px) scale(0.95);
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); margin: auto;
-        }
-        .incoming-overlay.active .incoming-content-wrapper { transform: translateY(0) scale(1); }
+        .incoming-content-wrapper { max-width: 400px; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; transform: scale(0.95); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .incoming-overlay.active .incoming-content-wrapper { transform: scale(1); }
 
-        .incoming-brand-text {
-            font-size: 1.5rem; font-weight: 800; color: var(--text-muted); 
-            margin-bottom: 24px; user-select: none;
-        }
+        .incoming-avatar { width: 100px; height: 100px; font-size: 2.8rem; margin-bottom: 24px; box-shadow: 0 16px 40px rgba(0, 122, 255, 0.3); }
+        .incoming-title { font-size: 2rem; font-weight: 700; margin: 0 0 8px 0; color: var(--text-main); letter-spacing: -0.02em;}
+        #incoming-device { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; }
 
-        .incoming-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; margin: 0 0 32px 0; color: var(--text-main); line-height: 1.2;}
-
-        .incoming-user-box { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 32px; width: 100%; }
-        
-        .pulsing-avatar-container { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
-        .incoming-avatar {
-            width: 100%; height: 100%; font-size: 2.4rem; position: relative; z-index: 2; margin: 0;
-            background: linear-gradient(135deg, var(--accent), #5e5ce6); box-shadow: 0 10px 30px rgba(10, 132, 255, 0.25);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-transform: uppercase;
-        }
-        .pulse-ring {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; height: 100%; border-radius: 50%; background: var(--accent); opacity: 0.4; z-index: 1;
-            animation: pulse-ring-anim 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
-        }
-        @keyframes pulse-ring-anim { 0% { width: 100%; height: 100%; opacity: 0.6; } 100% { width: 220%; height: 220%; opacity: 0; } }
-
-        .incoming-user-details { display: flex; flex-direction: column; gap: 4px; }
-        #incoming-name { font-weight: 700; font-size: 1.4rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #incoming-device { font-size: 1rem; color: var(--text-muted); }
-
-        .incoming-file-list {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
-            width: 100%; padding: 8px; margin-bottom: 32px; box-shadow: var(--shadow); box-sizing: border-box;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-
-        .incoming-file-item {
-            display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 16px;
-            background: var(--input-bg); text-align: left; transition: var(--transition);
-        }
-        
-        .file-preview-icon {
-            width: 44px; height: 44px; border-radius: 12px; background: var(--card-bg); color: var(--text-main);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .file-details { flex: 1; overflow: hidden; }
+        .incoming-file-list { background: var(--card-bg); border-radius: 24px; width: 100%; padding: 12px; margin-bottom: 40px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .incoming-file-item { display: flex; align-items: center; gap: 16px; padding: 12px; text-align: left; }
+        .file-preview-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--input-bg); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
         .incoming-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-        .btn-accept-huge {
-            background: var(--primary); color: var(--primary-text); border-radius: 100px;
-            font-size: 1.1rem; padding: 20px; font-weight: 600; width: 100%; border: none; cursor: pointer;
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s; margin: 0;
-        }
-        .btn-accept-huge:hover { background: var(--primary-hover); transform: scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .btn-decline-huge {
-            background: transparent; color: var(--text-main); border-radius: 100px; font-size: 1.1rem;
-            padding: 20px; font-weight: 600; width: 100%; border: none; cursor: pointer; transition: background 0.2s; margin: 0;
-        }
-        .btn-decline-huge:hover { background: var(--input-bg); }
+        .btn-decline-huge { background: var(--input-bg); color: var(--text-main); }
 
-        #toast-container { position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        /* Floating Pill Toasts (Google Material / iOS Dynamic) */
+        #toast-container { position: fixed; bottom: calc(40px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast {
-            background: rgba(30, 30, 30, 0.95); color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
+            background: #2c2c2e; color: #fff; padding: 14px 24px; border-radius: 100px; font-size: 0.95rem; font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; gap: 12px;
         }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.success .toast-icon { color: #34c759; fill: none; }
-        .toast.error .toast-icon { color: #ff3b30; fill: none; }
+        body.dark-mode .toast { background: #3a3a3c; }
+        .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast.success .toast-icon { color: #34c759; }
+        .toast.error .toast-icon { color: #ff3b30; }
 
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column; }
             .guide-pane { display: none; }
-            .app-content { padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
-            .ambient-glow { width: 150vw; height: 150vw; top: 50%; left: 50%; }
-            .modal-content { padding: calc(30px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom)) 20px; }
-            #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
-            .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
-
-            html, body {
-                height: auto !important;
-                min-height: 100dvh;
-                overflow: visible !important;
-                overscroll-behavior-y: auto; 
-            }
-
-            .layout-wrapper {
-                height: auto;
-                min-height: 100dvh;
-                overflow: visible;
-            }
-
-            .app-pane {
-                height: auto;
-                min-height: 100dvh;
-                overflow-y: visible;
-            }
+            html, body, .layout-wrapper, .app-pane { height: auto !important; min-height: 100dvh; overflow: visible !important; overscroll-behavior-y: auto; }
+            .ambient-glow { width: 150vw; height: 150vw; top: 30%; left: 50%; }
         }
     </style>
 </head>
@@ -635,20 +417,20 @@
                 <p>Set up your device to start sharing.</p>
             </div>
             
-            <div class="box animate-enter delay-2" style="padding: 30px;">
+            <div class="box animate-enter delay-2">
                 <div class="input-group">
                     <label>Full Name</label>
                     <input type="text" id="setup-name" placeholder="e.g. Anthony" autocomplete="name">
                 </div>
                 <div class="input-group">
                     <label>Device Name</label>
-                    <input type="text" id="setup-device" placeholder="e.g. Lightyear" autocomplete="off">
+                    <input type="text" id="setup-device" placeholder="e.g. iPhone 15 Pro" autocomplete="off">
                 </div>
                 <div class="input-group">
                     <label>Email (Optional)</label>
                     <input type="email" id="setup-email" placeholder="name@example.com" autocomplete="email">
                 </div>
-                <button onclick="saveInitialProfile()">Get Started</button>
+                <button onclick="saveInitialProfile()">Continue</button>
             </div>
         </div>
 
@@ -668,19 +450,19 @@
                 </div>
             </div>
             
-            <div id="identity-section" class="box">
-                <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Your Device ID</p>
+            <div id="identity-section" class="box" style="padding: 32px 24px;">
+                <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Your Device ID</p>
                 <div class="id-container">
                     <div class="id-text" id="my-id">Generating...</div>
-                    <button id="copy-btn" class="btn-small hidden" onclick="copyId()">Copy</button>
+                    <button id="copy-btn" class="btn-small hidden" onclick="copyId()" style="background: var(--card-bg); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">Copy</button>
                 </div>
                 <div class="qr-wrapper" id="qr-wrapper"><div id="qrcode"></div></div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; margin-bottom: 0;">Scan to connect directly</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 20px; margin-bottom: 0;">Scan to connect directly</p>
             </div>
 
-            <div id="connect-section">
+            <div id="connect-section" style="width: 100%;">
                 <div style="display: flex; gap: 12px; margin-bottom: 16px; width: 100%;">
-                    <input type="text" id="target-id" placeholder="Enter recipient's Device ID" autocomplete="off" style="margin-bottom: 0; flex: 1; border-radius: 100px; padding: 16px 24px;">
+                    <input type="text" id="target-id" placeholder="Enter recipient's ID" autocomplete="off" style="margin-bottom: 0; flex: 1; border-radius: 100px; padding: 16px 24px;">
                     <button id="scan-trigger-btn" class="btn-icon" onclick="startScan()" style="margin: 0; width: 56px; height: 56px; border-radius: 50%; background: var(--card-bg); box-shadow: var(--shadow);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
@@ -689,7 +471,7 @@
                         </svg>
                     </button>
                 </div>
-                <button id="connect-btn" onclick="connectToPeer()" style="margin-top: 0; color: white; background-color: #0a84ff;">Connect</button>
+                <button id="connect-btn" onclick="connectToPeer()" style="margin-top: 0;">Connect</button>
             </div>
 
             <div id="active-connection" class="active-connection hidden">
@@ -711,13 +493,13 @@
                     <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
                         <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
                     </svg>
-                    <p id="drop-text">Select files to send</p>
+                    <p id="drop-text">Tap to select files</p>
                     <p id="drop-subtext">or drag and drop them here</p>
                 </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
                     <div class="apple-file-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
@@ -731,19 +513,13 @@
                     <div class="transfer-progress-wrapper">
                         <div class="transfer-progress-header">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
-                            
                             <button class="btn-cancel-apple" onclick="abortTransfer(event)" title="Cancel Transfer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
-                        
                         <div class="transfer-progress-track">
                             <div class="transfer-progress-fill" id="custom-progress-bar"></div>
                         </div>
-
                         <div class="apple-stats-text">
                             <span id="amount-text">0/0 MB</span> &nbsp;&bull;&nbsp; 
                             <span id="speed-text">0 MB/s</span> &nbsp;&bull;&nbsp; 
@@ -765,63 +541,45 @@
             <div class="modal-content" style="max-width: 440px; margin: auto;">
                 <div class="scanner-header">
                     <h3>Scan QR Code</h3>
-                    <button class="close-btn" onclick="stopScan()" aria-label="Close Scanner">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <button class="close-btn btn-icon" onclick="stopScan()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
-                
                 <div id="reader-video-container">
                     <div id="reader-video"></div>
                     <div class="scanner-overlay">
-                        <div class="viewfinder" id="viewfinder">
-                            <div class="viewfinder-inner"></div>
-                        </div>
+                        <div class="viewfinder" id="viewfinder"><div class="viewfinder-inner"></div></div>
                     </div>
-                </div>
-
-                <div class="scanner-footer">
-                    <p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at recipient's PeerDrop QR code.</p>
                 </div>
             </div>
         </div>
 
         <div id="incoming-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
-                <div class="incoming-brand-text">PeerDrop</div>
-                <h2 class="incoming-title" id="incoming-title">File Transfer Request</h2>
+                <div class="peer-avatar incoming-avatar" id="incoming-avatar">?</div>
+                <h2 class="incoming-title" id="incoming-title">File Transfer</h2>
+                <div id="incoming-name" style="font-weight: 600; font-size: 1.4rem; color: var(--text-main); margin-bottom: 4px;">Sender Name</div>
+                <div id="incoming-device">Device Name</div>
 
-                <div class="incoming-user-box">
-                    <div class="pulsing-avatar-container">
-                        <div class="pulse-ring"></div>
-                        <div class="peer-avatar incoming-avatar" id="incoming-avatar">?</div>
-                    </div>
-                    <div class="incoming-user-details">
-                        <div id="incoming-name">Sender Name</div>
-                        <div id="incoming-device">Device Name</div>
-                    </div>
-                </div>
-
-                <div class="incoming-file-list" id="incoming-file-list-container">
-                </div>
+                <div class="incoming-file-list" id="incoming-file-list-container"></div>
 
                 <div class="incoming-actions">
-                    <button class="btn-accept-huge" onclick="acceptTransfer()">Accept</button>
+                    <button onclick="acceptTransfer()">Accept</button>
                     <button class="btn-decline-huge" onclick="rejectTransfer()">Decline</button>
                 </div>
-
             </div>
         </div>
 
         <div id="history-modal" class="modal-overlay" onclick="handleModalClick(event, 'history-modal', toggleHistory)">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Transfer History</h3>
+                    <h3>History</h3>
                     <div style="display: flex; gap: 8px;">
-                        <button class="btn-icon" onclick="clearHistory()" aria-label="Clear History" title="Clear History" style="color: var(--text-muted); background: transparent; box-shadow: none; border: none;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        <button class="btn-icon" onclick="clearHistory()" style="background: transparent;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
-                        <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">
-                            <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <button class="btn-icon close-btn" onclick="toggleHistory()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
                 </div>
@@ -833,30 +591,27 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>Settings</h3>
-                    <button class="close-btn" onclick="toggleSettings()" aria-label="Close Settings">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <button class="btn-icon close-btn" onclick="toggleSettings()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
                 <div class="settings-container">
-                    <div class="profile-avatar settings-avatar">
-                        <span id="settings-avatar-initial">?</span>
+                    <div class="profile-avatar settings-avatar"><span id="settings-avatar-initial">?</span></div>
+                    <div class="settings-list">
+                        <div style="padding: 16px 20px;">
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Profile Name</label>
+                            <input type="text" id="edit-name" placeholder="Your Name" style="background: var(--bg);">
+                        </div>
+                        <div style="padding: 16px 20px; border-top: 1px solid var(--border);">
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Device Name</label>
+                            <input type="text" id="edit-device" placeholder="e.g. MacBook Pro" style="background: var(--bg);">
+                        </div>
+                        <div style="padding: 16px 20px; border-top: 1px solid var(--border);">
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Email (Optional)</label>
+                            <input type="email" id="edit-email" placeholder="name@example.com" style="background: var(--bg);">
+                        </div>
                     </div>
-                    
-                    <div class="box" style="padding: 30px; margin-bottom: 0;">
-                        <div class="input-group">
-                            <label>Name</label>
-                            <input type="text" id="edit-name" placeholder="Your Name" autocomplete="name">
-                        </div>
-                        <div class="input-group">
-                            <label>Device Name</label>
-                            <input type="text" id="edit-device" placeholder="Your Device Name">
-                        </div>
-                        <div class="input-group">
-                            <label>Email Address</label>
-                            <input type="email" id="edit-email" placeholder="name@example.com">
-                        </div>
-                        <button onclick="saveSettingsProfile()" style="margin-top: 10px; margin-bottom: 0;">Save Changes</button>
-                    </div>
+                    <button onclick="saveSettingsProfile()" style="margin-top: 24px;">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -926,8 +681,8 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         const icon = type === 'success' ? 
-            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : 
-            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : 
+            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
         toast.innerHTML = `${icon} <span>${message}</span>`;
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
@@ -981,8 +736,8 @@
             transferUi.classList.add('hidden');
             dropZone.style.border = '2px dashed var(--border)';
             dropZone.style.background = 'var(--card-bg)';
-            dropZone.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)';
-            dropZone.style.padding = '40px 20px';
+            dropZone.style.boxShadow = 'var(--shadow)';
+            dropZone.style.padding = '48px 20px';
             fileInput.style.display = 'block';
         }
     }
@@ -1053,7 +808,6 @@
                     window.history.replaceState(null, '', window.location.pathname);
                 }, 600); 
             }
-
         } else {
             document.getElementById('setup-name').addEventListener('input', (e) => {
                 document.getElementById('avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';
@@ -1123,17 +877,19 @@
         history.forEach(item => {
             const isSent = item.type === 'sent';
             const actionText = isSent ? 'Sent to' : 'From';
-            const iconSvg = isSent ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+            const iconSvg = isSent ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
             const peerDisplay = item.peer && item.peer.device ? `${item.peer.name || 'Unknown'} (${item.peer.device})` : `${item.peer && item.peer.name ? item.peer.name : 'Unknown'}`;
-            const emailDisplay = item.peer && item.peer.email ? `<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>` : '';
 
             list.innerHTML += `
                 <div class="history-item">
                     <div class="history-icon ${isSent ? '' : 'received'}">${iconSvg}</div>
                     <div class="history-details">
                         <p class="history-name" title="${item.filename}">${item.filename}</p>
-                        <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
-                        <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
+                        <p class="history-peer">${actionText} ${peerDisplay}</p>
+                    </div>
+                    <div style="text-align: right; display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-main); font-family: 'SF Mono', monospace;">${item.filesize}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">${formatDate(item.date).split(' at ')[0]}</span>
                     </div>
                 </div>`;
         });
@@ -1171,8 +927,8 @@
         const qrContainer = document.getElementById("qrcode"); const qrWrapper = document.getElementById("qr-wrapper");
         qrContainer.innerHTML = ""; 
         const isDark = document.body.classList.contains('dark-mode');
-        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff'; qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
-        new QRCode(qrContainer, { text: url, width: 240, height: 240, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff'; 
+        new QRCode(qrContainer, { text: url, width: 200, height: 200, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
     if (localStorage.getItem('darkMode') === 'true') { 
@@ -1186,15 +942,15 @@
         const isDark = document.body.classList.toggle('dark-mode');
         try { localStorage.setItem('darkMode', isDark); } catch (e) {}
         updateThemeIcon(isDark); if (currentShareUrl) renderQR(currentShareUrl);
-        document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#f5f5f7');
+        document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#f2f2f7');
     }
 
     function copyId() {
         triggerHaptic('success');
         navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(() => {
             showToast("Device ID copied!");
-            const copyBtn = document.getElementById('copy-btn'); copyBtn.innerText = 'Copied!'; copyBtn.style.background = 'var(--accent)'; copyBtn.style.color = '#fff';
-            setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.background = 'transparent'; copyBtn.style.color = 'var(--text-main)'; }, 2000);
+            const copyBtn = document.getElementById('copy-btn'); copyBtn.innerText = 'Copied!';
+            setTimeout(() => { copyBtn.innerText = 'Copy'; }, 2000);
         }).catch(() => showToast("Could not copy ID.", "error"));
     }
 
@@ -1216,16 +972,16 @@
         if (fileInput.files.length === 1) {
             triggerHaptic('light');
             const file = fileInput.files[0];
-            dropText.innerHTML = `<strong style="color: var(--text-main)">${file.name}</strong>`;
+            dropText.innerHTML = `<strong style="color: var(--primary)">${file.name}</strong>`;
             dropSubtext.innerHTML = formatBytes(file.size); dropSubtext.classList.remove('hidden');
         } else if (fileInput.files.length > 1) {
             triggerHaptic('light');
             let totalSize = 0;
             for(let i=0; i<fileInput.files.length; i++) totalSize += fileInput.files[i].size;
-            dropText.innerHTML = `<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;
+            dropText.innerHTML = `<strong style="color: var(--primary)">${fileInput.files.length} files selected</strong>`;
             dropSubtext.innerHTML = `Total Size: ${formatBytes(totalSize)}`; dropSubtext.classList.remove('hidden');
         } else {
-            dropText.innerHTML = `Select files to send`; dropSubtext.innerHTML = `or drag and drop them here`; dropSubtext.classList.remove('hidden');
+            dropText.innerHTML = `Tap to select files`; dropSubtext.innerHTML = `or drag and drop them here`; dropSubtext.classList.remove('hidden');
         }
     }
 
@@ -1236,7 +992,7 @@
 
     function updateStatus(message, color = "var(--text-muted)", shadowColor = "transparent") {
         statusTextEl.innerText = message; statusDotEl.style.backgroundColor = color;
-        statusDotEl.style.boxShadow = `0 0 8px ${shadowColor === "transparent" ? color : shadowColor}`;
+        statusDotEl.style.boxShadow = `0 0 10px ${shadowColor === "transparent" ? color : shadowColor}`;
     }
 
     function updateStats(loadedBytes, totalBytes) {
@@ -1270,7 +1026,7 @@
         triggerHaptic('light');
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return showToast("Please enter a Device ID", "error");
-        updateStatus("Connecting...", "#f59e0b");
+        updateStatus("Connecting...", "#FF9500", "rgba(255, 149, 0, 0.4)");
         conn = peer.connect(targetId, { reliable: true }); setupConnection();
     }
 
@@ -1410,7 +1166,7 @@
                 document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
                 document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
                 
-                document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
+                document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files` : 'File Transfer';
 
                 const fileListContainer = document.getElementById('incoming-file-list-container');
                 fileListContainer.innerHTML = '';
@@ -1418,11 +1174,11 @@
                     fileListContainer.innerHTML += `
                         <div class="incoming-file-item">
                             <div class="file-preview-icon">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                             </div>
-                            <div class="file-details">
-                                <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600;">${formatBytes(f.size)}</div>
+                            <div class="file-details" style="flex: 1; overflow: hidden;">
+                                <div style="font-weight: 600; font-size: 1.05rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${f.name}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-family: 'SF Mono', monospace; font-weight: 500;">${formatBytes(f.size)}</div>
                             </div>
                         </div>`;
                 });
@@ -1437,9 +1193,8 @@
                     if (isTransferring) { cancelTransfer = true; receivingFile = []; }
                     resetTransferUI();
                     let msg = "Transfer cancelled";
-                    if(data.reason === 'declined') msg = "Transfer declined by peer";
-                    if(data.reason === 'busy') msg = "Peer is busy receiving another file";
-                    if(data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
+                    if(data.reason === 'declined') msg = "Transfer declined";
+                    if(data.reason === 'busy') msg = "Peer is busy";
                     showToast(msg, "error"); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
                 }
 
@@ -1510,7 +1265,7 @@
 
             setTransferState(true);
             updateStats(0, batchTotalSize);
-            updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#f59e0b");
+            updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#FF9500", "rgba(255, 149, 0, 0.4)");
             
             const filesMetadata = sendQueue.map(f => ({ name: f.name, size: f.size, type: f.type }));
             conn.send({ type: 'batch_header', files: filesMetadata, totalSize: batchTotalSize });

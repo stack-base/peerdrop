@@ -33,7 +33,6 @@
 
         * { -webkit-tap-highlight-color: transparent; }
 
-        /* --- SCROLL ARCHITECTURE UPDATES --- */
         html, body { 
             height: 100%; 
             overflow: hidden; 
@@ -43,7 +42,6 @@
             -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
         }
 
-        /* Custom Dynamic Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
@@ -83,7 +81,6 @@
         .step-text h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 600; }
         .step-text p { margin: 0; opacity: 0.85; font-size: 0.95rem; line-height: 1.4; }
 
-        /* --- SCROLL ARCHITECTURE UPDATES --- */
         .app-pane { 
             flex: 1; background: var(--bg); display: flex; align-items: center; flex-direction: column;
             padding: 0; position: relative; transition: var(--transition); box-sizing: border-box;
@@ -100,7 +97,6 @@
         }
         @keyframes pulseGlow { 0% { transform: translate(-50%, -50%) scale(0.9) translate(-20px, 20px); } 100% { transform: translate(-50%, -50%) scale(1.1) translate(20px, -20px); } }
 
-        /* --- SCROLL ARCHITECTURE UPDATES --- */
         .app-content { 
             width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; 
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; padding: 40px 20px; min-height: 100vh;
@@ -233,7 +229,6 @@
 
         .hidden { display: none !important; }
 
-        /* MODAL AND OVERLAY UPDATES */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -414,8 +409,6 @@
         }
 
         .file-details { flex: 1; overflow: hidden; }
-        #incoming-filename { font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-        #incoming-filesize { font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600; }
 
         .incoming-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .btn-accept-huge {
@@ -441,22 +434,13 @@
         .toast.success .toast-icon { color: #34c759; fill: none; }
         .toast.error .toast-icon { color: #ff3b30; fill: none; }
 
-        /* --- SCROLL ARCHITECTURE UPDATES FOR MOBILE --- */
         @media (max-width: 900px) {
             .layout-wrapper { flex-direction: column; }
             .guide-pane { display: none; }
-            
-            /* .app-content { padding-top: max(6vh, 40px; padding-bottom: 40px; } */
             .app-content { padding-top: 20px; padding-bottom: 40px; }
-            
-            .ambient-glow { 
-                width: 150vw; height: 150vw; 
-                top: 50%; left: 50%; 
-            }
+            .ambient-glow { width: 150vw; height: 150vw; top: 50%; left: 50%; }
             .modal-content { padding: 30px 20px; }
-            
             #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
-            
             .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
         }
     </style>
@@ -566,14 +550,14 @@
             </div>
 
             <div id="share-section" class="hidden drop-zone">
-                <input type="file" id="file-input">
+                <input type="file" id="file-input" multiple>
 
                 <div id="drop-ui-elements">
                     <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
                         <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
                     </svg>
-                    <p id="drop-text">Select a file to send</p>
-                    <p id="drop-subtext">or drag and drop it here</p>
+                    <p id="drop-text">Select files to send</p>
+                    <p id="drop-subtext">or drag and drop them here</p>
                 </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
@@ -621,7 +605,7 @@
                 </div>
             </div>
             
-            <button id="send-btn" class="hidden" onclick="sendFile()">Send File</button>
+            <button id="send-btn" class="hidden" onclick="sendFile()">Send Files</button>
 
             <div id="status">
                 <div class="status-dot" id="status-dot"></div>
@@ -655,12 +639,8 @@
 
         <div id="incoming-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
-                
-                <div class="incoming-brand-text">
-                    PeerDrop
-                </div>
-
-                <h2 class="incoming-title">File Transfer Request</h2>
+                <div class="incoming-brand-text">PeerDrop</div>
+                <h2 class="incoming-title" id="incoming-title">File Transfer Request</h2>
 
                 <div class="incoming-user-box">
                     <div class="pulsing-avatar-container">
@@ -673,16 +653,7 @@
                     </div>
                 </div>
 
-                <div class="incoming-file-list">
-                    <div class="incoming-file-item">
-                        <div class="file-preview-icon">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        </div>
-                        <div class="file-details">
-                            <div id="incoming-filename">filename.ext</div>
-                            <div id="incoming-filesize">0 MB</div>
-                        </div>
-                    </div>
+                <div class="incoming-file-list" id="incoming-file-list-container">
                 </div>
 
                 <div class="incoming-actions">
@@ -706,8 +677,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="history-list" id="history-list">
-                    </div>
+                <div class="history-list" id="history-list"></div>
             </div>
         </div>
 
@@ -751,16 +721,29 @@
 <script>
     let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
     let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
-    let peer, conn, receivingFile = [], receivingFileSize = 0, receivingFileName = '', receivingFileType = '', receivedSize = 0;
+    let peer, conn;
     let transferStartTime = 0;
     let isTransferring = false;
     let cancelTransfer = false; 
     let pendingFileTransfer = null; 
     let html5QrCode = null; 
 
+    // QUEUE SYSTEM VARIABLES
+    let sendQueue = [];
+    let currentSendIndex = 0;
+    let receiveQueue = [];
+    let currentReceiveIndex = 0;
+    let batchTotalSize = 0;
+    let batchSentSize = 0;
+    let batchReceivedSize = 0;
+
+    let receivingFile = [];
+    let receivingFileSize = 0;
+    let receivingFileName = '';
+    let receivingFileType = '';
+
     function triggerHaptic(type = 'light') {
         if (!navigator.vibrate) return;
-
         try {
             switch(type) {
                 case 'light': navigator.vibrate(15); break; 
@@ -778,11 +761,7 @@
         if ('wakeLock' in navigator) {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
-                console.log('Screen Wake Lock active');
-                wakeLock.addEventListener('release', () => console.log('Screen Wake Lock released'));
-            } catch (err) {
-                console.error(`Wake Lock error: ${err.name}, ${err.message}`);
-            }
+            } catch (err) {}
         }
     }
 
@@ -795,7 +774,6 @@
 
     function showToast(message, type = 'success') {
         if (type === 'error') triggerHaptic('error'); 
-
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -843,24 +821,20 @@
             dropUi.classList.add('hidden');
             sendBtn.classList.add('hidden');
             transferUi.classList.remove('hidden');
-            
             dropZone.classList.remove('dragover');
             dropZone.style.border = 'none';
             dropZone.style.background = 'transparent';
             dropZone.style.boxShadow = 'none';
             dropZone.style.padding = '0';
-            
             fileInput.style.display = 'none'; 
         } else {
             dropUi.classList.remove('hidden');
             if (conn && conn.open) { sendBtn.classList.remove('hidden'); }
             transferUi.classList.add('hidden');
-            
             dropZone.style.border = '2px dashed var(--border)';
             dropZone.style.background = 'var(--card-bg)';
             dropZone.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)';
             dropZone.style.padding = '40px 20px';
-            
             fileInput.style.display = 'block';
         }
     }
@@ -877,80 +851,35 @@
         triggerHaptic('light');
         const modal = document.getElementById('scanner-modal');
         modal.classList.add('active');
-        
         const viewfinder = document.getElementById('viewfinder');
         viewfinder.classList.remove('success');
 
         html5QrCode = new Html5Qrcode("reader-video");
-        const config = { fps: 30 };
-
         Html5Qrcode.getCameras().then(devices => {
             if (devices && devices.length) {
                 let cameraId = devices[0].id; 
-                
-                let backCameras = devices.filter(d => 
-                    d.label.toLowerCase().includes("back") || 
-                    d.label.toLowerCase().includes("environment") || 
-                    d.label.toLowerCase().includes("rear")
-                );
-
-                if (backCameras.length > 0) {
-                    let standardLenses = backCameras.filter(d => {
-                        let l = d.label.toLowerCase();
-                        return !l.includes("ultra") && !l.includes("wide") && 
-                               !l.includes("tele") && !l.includes("macro") && 
-                               !l.includes("depth");
-                    });
-
-                    let candidates = standardLenses.length > 0 ? standardLenses : backCameras;
-
-                    let primaryCam = candidates.find(d => d.label.includes("0,"));
-                    if(!primaryCam) primaryCam = candidates.find(d => d.label.includes(" 0"));
-                    
-                    cameraId = primaryCam ? primaryCam.id : candidates[0].id;
-                }
-
-                html5QrCode.start(cameraId, config, onScanSuccess).catch(err => {
-                    console.error("Error starting scanner:", err);
-                    showToast("Camera error.", "error");
-                    stopScan();
-                });
-            } else {
-                showToast("No cameras detected.", "error");
-                stopScan();
-            }
-        }).catch(err => {
-            console.error("Camera permission error:", err);
-            showToast("Camera blocked.", "error");
-            stopScan();
-        });
+                let backCameras = devices.filter(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment"));
+                if (backCameras.length > 0) cameraId = backCameras[0].id;
+                html5QrCode.start(cameraId, { fps: 30 }, onScanSuccess).catch(e => { showToast("Camera error.", "error"); stopScan(); });
+            } else { showToast("No cameras detected.", "error"); stopScan(); }
+        }).catch(e => { showToast("Camera blocked.", "error"); stopScan(); });
     }
 
     function stopScan() {
         triggerHaptic('light');
         document.getElementById('scanner-modal').classList.remove('active');
-        if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => {});
-        }
+        if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => {});
     }
 
     function onScanSuccess(decodedText) {
         if(html5QrCode.isScanning === false) return; 
-        
         triggerHaptic('success'); 
-        
         document.getElementById('viewfinder').classList.add('success');
         html5QrCode.pause();
-
         setTimeout(() => {
             stopScan();
             let targetId = decodedText;
-            try {
-                const url = new URL(decodedText);
-                const urlParams = new URLSearchParams(url.search);
-                if (urlParams.has('connect')) targetId = urlParams.get('connect');
-            } catch (e) {}
-
+            try { const urlParams = new URLSearchParams(new URL(decodedText).search); if (urlParams.has('connect')) targetId = urlParams.get('connect'); } catch (e) {}
             document.getElementById('target-id').value = targetId;
             showToast("QR Code Scanned!");
             setTimeout(connectToPeer, 300); 
@@ -964,10 +893,8 @@
         if (myProfile && myProfile.name && myProfile.device) {
             welcomeScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
-            
             const animatedEls = mainScreen.querySelectorAll('.box, .header, #connect-section, #status');
             animatedEls.forEach((el, index) => el.classList.add('animate-enter', `delay-${index+1}`));
-            
             requestWakeLock();
             initPeerJS();
         } else {
@@ -993,7 +920,6 @@
         welcomeScreen.style.opacity = '0';
         welcomeScreen.style.transform = 'translateY(-20px)';
         welcomeScreen.style.transition = 'all 0.4s ease';
-        
         setTimeout(() => initApp(), 400);
     }
 
@@ -1009,33 +935,24 @@
         modal.classList.toggle('active');
     }
 
-    document.getElementById('edit-name').addEventListener('input', (e) => {
-        document.getElementById('settings-avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';
-    });
+    document.getElementById('edit-name').addEventListener('input', (e) => { document.getElementById('settings-avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?'; });
 
     function saveSettingsProfile() {
         triggerHaptic('light');
         const name = document.getElementById('edit-name').value.trim();
         const device = document.getElementById('edit-device').value.trim();
         const email = document.getElementById('edit-email').value.trim();
-
         if (!name || !device) return showToast("Name and Device are required.", "error");
-
         myProfile = { name, device, email };
         localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
-        
         if (conn && conn.open) conn.send({ type: 'profile_sync', profile: myProfile });
-
         showToast("Settings saved successfully!");
         toggleSettings();
     }
 
     function saveToHistory(filename, filesize, type, peerInfo) {
         let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
-        history.unshift({ 
-            id: Date.now(), filename, filesize: formatBytes(filesize), 
-            type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', email: '' }
-        });
+        history.unshift({ id: Date.now(), filename, filesize: formatBytes(filesize), type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', email: '' } });
         if (history.length > 50) history.pop(); 
         localStorage.setItem('peerdrop_history', JSON.stringify(history));
         renderHistory();
@@ -1045,39 +962,23 @@
         const list = document.getElementById('history-list');
         const history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
         list.innerHTML = '';
-        
-        if (history.length === 0) {
-            list.innerHTML = '<div class="empty-history">No past transfers found.</div>';
-            return;
-        }
-
+        if (history.length === 0) { list.innerHTML = '<div class="empty-history">No past transfers found.</div>'; return; }
         history.forEach(item => {
             const isSent = item.type === 'sent';
             const actionText = isSent ? 'Sent to' : 'From';
-            const iconSvg = isSent ? 
-                `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : 
-                `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
-            
-            const pName = item.peer && item.peer.name ? item.peer.name : 'Unknown';
-            const pDevice = item.peer && item.peer.device ? item.peer.device : '';
-            const pEmail = item.peer && item.peer.email ? item.peer.email : '';
-            
-            const peerDisplay = pDevice ? `${pName} (${pDevice})` : `${pName}`;
-            const emailDisplay = pEmail ? `<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${pEmail}</span>` : '';
+            const iconSvg = isSent ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+            const peerDisplay = item.peer && item.peer.device ? `${item.peer.name || 'Unknown'} (${item.peer.device})` : `${item.peer && item.peer.name ? item.peer.name : 'Unknown'}`;
+            const emailDisplay = item.peer && item.peer.email ? `<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>` : '';
 
             list.innerHTML += `
                 <div class="history-item">
                     <div class="history-icon ${isSent ? '' : 'received'}">${iconSvg}</div>
                     <div class="history-details">
                         <p class="history-name" title="${item.filename}">${item.filename}</p>
-                        <p class="history-peer">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            ${actionText} ${peerDisplay} ${emailDisplay}
-                        </p>
+                        <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
                         <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
     }
 
@@ -1091,16 +992,12 @@
     function clearHistory() {
         triggerHaptic('medium');
         if(confirm("Are you sure you want to clear all your transfer history?")) {
-            localStorage.removeItem('peerdrop_history');
-            renderHistory();
-            showToast("History cleared successfully!");
+            localStorage.removeItem('peerdrop_history'); renderHistory(); showToast("History cleared successfully!");
         }
     }
 
     renderHistory();
-
-    const themeIcon = document.getElementById('theme-icon');
-    let currentShareUrl = ""; 
+    const themeIcon = document.getElementById('theme-icon'); let currentShareUrl = ""; 
     
     function updateThemeIcon(isDark) {
         if (isDark) {
@@ -1114,13 +1011,10 @@
 
     function renderQR(url) {
         currentShareUrl = url;
-        const qrContainer = document.getElementById("qrcode");
-        const qrWrapper = document.getElementById("qr-wrapper");
+        const qrContainer = document.getElementById("qrcode"); const qrWrapper = document.getElementById("qr-wrapper");
         qrContainer.innerHTML = ""; 
         const isDark = document.body.classList.contains('dark-mode');
-        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
-        qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
-        
+        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff'; qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
         new QRCode(qrContainer, { text: url, width: 240, height: 240, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
     }
 
@@ -1129,24 +1023,15 @@
     function toggleDarkMode() {
         triggerHaptic('light');
         const isDark = document.body.classList.toggle('dark-mode');
-        
-        try {
-            localStorage.setItem('darkMode', isDark); 
-        } catch (e) {
-            console.warn("Local storage blocked, theme will not persist on reload.");
-        }
-        
-        updateThemeIcon(isDark);
-        if (currentShareUrl) renderQR(currentShareUrl);
+        try { localStorage.setItem('darkMode', isDark); } catch (e) {}
+        updateThemeIcon(isDark); if (currentShareUrl) renderQR(currentShareUrl);
     }
 
     function copyId() {
         triggerHaptic('success');
-        const idText = document.getElementById('my-id').innerText;
-        navigator.clipboard.writeText(idText).then(() => {
+        navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(() => {
             showToast("Device ID copied!");
-            const copyBtn = document.getElementById('copy-btn');
-            copyBtn.innerText = 'Copied!'; copyBtn.style.background = 'var(--accent)'; copyBtn.style.color = '#fff';
+            const copyBtn = document.getElementById('copy-btn'); copyBtn.innerText = 'Copied!'; copyBtn.style.background = 'var(--accent)'; copyBtn.style.color = '#fff';
             setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.background = 'transparent'; copyBtn.style.color = 'var(--text-main)'; }, 2000);
         }).catch(() => showToast("Could not copy ID.", "error"));
     }
@@ -1155,34 +1040,31 @@
     const dropText = document.getElementById('drop-text'), dropSubtext = document.getElementById('drop-subtext');
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false));
-    
-    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => {
-        if(isTransferring) return;
-        dropZone.classList.add('dragover');
-    }, false));
-    
-    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => {
-        if(isTransferring) return;
-        dropZone.classList.remove('dragover');
-    }, false));
+    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => { if(!isTransferring) dropZone.classList.add('dragover'); }, false));
+    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => { if(!isTransferring) dropZone.classList.remove('dragover'); }, false));
 
     dropZone.addEventListener('drop', (e) => { 
         if(isTransferring) return;
-        if (e.dataTransfer.files.length > 0) { 
-            fileInput.files = e.dataTransfer.files; updateFileText(); 
-        } 
+        if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; updateFileText(); } 
     });
     
     fileInput.addEventListener('change', updateFileText);
 
+    // DYNAMIC FILE TEXT HANDLER
     function updateFileText() {
-        if (fileInput.files.length > 0) {
+        if (fileInput.files.length === 1) {
             triggerHaptic('light');
             const file = fileInput.files[0];
             dropText.innerHTML = `<strong style="color: var(--text-main)">${file.name}</strong>`;
             dropSubtext.innerHTML = formatBytes(file.size); dropSubtext.classList.remove('hidden');
+        } else if (fileInput.files.length > 1) {
+            triggerHaptic('light');
+            let totalSize = 0;
+            for(let i=0; i<fileInput.files.length; i++) totalSize += fileInput.files[i].size;
+            dropText.innerHTML = `<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;
+            dropSubtext.innerHTML = `Total Size: ${formatBytes(totalSize)}`; dropSubtext.classList.remove('hidden');
         } else {
-            dropText.innerHTML = `Select a file to send`; dropSubtext.innerHTML = `or drag and drop it here`; dropSubtext.classList.remove('hidden');
+            dropText.innerHTML = `Select files to send`; dropSubtext.innerHTML = `or drag and drop them here`; dropSubtext.classList.remove('hidden');
         }
     }
 
@@ -1214,15 +1096,12 @@
 
     function initPeerJS() {
         peer = new Peer({ config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }, debug: 1 });
-        
         peer.on('open', (id) => {
             document.getElementById('my-id').innerText = id; copyBtn.classList.remove('hidden'); 
-            const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
-            renderQR(shareUrl); 
+            const shareUrl = window.location.href.split('?')[0] + '?connect=' + id; renderQR(shareUrl); 
             const connectId = new URLSearchParams(window.location.search).get('connect');
             if (connectId) { document.getElementById('target-id').value = connectId; setTimeout(connectToPeer, 500); }
         });
-
         peer.on('connection', (connection) => { conn = connection; setupConnection(); });
     }
 
@@ -1231,23 +1110,17 @@
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return showToast("Please enter a Device ID", "error");
         updateStatus("Connecting...", "#f59e0b");
-        conn = peer.connect(targetId, { reliable: true });
-        setupConnection();
+        conn = peer.connect(targetId, { reliable: true }); setupConnection();
     }
 
     function disconnectPeer() {
         triggerHaptic('medium');
-        if (conn) conn.close();
-        resetTransferUI();
+        if (conn) conn.close(); resetTransferUI();
         document.getElementById('active-connection').classList.add('hidden');
         document.getElementById('share-section').classList.add('hidden');
         document.getElementById('send-btn').classList.add('hidden');
-        
-        connectSection.classList.remove('hidden');
-        identitySection.classList.remove('hidden');
-        connectSection.style.opacity = '1';
-        identitySection.style.opacity = '1';
-        
+        connectSection.classList.remove('hidden'); identitySection.classList.remove('hidden');
+        connectSection.style.opacity = '1'; identitySection.style.opacity = '1';
         updateStatus("Waiting for connection...", "var(--text-muted)");
         connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     }
@@ -1255,14 +1128,9 @@
     function abortTransfer(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
         if (!isTransferring) return;
-        
-        triggerHaptic('error');
-        cancelTransfer = true; 
+        triggerHaptic('error'); cancelTransfer = true; 
         if (conn && conn.open) conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
-        
-        resetTransferUI();
-        showToast("Transfer cancelled", "error");
-        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+        resetTransferUI(); showToast("Transfer cancelled", "error"); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
     }
 
     function acceptTransfer() {
@@ -1271,20 +1139,19 @@
         if (!pendingFileTransfer) return;
 
         cancelTransfer = false;
-        
-        document.getElementById('active-filename').innerText = pendingFileTransfer.filename;
-        document.getElementById('active-filesize').innerText = formatBytes(pendingFileTransfer.filesize);
+        receiveQueue = pendingFileTransfer.files;
+        currentReceiveIndex = 0;
+        batchTotalSize = pendingFileTransfer.totalSize;
+        batchReceivedSize = 0;
 
         setTransferState(true);
-        receivingFile = []; 
-        receivedSize = 0; 
-        receivingFileSize = pendingFileTransfer.filesize; 
-        receivingFileName = pendingFileTransfer.filename; 
-        receivingFileType = pendingFileTransfer.filetype;
         
-        updateStats(0, receivingFileSize);
+        document.getElementById('active-filename').innerText = `(1/${receiveQueue.length}) ${receiveQueue[0].name}`;
+        document.getElementById('active-filesize').innerText = formatBytes(receiveQueue[0].size);
+
+        updateStats(0, batchTotalSize);
         transferStartTime = Date.now();
-        updateStatus(`Receiving: ${receivingFileName}...`, "var(--accent)");
+        updateStatus(`Receiving 1 of ${receiveQueue.length}...`, "var(--accent)");
 
         conn.send({ type: 'transfer_response', accepted: true });
     }
@@ -1296,47 +1163,54 @@
         conn.send({ type: 'transfer_response', accepted: false, reason: 'declined' });
     }
 
-    function startSendingChunks() {
-        const file = fileInput.files[0];
-        if (!file) return;
+    function sendNextFile() {
+        if (cancelTransfer) return;
+        
+        // Check if batch is entirely complete
+        if (currentSendIndex >= sendQueue.length) {
+            conn.send({ type: 'batch_done' });
+            triggerHaptic('success');
+            updateStatus(`Sent ${sendQueue.length} files to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
+            showToast("All files sent successfully!");
+            setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
+            return;
+        }
 
-        document.getElementById('active-filename').innerText = file.name;
+        const file = sendQueue[currentSendIndex];
+        document.getElementById('active-filename').innerText = `(${currentSendIndex + 1}/${sendQueue.length}) ${file.name}`;
         document.getElementById('active-filesize').innerText = formatBytes(file.size);
 
-        transferStartTime = Date.now();
-        let offset = 0; const chunkSize = 64 * 1024; let chunkCount = 0;
+        conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, type: file.type, size: file.size });
+
+        let offset = 0; const chunkSize = 64 * 1024;
         
         function readSlice() {
             if (cancelTransfer) {
                 conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' });
-                resetTransferUI();
-                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-                return; 
+                resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); return; 
             }
 
             const slice = file.slice(offset, offset + chunkSize);
             const reader = new FileReader();
+            
             reader.onload = (e) => {
                 if (cancelTransfer) return; 
 
                 conn.send({ type: 'chunk', data: e.target.result });
-                offset += slice.size; chunkCount++;
+                offset += slice.size; 
+                batchSentSize += slice.size;
                 
-                if (chunkCount % 5 === 0 || offset >= file.size) updateStats(offset, file.size);
+                if (offset % (chunkSize * 5) === 0 || offset >= file.size) {
+                    updateStats(batchSentSize, batchTotalSize);
+                }
 
                 if (offset < file.size) {
-                    if (conn.dataChannel.bufferedAmount > 1024 * 1024) setTimeout(readSlice, 50); else readSlice();
+                    if (conn.dataChannel.bufferedAmount > 1024 * 1024 * 2) setTimeout(readSlice, 50); else readSlice();
                 } else {
-                    conn.send({ type: 'done' });
-                    triggerHaptic('success');
-                    updateStatus(`Sent to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-                    showToast("File sent successfully!");
-                    
+                    conn.send({ type: 'file_done' });
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
-                    setTimeout(() => { 
-                        resetTransferUI();
-                        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
-                    }, 3000);
+                    currentSendIndex++;
+                    sendNextFile(); // Recursive loop for next file
                 }
             };
             reader.readAsArrayBuffer(slice);
@@ -1347,14 +1221,12 @@
     function setupConnection() {
         conn.on('open', () => {
             conn.send({ type: 'profile_sync', profile: myProfile });
-            
             updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
             connectSection.style.opacity = '0'; identitySection.style.opacity = '0';
             setTimeout(() => {
                 connectSection.classList.add('hidden'); identitySection.classList.add('hidden'); 
                 document.getElementById('active-connection').classList.remove('hidden');
                 dropZone.classList.remove('hidden'); sendBtn.classList.remove('hidden');
-                
                 void dropZone.offsetWidth; 
                 document.getElementById('active-connection').classList.add('animate-enter');
                 dropZone.classList.add('animate-enter'); sendBtn.classList.add('animate-enter');
@@ -1363,101 +1235,110 @@
 
         conn.on('data', (data) => {
             if (data.type === 'profile_sync') {
-                triggerHaptic('success');
-                connectedPeerProfile = data.profile;
-                showToast(`Connected to ${connectedPeerProfile.name}`);
-                
+                triggerHaptic('success'); connectedPeerProfile = data.profile; showToast(`Connected to ${connectedPeerProfile.name}`);
                 document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
                 document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
                 const emailEl = document.getElementById('peer-email-display');
-                if (connectedPeerProfile.email) {
-                    emailEl.innerText = connectedPeerProfile.email;
-                    emailEl.style.display = 'block';
-                } else {
-                    emailEl.style.display = 'none';
-                }
+                if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } else { emailEl.style.display = 'none'; }
 
-            } else if (data.type === 'header') {
-                if (isTransferring) {
-                    conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' });
-                    return;
-                }
-                
+            } else if (data.type === 'batch_header') {
+                if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
                 triggerHaptic('heavy'); 
                 
-                pendingFileTransfer = { filename: data.filename, filetype: data.filetype, filesize: data.filesize };
-
+                pendingFileTransfer = data; 
                 document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
                 document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
                 document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
                 
-                document.getElementById('incoming-filename').innerText = data.filename;
-                document.getElementById('incoming-filesize').innerText = formatBytes(data.filesize);
+                document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
 
+                const fileListContainer = document.getElementById('incoming-file-list-container');
+                fileListContainer.innerHTML = '';
+                data.files.forEach(f => {
+                    fileListContainer.innerHTML += `
+                        <div class="incoming-file-item">
+                            <div class="file-preview-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            </div>
+                            <div class="file-details">
+                                <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600;">${formatBytes(f.size)}</div>
+                            </div>
+                        </div>`;
+                });
                 document.getElementById('incoming-modal').classList.add('active');
 
             } else if (data.type === 'transfer_response') {
                 if (data.accepted) {
-                    updateStatus(`Sending ${fileInput.files[0].name}...`, "var(--accent)");
-                    startSendingChunks();
+                    updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
+                    transferStartTime = Date.now();
+                    sendNextFile();
                 } else {
-                    if (isTransferring) {
-                        cancelTransfer = true;
-                        receivingFile = []; 
-                    }
+                    if (isTransferring) { cancelTransfer = true; receivingFile = []; }
                     resetTransferUI();
-                    
                     let msg = "Transfer cancelled";
                     if(data.reason === 'declined') msg = "Transfer declined by peer";
                     if(data.reason === 'busy') msg = "Peer is busy receiving another file";
                     if(data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
-                    
-                    showToast(msg, "error");
-                    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                    showToast(msg, "error"); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
                 }
+
+            } else if (data.type === 'file_header') {
+                receivingFile = [];
+                receivingFileSize = data.size;
+                receivingFileName = data.name;
+                receivingFileType = data.type;
+                currentReceiveIndex = data.index;
+
+                document.getElementById('active-filename').innerText = `(${currentReceiveIndex + 1}/${receiveQueue.length}) ${data.name}`;
+                document.getElementById('active-filesize').innerText = formatBytes(data.size);
+                updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
 
             } else if (data.type === 'chunk') {
                 if (cancelTransfer) return;
-                receivingFile.push(data.data); receivedSize += data.data.byteLength;
-                if (receivingFile.length % 10 === 0 || receivedSize === receivingFileSize) updateStats(receivedSize, receivingFileSize);
+                receivingFile.push(data.data); 
+                batchReceivedSize += data.data.byteLength;
+                if (receivingFile.length % 10 === 0 || batchReceivedSize >= batchTotalSize) {
+                    updateStats(batchReceivedSize, batchTotalSize);
+                }
 
-            } else if (data.type === 'done') {
+            } else if (data.type === 'file_done') {
                 if (cancelTransfer) return;
                 const blob = new Blob(receivingFile, { type: receivingFileType });
-                const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
+                const url = URL.createObjectURL(blob); 
+                const a = document.createElement('a'); a.href = url; a.download = receivingFileName; a.click();
                 URL.revokeObjectURL(url);
-                triggerHaptic('success'); 
-                updateStatus(`Received from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-                showToast(`Received ${receivingFileName}`, "success");
-                
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
-                setTimeout(() => { 
-                    resetTransferUI();
-                    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); 
-                }, 3000);
+
+            } else if (data.type === 'batch_done') {
+                triggerHaptic('success'); 
+                updateStatus(`Received ${receiveQueue.length} files from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
+                showToast("All files received", "success");
+                setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
             }
         });
 
-        conn.on('close', () => {
-            showToast("Connection ended", "error");
-            disconnectPeer();
-        });
+        conn.on('close', () => { showToast("Connection ended", "error"); disconnectPeer(); });
     }
 
     function sendFile() {
         triggerHaptic('light');
         if (isTransferring) return showToast("Transfer already in progress.", "error");
-        
-        const file = fileInput.files[0];
-        if (!file) return showToast("Please select a file first.", "error");
+        if (fileInput.files.length === 0) return showToast("Please select files first.", "error");
         
         if (conn && conn.open) {
             cancelTransfer = false;
+            sendQueue = Array.from(fileInput.files);
+            currentSendIndex = 0;
+            batchTotalSize = sendQueue.reduce((acc, file) => acc + file.size, 0);
+            batchSentSize = 0;
+
             setTransferState(true);
-            updateStats(0, file.size);
+            updateStats(0, batchTotalSize);
             updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#f59e0b");
             
-            conn.send({ type: 'header', filename: file.name, filetype: file.type, filesize: file.size });
+            const filesMetadata = sendQueue.map(f => ({ name: f.name, size: f.size, type: f.type }));
+            conn.send({ type: 'batch_header', files: filesMetadata, totalSize: batchTotalSize });
         } else showToast("No active connection.", "error");
     }
 

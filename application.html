@@ -15,6 +15,8 @@
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png" type="image/x-icon">
     <link rel="apple-touch-icon" href="https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -42,7 +44,8 @@
         html, body { 
             height: 100dvh;
             overflow: hidden; 
-            font-family: 'Inter', sans-serif; 
+            /* The new Google typography stack */
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif; 
             background-color: var(--bg); color: var(--text-main); 
             margin: 0; padding: 0; transition: background-color 0.5s ease, color 0.5s ease;
             -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
@@ -138,7 +141,13 @@
             display: flex; align-items: center; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;
             background: var(--input-bg); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border);
         }
-        .id-text { font-size: 1.15rem; font-weight: 600; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px;}
+        .id-text { 
+            font-size: 1.15rem; 
+            font-weight: 500; 
+            font-family: 'Google Sans Mono', 'Roboto Mono', monospace; 
+            word-break: break-all; 
+            letter-spacing: 0.5px;
+        }
         
         input[type="text"], input[type="email"] { 
             width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
@@ -206,14 +215,14 @@
 
         .qr-wrapper { display: inline-block; margin-top: 10px; transition: var(--transition); background: #fff;}
 
-        /* --- Native OS Transfer UI --- */
-
+        /* --- Premium File List UI --- */
         .transfer-active-ui {
+            padding: 24px 20px;
+            gap: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 32px 20px;
             background: var(--card-bg);
             border-radius: 24px;
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
@@ -228,104 +237,126 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        .apple-file-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 22px; /* Apple squircle */
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .apple-file-icon {
-            background: #2c2c2e;
-            border-color: #3a3a3c;
-            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.3);
-        }
-
-        .transfer-file-details {
-            text-align: center;
-            margin-bottom: 28px;
-            width: 100%;
-        }
-
-        .transfer-file-details h4 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-            color: var(--text-main);
-            letter-spacing: -0.01em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .transfer-file-details p {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        .transfer-progress-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px; /* Slightly more space */
-        }
-
-        .transfer-progress-header {
+        .transfer-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2px;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transfer-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .btn-cancel-transfer {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--input-bg);
+            color: var(--text-muted);
+            border: none; padding: 0; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+
+        .btn-cancel-transfer svg { width: 14px; height: 14px; pointer-events: none; }
+        .btn-cancel-transfer:hover { background: rgba(255, 59, 48, 0.1); color: #ff3b30; transform: scale(1.05); }
+
+        .transfer-file-list {
+            width: 100%;
+            max-height: 200px; /* Fits about 3.5 items before scrolling */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-right: 4px;
+        }
+
+        .transfer-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            background: var(--input-bg);
+            border-radius: 14px;
+            gap: 14px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            border: 1px solid transparent;
+        }
+
+        .transfer-item.active {
+            background: rgba(10, 132, 255, 0.08);
+            border-color: rgba(10, 132, 255, 0.2);
+            transform: scale(1.01);
+        }
+
+        .transfer-item.done { opacity: 0.6; }
+
+        .transfer-item-icon {
+            width: 34px; height: 34px;
+            color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .transfer-item-icon svg { width: 20px; height: 20px; }
+        .transfer-item.active .transfer-item-icon { color: var(--accent); }
+
+        .transfer-item-info { flex: 1; overflow: hidden; text-align: left; display: flex; flex-direction: column; gap: 2px;}
+        .transfer-item-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+        .transfer-item-size, .transfer-overall-stats, .history-meta {
+            font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+        }
+
+        .transfer-item-status { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+
+        /* Native-style spinning loader */
+        .spinner-ring {
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(10,132,255,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .transfer-progress-section {
+            width: 100%;
+            background: var(--input-bg);
+            padding: 18px;
+            border-radius: 18px;
+            box-sizing: border-box;
+        }
+
+        .transfer-progress-info {
+            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;
         }
 
         .transfer-percentage {
             font-size: 1.6rem;
-            font-weight: 600; /* Bolder, more native */
+            font-weight: 600;
             color: var(--text-main);
             letter-spacing: -0.03em;
             line-height: 1;
         }
 
-        .btn-cancel-apple {
-            width: 32px;
-            height: 32px;
-            border-radius: 16px;
-            background: var(--input-bg);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            padding: 0;
-            transition: all 0.2s;
-            margin: 0;
+        .transfer-stats-right {
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums;
+            display: flex; align-items: center; gap: 6px;
         }
-
-        .btn-cancel-apple svg {
-            width: 16px;
-            height: 16px;
-            pointer-events: none;
-        }
-
-        .btn-cancel-apple:hover {
-            background: rgba(255, 59, 48, 0.1);
-            color: #ff3b30;
-            border-color: rgba(255, 59, 48, 0.3);
-            transform: scale(1.05);
-        }
+        
+        .stat-dot { opacity: 0.5; font-size: 0.7rem; }
 
         .transfer-progress-track {
             width: 100%;
-            height: 8px; /* Slightly thicker */
+            height: 8px;
             background: var(--border);
             border-radius: 10px;
             overflow: hidden;
@@ -339,23 +370,10 @@
             width: 0%;
             transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        
-        /* Native Text Stats */
-        .apple-stats-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-align: center;
-            margin-top: 10px;
-            font-variant-numeric: tabular-nums;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-        .stat-dot {
-            opacity: 0.5;
-            font-size: 0.7rem;
+
+        .transfer-overall-stats {
+            display: flex; justify-content: space-between; margin-top: 12px;
+            font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
         }
 
         #status { font-size: 0.95rem; margin-top: 20px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -416,7 +434,7 @@
         .history-name { font-weight: 600; font-size: 1.05rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
         .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
         .history-peer svg { fill: none; }
-        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-family: 'Courier New', Courier, monospace; font-weight: 600;}
+        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-weight: 600;}
         .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
 
         .settings-container { 
@@ -632,7 +650,7 @@
                 <span id="avatar-initial">?</span>
             </div>
             <div class="welcome-text animate-enter delay-1">
-                <h2>Welcome to PeerDrop</h2>
+                <h2>Welcome to <font style="font-family: 'Inter', sans-serif; ">PeerDrop</font></h2>
                 <p>Set up your device to start sharing.</p>
             </div>
             
@@ -655,7 +673,7 @@
 
         <div id="main-app-screen" class="app-content hidden">
             <div class="header">
-                <h2>PeerDrop</h2>
+                <h2 style="font-family: 'Inter', sans-serif; ">PeerDrop</h2>
                 <div class="header-controls">
                     <button class="btn-icon" onclick="toggleHistory()" aria-label="View History" title="Transfer History">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -717,40 +735,35 @@
                 </div>
                 
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
-                    <div class="apple-file-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                        </svg>
+                    <div class="transfer-header">
+                        <h3 id="transfer-title">Transferring Files</h3>
+                        <button class="btn-cancel-transfer" onclick="abortTransfer(event)" title="Cancel Transfer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
                     
-                    <div class="transfer-file-details">
-                        <h4 id="active-filename">file.txt</h4>
-                        <p id="active-filesize">0 MB</p>
-                    </div>
+                    <div class="transfer-file-list" id="transfer-file-list"></div>
 
-                    <div class="transfer-progress-wrapper">
-                        <div class="transfer-progress-header">
+                    <div class="transfer-progress-section">
+                        <div class="transfer-progress-info">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
-                            
-                            <button class="btn-cancel-apple" onclick="abortTransfer(event)" title="Cancel Transfer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
+                            <div class="transfer-stats-right">
+                                <span id="speed-text">0 MB/s</span>
+                                <span class="stat-dot">&bull;</span>
+                                <span id="eta-text">--:--</span> left
+                            </div>
                         </div>
                         
                         <div class="transfer-progress-track">
                             <div class="transfer-progress-fill" id="custom-progress-bar"></div>
                         </div>
 
-                        <div class="apple-stats-text">
+                        <div class="transfer-overall-stats">
+                            <span id="file-count-text">File 1 of 1</span>
                             <span id="amount-text">0/0 MB</span>
-                            <span class="stat-dot">&bull;</span>
-                            <span id="speed-text">0 MB/s</span>
-                            <span class="stat-dot">&bull;</span>
-                            <span><span id="eta-text">--:--</span> left</span>
                         </div>
                     </div>
                 </div>
@@ -790,7 +803,7 @@
 
         <div id="incoming-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
-                <div class="incoming-brand-text">PeerDrop</div>
+                <div class="incoming-brand-text" style="font-family: 'Inter', sans-serif; ">PeerDrop</div>
                 <h2 class="incoming-title" id="incoming-title">File Transfer Request</h2>
 
                 <div class="incoming-user-box">
@@ -893,6 +906,55 @@
         }
     }
 
+    // --- UI HELPER FUNCTIONS ---
+    function renderTransferFileList(files, isSending) {
+        document.getElementById('transfer-title').innerText = isSending ? 'Sending Files' : 'Receiving Files';
+        const list = document.getElementById('transfer-file-list');
+        list.innerHTML = '';
+        
+        files.forEach((file, index) => {
+            const type = file.type || file.filetype || ''; 
+            const svgIcon = getFileIconSVG(type);
+            
+            list.innerHTML += `
+                <div class="transfer-item" id="transfer-item-${index}">
+                    <div class="transfer-item-icon">${svgIcon}</div>
+                    <div class="transfer-item-info">
+                        <div class="transfer-item-name">${file.name}</div>
+                        <div class="transfer-item-size">${formatBytes(file.size)}</div>
+                    </div>
+                    <div class="transfer-item-status" id="transfer-item-status-${index}"></div>
+                </div>
+            `;
+        });
+    }
+
+    function updateActiveTransferFile(index, totalFiles) {
+        document.querySelectorAll('.transfer-item').forEach(el => el.classList.remove('active'));
+        
+        const activeItem = document.getElementById(`transfer-item-${index}`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+            activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById(`transfer-item-status-${index}`).innerHTML = `<div class="spinner-ring"></div>`;
+        }
+        
+        document.getElementById('file-count-text').innerText = `File ${index + 1} of ${totalFiles}`;
+    }
+
+    function markTransferFileDone(index) {
+        const item = document.getElementById(`transfer-item-${index}`);
+        if (item) {
+            item.classList.remove('active');
+            item.classList.add('done');
+            document.getElementById(`transfer-item-status-${index}`).innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>`;
+        }
+    }
+
+    // --- CORE VARIABLES ---
     let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
     let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
     let peer, conn;
@@ -915,15 +977,14 @@
     let batchSentSize = 0;
     let batchReceivedSize = 0;
 
-    // The new ACK Flow Control Variables
+    // ACK Flow Control Variables
     let unackedChunks = 0;
-    const MAX_IN_FLIGHT = 32; // Allow max 8MB in the network pipe at once
-    let resumeReading = null; // Global reference to wake up the file reader
+    const MAX_IN_FLIGHT = 32; 
+    let resumeReading = null; 
 
     let receivingFile = []; 
     let fileHandle = null;
     let fileWritable = null;
-    // We use a queue to ensure chunks write to disk in the exact order they arrive
     let writeQueue = Promise.resolve();
 
     let receivingFileSize = 0;
@@ -1151,18 +1212,14 @@
     async function clearOPFSCache() {
         triggerHaptic('medium');
         try {
-            // Access the browser's sandboxed virtual hard drive
             const root = await navigator.storage.getDirectory();
             let deletedCount = 0;
-            
-            // Loop through all files in the directory
             for await (const [name, handle] of root.entries()) {
                 await root.removeEntry(name, { recursive: true });
                 deletedCount++;
             }
-            
             if (deletedCount > 0) {
-                showToast(`Cleared ${deletedCount} incomplete files from storage.`, "success");
+                showToast(`Cleared ${deletedCount} incomplete files.`, "success");
                 triggerHaptic('success');
             } else {
                 showToast("Storage is already clean.", "success");
@@ -1309,7 +1366,6 @@
     function updateStats(loadedBytes, totalBytes) {
         const now = Date.now();
         
-        // Reset the trackers when a new transfer starts
         if (loadedBytes === 0) {
             lastUpdateTime = now;
             lastLoadedBytes = 0;
@@ -1324,12 +1380,10 @@
 
         const elapsedSinceLastUpdate = (now - lastUpdateTime) / 1000; 
 
-        // Update the speed math only every 250ms for visual smoothness
         if (elapsedSinceLastUpdate >= 0.25 || loadedBytes === totalBytes) {
             const bytesSinceLast = loadedBytes - lastLoadedBytes;
             const currentInstantSpeed = elapsedSinceLastUpdate > 0 ? bytesSinceLast / elapsedSinceLastUpdate : 0;
             
-            // Exponential Moving Average: Blend 30% of the new speed with 70% of the old speed
             if (smoothedSpeedBps === 0) {
                 smoothedSpeedBps = currentInstantSpeed;
             } else {
@@ -1338,17 +1392,14 @@
             
             speedText.innerText = `${formatBytes(smoothedSpeedBps)}/s`;
             
-            // ETA is now based on current smoothed speed, not the overall average
             const remainingBytes = totalBytes - loadedBytes;
             const etaSeconds = smoothedSpeedBps > 0 ? remainingBytes / smoothedSpeedBps : 0;
             document.getElementById('eta-text').innerText = formatTime(etaSeconds);
 
-            // Save state for the next tick
             lastUpdateTime = now;
             lastLoadedBytes = loadedBytes;
         }
 
-        // Always update the progress bar and raw byte count immediately
         amountText.innerText = `${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
         const percent = totalBytes > 0 ? Math.min(100, Math.floor((loadedBytes / totalBytes) * 100)) : 0;
         document.getElementById('transfer-percentage').innerText = `${percent}%`;
@@ -1393,17 +1444,12 @@
         triggerHaptic('error'); 
         cancelTransfer = true; 
         
-        // CRITICAL: If we are the receiver, safely abort the disk write and delete the incomplete file
         if (fileWritable) {
-            try { 
-                await fileWritable.abort(); // .abort() closes the stream AND deletes the temporary file
-            } catch(e) {
-                console.warn("Failed to abort OPFS write:", e);
-            }
+            try { await fileWritable.abort(); } catch(e) { console.warn("Failed to abort OPFS write:", e); }
             fileWritable = null;
             fileHandle = null;
         }
-        receivingFile = []; // Clear RAM fallback just in case
+        receivingFile = []; 
 
         if (conn && conn.open) {
             conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
@@ -1426,11 +1472,9 @@
         batchTotalSize = pendingFileTransfer.totalSize;
         batchReceivedSize = 0;
 
+        renderTransferFileList(receiveQueue, false);
         setTransferState(true);
         
-        document.getElementById('active-filename').innerText = `(1/${receiveQueue.length}) ${receiveQueue[0].name}`;
-        document.getElementById('active-filesize').innerText = formatBytes(receiveQueue[0].size);
-
         updateStats(0, batchTotalSize);
         transferStartTime = Date.now();
         updateStatus(`Receiving 1 of ${receiveQueue.length}...`, "var(--accent)");
@@ -1459,20 +1503,17 @@
         }
 
         const file = sendQueue[currentSendIndex];
-        document.getElementById('active-filename').innerText = `(${currentSendIndex + 1}/${sendQueue.length}) ${file.name}`;
-        document.getElementById('active-filesize').innerText = formatBytes(file.size);
-        document.querySelector('.apple-file-icon').innerHTML = getFileIconSVG(file.type); // Update Icon
+        updateActiveTransferFile(currentSendIndex, sendQueue.length);
 
         conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
 
         let offset = 0; 
         const chunkSize = 256 * 1024;
         
-        unackedChunks = 0; // Reset traffic counter for the new file
-        let isReading = false; // Prevent multiple FileReader instances from overlapping
+        unackedChunks = 0; 
+        let isReading = false; 
         
         resumeReading = () => {
-            // Stop if cancelled, already reading, file is done, or the network pipe is full
             if (cancelTransfer || isReading || offset >= file.size || unackedChunks >= MAX_IN_FLIGHT) return;
             
             isReading = true;
@@ -1480,23 +1521,24 @@
             const reader = new FileReader();
             
             reader.onload = (e) => {
-                isReading = false; // Unlock reader
+                isReading = false; 
                 if (cancelTransfer) return; 
 
                 conn.send({ type: 'chunk', data: e.target.result });
                 offset += slice.size; 
                 batchSentSize += slice.size;
-                unackedChunks++; // Mark a chunk as "in flight"
+                unackedChunks++; 
                 
                 if (offset % (chunkSize * 5) === 0 || offset >= file.size) {
                     updateStats(batchSentSize, batchTotalSize);
                 }
 
                 if (offset < file.size) {
-                    resumeReading(); // Loop: Instantly check if we have permission to send the next chunk
+                    resumeReading(); 
                 } else {
                     conn.send({ type: 'file_done' });
                     saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
+                    markTransferFileDone(currentSendIndex);
                     currentSendIndex++;
                     sendNextFile();
                 }
@@ -1504,7 +1546,7 @@
             reader.readAsArrayBuffer(slice);
         };
         
-        resumeReading(); // Kick off the process
+        resumeReading(); 
     }
 
     function setupConnection() {
@@ -1522,7 +1564,6 @@
             }, 300);
         });
 
-        // Listen directly to the raw WebRTC connection state for instant drop detection
         conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
             const state = conn.peerConnection.iceConnectionState;
             
@@ -1531,7 +1572,6 @@
                 
                 if (isTransferring) {
                     cancelTransfer = true;
-                    // Clean up the disk if a file was mid-download
                     if (fileWritable) {
                         try { await fileWritable.abort(); } catch(e) {}
                         fileWritable = null;
@@ -1543,7 +1583,7 @@
                     showToast("Connection lost", "error");
                 }
                 
-                disconnectPeer(); // Reset the UI to the QR scanner screen
+                disconnectPeer(); 
             }
         });
 
@@ -1582,7 +1622,7 @@
                             </div>
                             <div class="file-details">
                                 <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted); font-family: 'Courier New', monospace; font-weight: 600;">${formatBytes(f.size)}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div>
                             </div>
                         </div>`;
                 });
@@ -1608,25 +1648,19 @@
                 receivingFileName = data.name;
                 receivingFileType = data.filetype; 
                 currentReceiveIndex = data.index;
-                
-                document.querySelector('.apple-file-icon').innerHTML = getFileIconSVG(data.filetype); // Update Icon
 
-                // Try to use the modern Disk-direct OPFS API
                 try {
                     const root = await navigator.storage.getDirectory();
-                    // Delete old file if it exists to avoid appending to previous failed transfers
                     try { await root.removeEntry(data.name); } catch(e){} 
-                    
                     fileHandle = await root.getFileHandle(data.name, { create: true });
                     fileWritable = await fileHandle.createWritable();
                 } catch (e) {
                     console.warn("OPFS Disk Write not supported. Falling back to RAM.", e);
                     fileWritable = null;
-                    receivingFile = []; // Fallback
+                    receivingFile = []; 
                 }
 
-                document.getElementById('active-filename').innerText = `(${currentReceiveIndex + 1}/${receiveQueue.length}) ${data.name}`;
-                document.getElementById('active-filesize').innerText = formatBytes(data.size);
+                updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
                 updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
 
             } else if (data.type === 'chunk') {
@@ -1635,17 +1669,14 @@
                 batchReceivedSize += data.data.byteLength;
 
                 if (fileWritable) {
-                    // Chain the write, THEN send the ACK back to the sender
                     writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(() => {
                         conn.send({ type: 'ack' });
                     });
                 } else {
-                    // Fallback RAM method
                     receivingFile.push(data.data); 
                     conn.send({ type: 'ack' });
                 }
 
-                // Update UI slightly less often to save CPU cycles
                 if (batchReceivedSize % (256 * 1024 * 5) === 0 || batchReceivedSize >= batchTotalSize) {
                     updateStats(batchReceivedSize, batchTotalSize);
                 }
@@ -1656,25 +1687,20 @@
                 let url;
                 
                 if (fileWritable) {
-                    // Wait for all queued writes to finish, then close the disk stream
                     await writeQueue;
                     await fileWritable.close();
                     
-                    // Get the finished file from disk and create a download link
                     const diskFile = await fileHandle.getFile();
                     url = URL.createObjectURL(diskFile);
                     
-                    // Clean up
                     fileWritable = null;
                     fileHandle = null;
                 } else {
-                    // Fallback RAM method
                     const safeType = receivingFileType || 'application/octet-stream';
                     const blob = new Blob(receivingFile, { type: safeType });
                     url = URL.createObjectURL(blob); 
                 }
                 
-                // Trigger the browser download
                 const a = document.createElement('a'); 
                 a.style.display = 'none'; 
                 a.href = url; 
@@ -1688,6 +1714,7 @@
                     window.URL.revokeObjectURL(url);
                 }, 2000); 
                 
+                markTransferFileDone(currentReceiveIndex);
                 saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
 
             } else if (data.type === 'batch_done') {
@@ -1696,17 +1723,15 @@
                 showToast("All files received", "success");
                 setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
             
-            // --- ADD THIS NEW BLOCK ---
             } else if (data.type === 'ack') {
-                unackedChunks--; // A chunk arrived safely! Free up a slot.
-                if (resumeReading) resumeReading(); // Wake up the file reader
+                unackedChunks--; 
+                if (resumeReading) resumeReading(); 
             }
         });
 
         conn.on('close', async () => { 
             if (pulseInterval) clearInterval(pulseInterval);
             
-            // Failsafe cleanup
             if (isTransferring && !cancelTransfer) {
                 cancelTransfer = true;
                 if (fileWritable) {
@@ -1733,7 +1758,9 @@
             batchTotalSize = sendQueue.reduce((acc, file) => acc + file.size, 0);
             batchSentSize = 0;
 
+            renderTransferFileList(sendQueue, true);
             setTransferState(true);
+            
             updateStats(0, batchTotalSize);
             updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#f59e0b");
             

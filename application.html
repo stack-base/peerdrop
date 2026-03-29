@@ -425,11 +425,11 @@ function markTransferFileDone(index){const item=document.getElementById(`transfe
 
 let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
 
-// --- NEW TRANSFER CONSTANTS ---
-const CHUNK_SIZE = 1024 * 1024; // 1MB chunks (Faster throughput)
-const MAX_BUFFER = 16 * 1024 * 1024; // 16MB Network Buffer Limit
-const MAX_IN_FLIGHT = 16 * 1024 * 1024; // 16MB Unacknowledged Data Limit
+const CHUNK_SIZE = 512 * 1024; // 512KB chunks
+const MAX_BUFFER = 8 * 1024 * 1024; // 8MB Network Buffer Limit
+const MAX_IN_FLIGHT = 8 * 1024 * 1024; // 8MB Unacknowledged Data Limit
 const ACK_INTERVAL = 4 * 1024 * 1024; // Send ACK every 4MB written
+// ----------------------------------
 
 let bytesConfirmedWritten = 0; // Tracks what the receiver safely saved
 let receiverBytesWritten = 0; // Tracks local writes on the receiver side
@@ -569,7 +569,7 @@ function setupConnection() {
 
         // --- NEW: WAKE SENDER WHEN BUFFER DRAINS ---
         if (conn.dataChannel) {
-            conn.dataChannel.bufferedAmountLowThreshold = 8 * 1024 * 1024; // 8MB
+            conn.dataChannel.bufferedAmountLowThreshold = 6 * 1024 * 1024; // 8MB
             conn.dataChannel.onbufferedamountlow = () => {
                 if (resumeReading) resumeReading();
             };

@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <title>PeerDrop | StackBase</title>
     <link rel="manifest" href="manifest.json">
-    
     <meta id="theme-color-meta" name="theme-color" content="#f5f5f7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png" type="image/x-icon">
     <link rel="apple-touch-icon" href="https://stack-base.github.io/media/brand/peerdrop/peerdrop-favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,690 +17,194 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        :root { 
-            --bg: #f5f5f7; --card-bg: #ffffff; --text-main: #1d1d1f; --text-muted: #86868b;
-            --primary: #1d1d1f; --primary-hover: #434344; --primary-text: #ffffff;
-            --border: #e5e5ea; --input-bg: #f5f5f7; --accent: #007AFF; 
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            --radius-lg: 24px; --radius-md: 14px;
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --glow-opacity: 0.15;
-        }
-
-        body.dark-mode {
-            --bg: #000000; --card-bg: #1c1c1e; --text-main: #f5f5f7; --text-muted: #86868b;
-            --primary: #ffffff; --primary-hover: #e5e5ea; --primary-text: #000000;
-            --border: #2c2c2e; --input-bg: #2c2c2e; --accent: #0a84ff;
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
-            --glow-opacity: 0.25;
-        }
-
-        * { -webkit-tap-highlight-color: transparent; }
-
-        html, body { 
-            height: 100dvh;
-            overflow: hidden; 
-            font-family: 'Roboto', Arial, sans-serif; 
-            background-color: var(--bg); color: var(--text-main); 
-            margin: 0; padding: 0; transition: background-color 0.5s ease, color 0.5s ease;
-            -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
-        }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--border); 
-            border-radius: 10px; 
-            border: 2px solid var(--bg); 
-            transition: background 0.3s ease; 
-        }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-        * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-enter { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } 
-        .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
-
-        .layout-wrapper { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
-
-        .guide-pane {
-            flex: 1.2; background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f);
-            background-size: 300% 300%; animation: gradientBG 15s ease infinite; color: white;
-            display: flex; flex-direction: column; justify-content: center; padding: 60px; position: relative;
-        }
-        .brand-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-transform: uppercase;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 16px;
-            margin-top: 36px;
-            padding-top: 28px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .feature {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feature svg {
-            width: 28px;
-            height: 28px;
-            flex-shrink: 0;
-            stroke: rgba(255, 255, 255, 0.9);
-        }
-
-        .feature div {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .feature strong { 
-            font-size: 0.9rem; 
-            font-weight: 700; 
-        }
-
-        .feature span { 
-            font-size: 0.8rem; 
-            opacity: 0.8; 
-            line-height: 1.2;
-        }   
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .guide-content { max-width: 460px; margin: 0 auto; z-index: 2; }
-        .guide-pane h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 16px; color: #ffffff; line-height: 1.05; }
-        /* Update this existing rule */
-        .guide-pane p.subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 32px; line-height: 1.5; font-weight: 400;}
-        
-        /* Add these to your existing delay classes */
-        .delay-5 { animation-delay: 0.5s; } 
-        .delay-6 { animation-delay: 0.6s; }
-
-        .step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
-        .step-number {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 1.05rem; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .step-text h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 600; }
-        .step-text p { margin: 0; opacity: 0.85; font-size: 0.95rem; line-height: 1.4; }
-
-        .app-pane { 
-            flex: 1; background: var(--bg); display: flex; align-items: center; flex-direction: column;
-            padding: 0; position: relative; transition: var(--transition); box-sizing: border-box;
-            height: 100dvh; overflow-y: auto; overflow-x: hidden;
-        }
-        .app-pane::before, .app-pane::after { content: ''; flex: auto; }
-
-        .ambient-glow {
-            position: fixed; top: 50%; left: 70%; transform: translate(-50%, -50%);
-            width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
-            background: radial-gradient(circle, rgba(10,132,255,var(--glow-opacity)) 0%, rgba(94,92,230,var(--glow-opacity)) 30%, rgba(191,90,242,0) 70%);
-            filter: blur(60px); border-radius: 50%; z-index: 0; pointer-events: none;
-            animation: pulseGlow 8s ease-in-out infinite alternate; transition: opacity 0.5s ease;
-        }
-        @keyframes pulseGlow { 0% { transform: translate(-50%, -50%) scale(0.9) translate(-20px, 20px); } 100% { transform: translate(-50%, -50%) scale(1.1) translate(20px, -20px); } }
-
-        .app-content { 
-            width: 100%; max-width: 440px; text-align: center; box-sizing: border-box; 
-            display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; 
-            padding: calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)) 20px; 
-            min-height: 100vh;
-        }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; }
-        .header-controls { display: flex; gap: 8px; }
-
-        .profile-avatar {
-            width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #bf5af2);
-            border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2.2rem; font-weight: bold; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3); text-transform: uppercase;
-        }
-        .settings-avatar { 
-            margin-top: 10px; 
-            margin-bottom: 30px; 
-            width: 90px; 
-            height: 90px; 
-            font-size: 2.5rem;
-            flex-shrink: 0; /* Prevents the oval distortion */
-        }
-        
-        .welcome-text { margin-bottom: 30px; }
-        .welcome-text h2 { font-size: 1.8rem; margin: 0 0 10px 0; font-weight: 700;}
-        .welcome-text p { color: var(--text-muted); margin: 0; }
-        
-        .input-group { margin-bottom: 18px; text-align: left; width: 100%;}
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; margin-left: 4px; }
-
-        .box { 
-            background: var(--card-bg); padding: 28px; border-radius: var(--radius-lg); margin-bottom: 24px; 
-            display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); 
-            transition: var(--transition); box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
-        }
-        
-        .id-container { 
-            display: flex; align-items: center; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;
-            background: var(--input-bg); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border);
-        }
-        .id-text { 
-            font-size: 1.15rem; 
-            font-weight: 500; 
-            font-family: 'Roboto', sans-serif; 
-            word-break: break-all; 
-            letter-spacing: 0.5px;
-        }
-        
-        input[type="text"], input[type="email"] { 
-            width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); 
-            background: var(--card-bg); color: var(--text-main); font-size: 1.05rem; font-family: inherit; box-sizing: border-box; 
-            transition: var(--transition); outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); transform: translateY(-1px); }
-        
-        .active-connection {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
-            text-align: left; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            position: relative; overflow: hidden;
-        }
-        .peer-avatar {
-            width: 46px; height: 46px; background: linear-gradient(135deg, #34c759, #30b053);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.3rem; font-weight: bold; flex-shrink: 0; text-transform: uppercase;
-        }
-        .peer-info { flex: 1; overflow: hidden; }
-        .peer-status { font-size: 0.75rem; color: #34c759; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;}
-        .peer-name-display { font-size: 1.05rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;}
-        .peer-email-display { font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        
-        .btn-disconnect { margin: 0; width: 36px; height: 36px; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
-        .btn-disconnect:hover { background: rgba(255, 59, 48, 0.2); transform: scale(1.05); cursor: pointer;}
-
-        .drop-zone { 
-            border: 2px dashed var(--border); padding: 40px 20px; border-radius: var(--radius-md); transition: var(--transition); 
-            background: var(--card-bg); margin-bottom: 20px; position: relative; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .drop-zone:hover { border-color: var(--text-muted); transform: scale(0.99); }
-        .drop-zone:active { transform: scale(0.97); }
-        .drop-zone.dragover { border-color: var(--accent); background-color: rgba(10, 132, 255, 0.05); transform: scale(1.02); border-style: solid;}
-        
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
-        
-        #drop-ui-elements { display: flex; flex-direction: column; align-items: center; width: 100%; pointer-events: none;}
-        .drop-icon { width: 48px; height: 48px; margin-bottom: 16px; fill: var(--text-muted); transition: fill 0.3s ease;}
-        .drop-zone.dragover .drop-icon { fill: var(--accent); }
-        #drop-text { margin: 0; font-size: 1rem; font-weight: 500; word-break: break-word; line-height: 1.4; z-index: 2;}
-        #drop-subtext { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); z-index: 2;}
-
-        /* Pill Buttons */
-        button { 
-            background: var(--primary); color: var(--primary-text); border: none; padding: 18px 24px; width: 100%; 
-            border-radius: 100px; /* Apple/Google standard pill */
-            font-weight: 600; font-size: 1.05rem; font-family: inherit; letter-spacing: 0.3px;
-            cursor: pointer; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s; margin-bottom: 12px; margin-top: 10px;
-        }
-        button:hover { background: var(--primary-hover); }
-        button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-         .btn-small { width: auto; padding: 10px 20px; margin: 0; font-size: 0.9rem; }
-
-        .btn-icon { 
-            width: 44px; height: 44px; padding: 0; margin: 0; background: var(--card-bg); border: none; 
-            color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: transform 0.2s, background 0.2s;
-        }
-        .btn-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; pointer-events: none;}
-        .btn-icon:hover { background: rgba(120, 120, 128, 0.16); }
-        .btn-icon:active { transform: scale(0.92); }
-
-        .qr-wrapper { display: inline-block; margin-top: 10px; transition: var(--transition); background: #fff;}
-
-        /* --- Premium File List UI --- */
-        .transfer-active-ui {
-            padding: 24px 20px;
-            gap: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-sizing: border-box;
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .transfer-active-ui {
-            background: #1c1c1e;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .transfer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .transfer-header h3 {
-            margin: 0;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-        }
-
-        .btn-cancel-transfer {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: var(--input-bg);
-            color: var(--text-muted);
-            border: none; padding: 0; margin: 0;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-cancel-transfer svg { width: 14px; height: 14px; pointer-events: none; }
-        .btn-cancel-transfer:hover { background: rgba(255, 59, 48, 0.1); color: #ff3b30; transform: scale(1.05); }
-
-        .transfer-file-list {
-            width: 100%;
-            max-height: 200px; /* Fits about 3.5 items before scrolling */
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding-right: 4px;
-        }
-
-        .transfer-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 14px;
-            background: var(--input-bg);
-            border-radius: 14px;
-            gap: 14px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            border: 1px solid transparent;
-        }
-
-        .transfer-item.active {
-            background: rgba(10, 132, 255, 0.08);
-            border-color: rgba(10, 132, 255, 0.2);
-            transform: scale(1.01);
-        }
-
-        .transfer-item.done { opacity: 0.6; }
-
-        .transfer-item-icon {
-            width: 34px; height: 34px;
-            color: var(--text-muted);
-            display: flex; align-items: center; justify-content: center;
-            background: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        }
-        .transfer-item-icon svg { width: 20px; height: 20px; }
-        .transfer-item.active .transfer-item-icon { color: var(--accent); }
-
-        .transfer-item-info { flex: 1; overflow: hidden; text-align: left; display: flex; flex-direction: column; gap: 2px;}
-        .transfer-item-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
-        .transfer-item-size, .transfer-overall-stats, .history-meta {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .transfer-item-status { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-
-        /* Native-style spinning loader */
-        .spinner-ring {
-            width: 18px; height: 18px;
-            border: 2.5px solid rgba(10,132,255,0.2);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .transfer-progress-section {
-            width: 100%;
-            background: var(--input-bg);
-            padding: 18px;
-            border-radius: 18px;
-            box-sizing: border-box;
-        }
-
-        .transfer-progress-info {
-            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;
-        }
-
-        .transfer-percentage {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
-            line-height: 1;
-        }
-
-        .transfer-stats-right {
-            font-size: 0.85rem; color: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums;
-            display: flex; align-items: center; gap: 6px;
-        }
-        
-        .stat-dot { opacity: 0.5; font-size: 0.7rem; }
-
-        .transfer-progress-track {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .transfer-progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .transfer-overall-stats {
-            display: flex; justify-content: space-between; margin-top: 12px;
-            font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
-        }
-
-        #status { font-size: 0.95rem; margin-top: 20px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .status-dot { width: 10px; height: 10px; background: var(--text-muted); border-radius: 50%; transition: background-color 0.3s ease; box-shadow: 0 0 8px currentColor;}
-
-        .hidden { display: none !important; }
-
-        .modal-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            z-index: 1000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
-        }
-        .modal-overlay.active { 
-            opacity: 1; pointer-events: auto; visibility: visible; 
-            transition: opacity 0.4s ease, visibility 0s linear 0s;
-        }
-        
-        .modal-content {
-            background: var(--bg); width: 100%; height: 100%; border-radius: 0;
-            padding: calc(40px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
-            border: none; box-shadow: none; margin: 0;
-            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; box-sizing: border-box; overflow-y: hidden;
-        }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-shrink: 0;}
-        .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;}
-        
-        .close-btn { 
-            background: var(--card-bg); color: var(--text-main); 
-            cursor: pointer; padding: 0; width: 44px; height: 44px; border-radius: 50%; margin: 0;
-            display: flex; align-items: center; justify-content: center; transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
-        }
-        .close-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; pointer-events: none;}
-        .close-btn:hover { background: var(--input-bg); transform: scale(1.05); }
-        .close-btn:active { transform: scale(0.95); }
-
-        .history-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; padding-right: 5px; margin-top: 10px;}
-        .history-list::-webkit-scrollbar { width: 6px; }
-        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        
-        .history-item {
-            display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: var(--radius-lg);
-            background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.2s ease;
-        }
-        .history-item:hover { transform: translateY(-2px); border-color: var(--text-muted); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
-        .history-icon { 
-            width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; 
-            background: rgba(10, 132, 255, 0.1); color: var(--accent); flex-shrink: 0;
-        }
-        .history-icon.received { background: rgba(52, 199, 89, 0.1); color: #34c759; }
-        .history-icon svg { fill: none; }
-        
-        .history-details { flex: 1; overflow: hidden; text-align: left; display: flex; flex-direction: column; gap: 4px; }
-        .history-name { font-weight: 600; font-size: 1.05rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
-        .history-peer { font-size: 0.85rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
-        .history-peer svg { fill: none; }
-        .history-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin: 0; opacity: 0.8; font-weight: 600;}
-        .empty-history { text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic; font-size: 1.1rem;}
-
-        .settings-container { 
-            display: flex; flex-direction: column; align-items: center; max-width: 420px; 
-            margin: 0 auto; width: 100%; flex: 1; padding-right: 5px;
-        }
-
-        /* Optional: Match the scrollbar style to the rest of the app */
-        .settings-container::-webkit-scrollbar { width: 6px; }
-        .settings-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        #scanner-modal .modal-content {
-            padding: 0; overflow: hidden; display: flex; flex-direction: column;
-            background: #000; color: #fff; border-radius: 32px;
-            height: 80vh; max-height: 750px; position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .scanner-header {
-            padding: calc(24px + env(safe-area-inset-top)) 24px 24px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 10; 
-            position: absolute; top: 0; left: 0; right: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none;
-        }
-        .scanner-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;}
-        .scanner-header .close-btn { 
-            pointer-events: auto; background: rgba(255,255,255,0.15); color: #fff; border: none; 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        }
-        
-        #reader-video-container {
-            width: 100%; flex: 1; position: absolute; inset: 0; background: #000; 
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
-        
-        #reader-video { width: 100% !important; height: 100% !important; position: absolute; inset: 0;}
-        #reader-video video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 0 !important; }
-        
-        .scanner-overlay {
-            position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; pointer-events: none; overflow: hidden;
-        }
-        
-        .viewfinder { 
-            width: 280px; height: 280px; position: relative; 
-            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45); 
-            border-radius: 24px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .viewfinder::before, .viewfinder::after, .viewfinder-inner::before, .viewfinder-inner::after {
-            content: ''; position: absolute; width: 48px; height: 48px; 
-            border-color: #ffffff; border-style: solid; border-width: 0;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-            transition: border-color 0.2s ease;
-        }
-        .viewfinder::before { top: 0; left: 0; border-top-width: 5px; border-left-width: 5px; border-top-left-radius: 24px; }
-        .viewfinder::after { top: 0; right: 0; border-top-width: 5px; border-right-width: 5px; border-top-right-radius: 24px; }
-        .viewfinder-inner { position: absolute; inset: 0; }
-        .viewfinder-inner::before { bottom: 0; left: 0; border-bottom-width: 5px; border-left-width: 5px; border-bottom-left-radius: 24px; }
-        .viewfinder-inner::after { bottom: 0; right: 0; border-bottom-width: 5px; border-right-width: 5px; border-bottom-right-radius: 24px; }
-        
-        .viewfinder.success { transform: scale(0.92); }
-        .viewfinder.success::before, .viewfinder.success::after, 
-        .viewfinder.success .viewfinder-inner::before, .viewfinder.success .viewfinder-inner::after {
-            border-color: #34c759;
-        }
-
-        .scanner-footer {
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            padding: 40px 20px calc(30px + env(safe-area-inset-bottom)); text-align: center; z-index: 10; 
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-        }
-
-        .incoming-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; visibility: hidden;
-            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.5s;
-            overflow-y: auto; padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom)) 24px; box-sizing: border-box;
-        }
-        .incoming-overlay.active { 
-            opacity: 1; pointer-events: auto; visibility: visible; 
-            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0s;
-        }
-        
-        .incoming-content-wrapper {
-            max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center;
-            text-align: center; transform: translateY(40px) scale(0.95);
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); margin: auto;
-        }
-        .incoming-overlay.active .incoming-content-wrapper { transform: translateY(0) scale(1); }
-
-        .incoming-brand-text {
-            font-size: 1.5rem; font-weight: 800; color: var(--text-muted); 
-            margin-bottom: 24px; user-select: none;
-        }
-
-        .incoming-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; margin: 0 0 32px 0; color: var(--text-main); line-height: 1.2;}
-
-        .incoming-user-box { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 32px; width: 100%; }
-        
-        .pulsing-avatar-container { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
-        .incoming-avatar {
-            width: 100%; height: 100%; font-size: 2.4rem; position: relative; z-index: 2; margin: 0;
-            background: linear-gradient(135deg, var(--accent), #5e5ce6); box-shadow: 0 10px 30px rgba(10, 132, 255, 0.25);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-transform: uppercase;
-        }
-        .pulse-ring {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; height: 100%; border-radius: 50%; background: var(--accent); opacity: 0.4; z-index: 1;
-            animation: pulse-ring-anim 1s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
-        }
-        @keyframes pulse-ring-anim { 0% { width: 100%; height: 100%; opacity: 0.6; } 100% { width: 220%; height: 220%; opacity: 0; } }
-
-        .incoming-user-details { display: flex; flex-direction: column; gap: 4px; }
-        #incoming-name { font-weight: 700; font-size: 1.4rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #incoming-device { font-size: 1rem; color: var(--text-muted); }
-
-        .incoming-file-list {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
-            width: 100%; padding: 8px; margin-bottom: 32px; box-shadow: var(--shadow); box-sizing: border-box;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-
-        .incoming-file-item {
-            display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 16px;
-            background: var(--input-bg); text-align: left; transition: var(--transition);
-        }
-        
-        .file-preview-icon {
-            width: 44px; height: 44px; border-radius: 12px; background: var(--card-bg); color: var(--text-main);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .file-details { flex: 1; overflow: hidden; }
-
-        .incoming-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-        .btn-accept-huge {
-            background: var(--primary); color: var(--primary-text); border-radius: 100px;
-            font-size: 1.1rem; padding: 20px; font-weight: 600; width: 100%; border: none; cursor: pointer;
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s; margin: 0;
-        }
-        .btn-accept-huge:hover { background: var(--primary-hover); transform: scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .btn-decline-huge {
-            background: transparent; color: var(--text-main); border-radius: 100px; font-size: 1.1rem;
-            padding: 20px; font-weight: 600; width: 100%; border: none; cursor: pointer; transition: background 0.2s; margin: 0;
-        }
-        .btn-decline-huge:hover { background: var(--input-bg); }
-
-        #toast-container { position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast {
-            background: rgba(30, 30, 30, 0.95); color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.success .toast-icon { color: #34c759; fill: none; }
-        .toast.error .toast-icon { color: #ff3b30; fill: none; }
-
-        @media (max-width: 900px) {
-            .layout-wrapper { flex-direction: column; }
-            .guide-pane { display: none; }
-            .app-content { padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
-            .ambient-glow { width: 150vw; height: 150vw; top: 50%; left: 50%; }
-            .modal-content { padding: calc(20px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom)) 20px; }
-            #scanner-modal .modal-content { height: 100dvh; max-height: none; border-radius: 0; }
-            .modal-overlay, .incoming-overlay { position: fixed; width: 100vw; height: 100dvh; }
-
-            html, body {
-                height: auto !important;
-                min-height: 100dvh;
-                overflow: visible !important;
-                overscroll-behavior-y: auto; 
-            }
-
-            .layout-wrapper {
-                height: auto;
-                min-height: 100dvh;
-                overflow: visible;
-            }
-
-            .app-pane {
-                height: auto;
-                min-height: 100dvh;
-                overflow-y: visible;
-            }
-            .settings-container {
-                overflow-y: auto;
-                overscroll-behavior-y: contain;
-                scrollbar-width: none; /* Hides scrollbar in Firefox */
-            }
-            
-            .settings-container::-webkit-scrollbar {
-                display: none; /* Hides scrollbar in Chrome/Safari */
-            }
-        }
+        :root{--bg:#f5f5f7;--card-bg:#ffffff;--text-main:#1d1d1f;--text-muted:#86868b;--primary:#1d1d1f;--primary-hover:#434344;--primary-text:#ffffff;--border:#e5e5ea;--input-bg:#f5f5f7;--accent:#007AFF;--shadow:0 10px 40px -10px rgba(0,0,0,0.08);--radius-lg:24px;--radius-md:14px;--transition:all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);--glow-opacity:0.15}
+        body.dark-mode{--bg:#000000;--card-bg:#1c1c1e;--text-main:#f5f5f7;--text-muted:#86868b;--primary:#ffffff;--primary-hover:#e5e5ea;--primary-text:#000000;--border:#2c2c2e;--input-bg:#2c2c2e;--accent:#0a84ff;--shadow:0 10px 40px -10px rgba(0,0,0,0.8);--glow-opacity:0.25}
+        *{-webkit-tap-highlight-color:transparent}
+        html,body{height:100dvh;overflow:hidden;font-family:'Roboto',Arial,sans-serif;background-color:var(--bg);color:var(--text-main);margin:0;padding:0;transition:background-color .5s ease,color .5s ease;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+        ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;border:2px solid var(--bg);transition:background .3s ease}
+        ::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+        @keyframes slideUpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .animate-enter{opacity:0;animation:slideUpFade .6s cubic-bezier(0.16,1,0.3,1) forwards}
+        .delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}.delay-5{animation-delay:.5s}.delay-6{animation-delay:.6s}
+        .layout-wrapper{display:flex;height:100dvh;width:100%;overflow:hidden}
+        .guide-pane{flex:1.2;background:linear-gradient(-45deg,#0a84ff,#5e5ce6,#bf5af2,#ff375f);background-size:300% 300%;animation:gradientBG 15s ease infinite;color:#fff;display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative}
+        .brand-badge{display:inline-block;background:rgba(255,255,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 14px;border-radius:20px;font-size:.85rem;font-weight:700;letter-spacing:.5px;margin-bottom:24px;border:1px solid rgba(255,255,255,.2);text-transform:uppercase}
+        .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin-top:36px;padding-top:28px;border-top:1px solid rgba(255,255,255,.2)}
+        .feature{display:flex;align-items:center;gap:10px}
+        .feature svg{width:28px;height:28px;flex-shrink:0;stroke:rgba(255,255,255,.9)}
+        .feature div{display:flex;flex-direction:column;gap:2px}
+        .feature strong{font-size:.9rem;font-weight:700}
+        .feature span{font-size:.8rem;opacity:.8;line-height:1.2}
+        @keyframes gradientBG{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+        .guide-content{max-width:460px;margin:0 auto;z-index:2}
+        .guide-pane h1{font-size:3.2rem;font-weight:800;letter-spacing:-.04em;margin-bottom:16px;color:#fff;line-height:1.05}
+        .guide-pane p.subtitle{font-size:1.1rem;opacity:.9;margin-bottom:32px;line-height:1.5;font-weight:400}
+        .step{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px}
+        .step-number{background:rgba(255,255,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.05rem;flex-shrink:0;border:1px solid rgba(255,255,255,.2);box-shadow:0 4px 15px rgba(0,0,0,.1)}
+        .step-text h3{margin:0 0 4px 0;font-size:1.1rem;font-weight:600}
+        .step-text p{margin:0;opacity:.85;font-size:.95rem;line-height:1.4}
+        .app-pane{flex:1;background:var(--bg);display:flex;align-items:center;flex-direction:column;padding:0;position:relative;transition:var(--transition);box-sizing:border-box;height:100dvh;overflow-y:auto;overflow-x:hidden}
+        .app-pane::before,.app-pane::after{content:'';flex:auto}
+        .ambient-glow{position:fixed;top:50%;left:70%;transform:translate(-50%,-50%);width:50vw;height:50vw;max-width:600px;max-height:600px;background:radial-gradient(circle,rgba(10,132,255,var(--glow-opacity)) 0,rgba(94,92,230,var(--glow-opacity)) 30%,rgba(191,90,242,0) 70%);filter:blur(60px);border-radius:50%;z-index:0;pointer-events:none;animation:pulseGlow 8s ease-in-out infinite alternate;transition:opacity .5s ease}
+        @keyframes pulseGlow{0%{transform:translate(-50%,-50%) scale(.9) translate(-20px,20px)}100%{transform:translate(-50%,-50%) scale(1.1) translate(20px,-20px)}}
+        .app-content{width:100%;max-width:440px;text-align:center;box-sizing:border-box;display:flex;flex-direction:column;flex-shrink:0;z-index:10;padding:calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)) 20px;min-height:100vh}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+        .header h2{margin:0;font-size:1.8rem;font-weight:800}
+        .header-controls{display:flex;gap:8px}
+        .profile-avatar{width:80px;height:80px;background:linear-gradient(135deg,var(--accent),#bf5af2);border-radius:50%;margin:0 auto 20px auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.2rem;font-weight:700;box-shadow:0 8px 24px rgba(10,132,255,.3);text-transform:uppercase}
+        .settings-avatar{margin-top:10px;margin-bottom:30px;width:90px;height:90px;font-size:2.5rem;flex-shrink:0}
+        .welcome-text{margin-bottom:30px}
+        .welcome-text h2{font-size:1.8rem;margin:0 0 10px 0;font-weight:700}
+        .welcome-text p{color:var(--text-muted);margin:0}
+        .input-group{margin-bottom:18px;text-align:left;width:100%}
+        .input-group label{display:block;font-size:.85rem;font-weight:600;color:var(--text-muted);margin-bottom:8px;margin-left:4px}
+        .box{background:var(--card-bg);padding:28px;border-radius:var(--radius-lg);margin-bottom:24px;display:flex;flex-direction:column;align-items:center;border:1px solid var(--border);transition:var(--transition);box-shadow:var(--shadow);width:100%;box-sizing:border-box}
+        .id-container{display:flex;align-items:center;gap:12px;margin-bottom:20px;justify-content:center;flex-wrap:wrap;background:var(--input-bg);padding:12px 20px;border-radius:30px;border:1px solid var(--border)}
+        .id-text{font-size:1.15rem;font-weight:500;font-family:'Roboto',sans-serif;word-break:break-all;letter-spacing:.5px}
+        input[type="text"],input[type="email"]{width:100%;padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card-bg);color:var(--text-main);font-size:1.05rem;font-family:inherit;box-sizing:border-box;transition:var(--transition);outline:0;box-shadow:0 2px 8px rgba(0,0,0,.02)}
+        input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(10,132,255,.15);transform:translateY(-1px)}
+        .active-connection{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;text-align:left;width:100%;box-sizing:border-box;box-shadow:0 4px 12px rgba(0,0,0,.03);position:relative;overflow:hidden}
+        .peer-avatar{width:46px;height:46px;background:linear-gradient(135deg,#34c759,#30b053);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;font-weight:700;flex-shrink:0;text-transform:uppercase}
+        .peer-info{flex:1;overflow:hidden}
+        .peer-status{font-size:.75rem;color:#34c759;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;display:flex;align-items:center;gap:4px}
+        .peer-name-display{font-size:1.05rem;font-weight:600;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+        .peer-email-display{font-size:.85rem;color:var(--text-muted);margin:2px 0 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .btn-disconnect{margin:0;width:36px;height:36px;color:#ff3b30;background:rgba(255,59,48,.1);border:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .btn-disconnect:hover{background:rgba(255,59,48,.2);transform:scale(1.05);cursor:pointer}
+        .drop-zone{border:2px dashed var(--border);padding:40px 20px;border-radius:var(--radius-md);transition:var(--transition);background:var(--card-bg);margin-bottom:20px;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.02);display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .drop-zone:hover{border-color:var(--text-muted);transform:scale(.99)}
+        .drop-zone:active{transform:scale(.97)}
+        .drop-zone.dragover{border-color:var(--accent);background-color:rgba(10,132,255,.05);transform:scale(1.02);border-style:solid}
+        .drop-zone input[type="file"]{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10}
+        #drop-ui-elements{display:flex;flex-direction:column;align-items:center;width:100%;pointer-events:none}
+        .drop-icon{width:48px;height:48px;margin-bottom:16px;fill:var(--text-muted);transition:fill .3s ease}
+        .drop-zone.dragover .drop-icon{fill:var(--accent)}
+        #drop-text{margin:0;font-size:1rem;font-weight:500;word-break:break-word;line-height:1.4;z-index:2}
+        #drop-subtext{margin-top:8px;font-size:.85rem;color:var(--text-muted);z-index:2}
+        button{background:var(--primary);color:var(--primary-text);border:0;padding:18px 24px;width:100%;border-radius:100px;font-weight:600;font-size:1.05rem;font-family:inherit;letter-spacing:.3px;cursor:pointer;transition:transform .2s cubic-bezier(0.25,1,0.5,1),background .2s;margin-bottom:12px;margin-top:10px}
+        button:hover{background:var(--primary-hover)}
+        button:active{transform:translateY(1px);box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .btn-small{width:auto;padding:10px 20px;margin:0;font-size:.9rem}
+        .btn-icon{width:44px;height:44px;padding:0;margin:0;background:var(--card-bg);border:0;color:var(--text-main);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,background .2s}
+        .btn-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+        .btn-icon:hover{background:rgba(120,120,128,.16)}
+        .btn-icon:active{transform:scale(.92)}
+        .qr-wrapper{display:inline-block;margin-top:10px;transition:var(--transition);background:#fff}
+        .transfer-active-ui{padding:24px 20px;gap:0;display:flex;flex-direction:column;align-items:center;width:100%;background:var(--card-bg);border-radius:24px;box-shadow:0 10px 40px -10px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.03);box-sizing:border-box;margin-bottom:20px}
+        body.dark-mode .transfer-active-ui{background:#1c1c1e;border:1px solid rgba(255,255,255,.05);box-shadow:0 10px 40px -10px rgba(0,0,0,.5)}
+        .transfer-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+        .transfer-header h3{margin:0;font-size:1.15rem;font-weight:700;color:var(--text-main);letter-spacing:-.02em}
+        .btn-cancel-transfer{width:32px;height:32px;border-radius:50%;background:var(--input-bg);color:var(--text-muted);border:0;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+        .btn-cancel-transfer svg{width:14px;height:14px;pointer-events:none}
+        .btn-cancel-transfer:hover{background:rgba(255,59,48,.1);color:#ff3b30;transform:scale(1.05)}
+        .transfer-file-list{width:100%;max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;padding-right:4px}
+        .transfer-item{display:flex;align-items:center;padding:12px 14px;background:var(--input-bg);border-radius:14px;gap:14px;transition:all .3s cubic-bezier(0.25,1,0.5,1);border:1px solid transparent}
+        .transfer-item.active{background:rgba(10,132,255,.08);border-color:rgba(10,132,255,.2);transform:scale(1.01)}
+        .transfer-item.done{opacity:.6}
+        .transfer-item-icon{width:34px;height:34px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;background:var(--card-bg);border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+        .transfer-item-icon svg{width:20px;height:20px}
+        .transfer-item.active .transfer-item-icon{color:var(--accent)}
+        .transfer-item-info{flex:1;overflow:hidden;text-align:left;display:flex;flex-direction:column;gap:2px}
+        .transfer-item-name{font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-main)}
+        .transfer-item-size,.transfer-overall-stats,.history-meta{font-family:'Roboto',sans-serif}
+        .transfer-item-status{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+        .spinner-ring{width:18px;height:18px;border:2.5px solid rgba(10,132,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .transfer-progress-section{width:100%;background:var(--input-bg);padding:18px;border-radius:18px;box-sizing:border-box}
+        .transfer-progress-info{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
+        .transfer-percentage{font-size:1.6rem;font-weight:600;color:var(--text-main);letter-spacing:-.03em;line-height:1}
+        .transfer-stats-right{font-size:.85rem;color:var(--text-muted);font-weight:600;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px}
+        .stat-dot{opacity:.5;font-size:.7rem}
+        .transfer-progress-track{width:100%;height:8px;background:var(--border);border-radius:10px;overflow:hidden;position:relative}
+        .transfer-progress-fill{height:100%;background:var(--accent);border-radius:10px;width:0;transition:width .3s cubic-bezier(0.25,1,0.5,1)}
+        .transfer-overall-stats{display:flex;justify-content:space-between;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--text-muted)}
+        #status{font-size:.95rem;margin-top:20px;font-weight:500;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:10px}
+        .status-dot{width:10px;height:10px;background:var(--text-muted);border-radius:50%;transition:background-color .3s ease;box-shadow:0 0 8px currentColor}
+        .hidden{display:none!important}
+        .modal-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:1000;display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
+        .modal-overlay.active{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .4s ease,visibility 0s linear 0s}
+        .modal-content{background:var(--bg);width:100%;height:100%;border-radius:0;padding:calc(40px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px;border:0;box-shadow:none;margin:0;transform:translateY(30px);transition:transform .4s cubic-bezier(0.16,1,0.3,1);display:flex;flex-direction:column;box-sizing:border-box;overflow-y:hidden}
+        .modal-overlay.active .modal-content{transform:translateY(0)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-shrink:0}
+        .modal-header h3{margin:0;font-size:1.4rem;font-weight:700;letter-spacing:-.02em}
+        .close-btn{background:var(--card-bg);color:var(--text-main);cursor:pointer;padding:0;width:44px;height:44px;border-radius:50%;margin:0;display:flex;align-items:center;justify-content:center;transition:var(--transition);box-shadow:0 2px 8px rgba(0,0,0,.04);flex-shrink:0}
+        .close-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;pointer-events:none}
+        .close-btn:hover{background:var(--input-bg);transform:scale(1.05)}
+        .close-btn:active{transform:scale(.95)}
+        .history-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;padding-right:5px;margin-top:10px}
+        .history-list::-webkit-scrollbar{width:6px}
+        .history-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+        .history-item{display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:var(--radius-lg);background:var(--card-bg);border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,.02);transition:all .2s ease}
+        .history-item:hover{transform:translateY(-2px);border-color:var(--text-muted);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+        .history-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(10,132,255,.1);color:var(--accent);flex-shrink:0}
+        .history-icon.received{background:rgba(52,199,89,.1);color:#34c759}
+        .history-icon svg{fill:none}
+        .history-details{flex:1;overflow:hidden;text-align:left;display:flex;flex-direction:column;gap:4px}
+        .history-name{font-weight:600;font-size:1.05rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-main)}
+        .history-peer{font-size:.85rem;color:var(--text-muted);margin:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .history-peer svg{fill:none}
+        .history-meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-muted);margin:0;opacity:.8;font-weight:600}
+        .empty-history{text-align:center;color:var(--text-muted);padding:40px 0;font-style:italic;font-size:1.1rem}
+        .settings-container{display:flex;flex-direction:column;align-items:center;max-width:420px;margin:0 auto;width:100%;flex:1;padding-right:5px}
+        .settings-container::-webkit-scrollbar{width:6px}
+        .settings-container::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+        #scanner-modal .modal-content{padding:0;overflow:hidden;display:flex;flex-direction:column;background:#000;color:#fff;border-radius:32px;height:80vh;max-height:750px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+        .scanner-header{padding:calc(24px + env(safe-area-inset-top)) 24px 24px 24px;display:flex;justify-content:space-between;align-items:center;z-index:10;position:absolute;top:0;left:0;right:0;background:linear-gradient(to bottom,rgba(0,0,0,.7) 0,transparent 100%);pointer-events:none}
+        .scanner-header h3{margin:0;font-size:1.2rem;font-weight:600;color:#fff;letter-spacing:.5px}
+        .scanner-header .close-btn{pointer-events:auto;background:rgba(255,255,255,.15);color:#fff;border:0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+        #reader-video-container{width:100%;flex:1;position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        #reader-video{width:100%!important;height:100%!important;position:absolute;inset:0}
+        #reader-video video{object-fit:cover!important;width:100%!important;height:100%!important;border-radius:0!important}
+        .scanner-overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
+        .viewfinder{width:280px;height:280px;position:relative;box-shadow:0 0 0 4000px rgba(0,0,0,.45);border-radius:24px;transition:all .3s cubic-bezier(0.16,1,0.3,1)}
+        .viewfinder::before,.viewfinder::after,.viewfinder-inner::before,.viewfinder-inner::after{content:'';position:absolute;width:48px;height:48px;border-color:#fff;border-style:solid;border-width:0;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));transition:border-color .2s ease}
+        .viewfinder::before{top:0;left:0;border-top-width:5px;border-left-width:5px;border-top-left-radius:24px}
+        .viewfinder::after{top:0;right:0;border-top-width:5px;border-right-width:5px;border-top-right-radius:24px}
+        .viewfinder-inner{position:absolute;inset:0}
+        .viewfinder-inner::before{bottom:0;left:0;border-bottom-width:5px;border-left-width:5px;border-bottom-left-radius:24px}
+        .viewfinder-inner::after{bottom:0;right:0;border-bottom-width:5px;border-right-width:5px;border-bottom-right-radius:24px}
+        .viewfinder.success{transform:scale(.92)}
+        .viewfinder.success::before,.viewfinder.success::after,.viewfinder.success .viewfinder-inner::before,.viewfinder.success .viewfinder-inner::after{border-color:#34c759}
+        .scanner-footer{position:absolute;bottom:0;left:0;right:0;padding:40px 20px calc(30px + env(safe-area-inset-bottom));text-align:center;z-index:10;background:linear-gradient(to top,rgba(0,0,0,.8) 0,transparent 100%)}
+        .incoming-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .5s cubic-bezier(0.2,0.8,0.2,1),visibility 0s linear .5s;overflow-y:auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom)) 24px;box-sizing:border-box}
+        .incoming-overlay.active{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .5s cubic-bezier(0.2,0.8,0.2,1),visibility 0s linear 0s}
+        .incoming-content-wrapper{max-width:440px;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;transform:translateY(40px) scale(.95);transition:all .6s cubic-bezier(0.2,0.8,0.2,1);margin:auto}
+        .incoming-overlay.active .incoming-content-wrapper{transform:translateY(0) scale(1)}
+        .incoming-brand-text{font-size:1.5rem;font-weight:800;color:var(--text-muted);margin-bottom:24px;user-select:none}
+        .incoming-title{font-size:2.2rem;font-weight:800;letter-spacing:-.04em;margin:0 0 32px 0;color:var(--text-main);line-height:1.2}
+        .incoming-user-box{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:32px;width:100%}
+        .pulsing-avatar-container{position:relative;width:88px;height:88px;flex-shrink:0}
+        .incoming-avatar{width:100%;height:100%;font-size:2.4rem;position:relative;z-index:2;margin:0;background:linear-gradient(135deg,var(--accent),#5e5ce6);box-shadow:0 10px 30px rgba(10,132,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;text-transform:uppercase}
+        .pulse-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;border-radius:50%;background:var(--accent);opacity:.4;z-index:1;animation:pulse-ring-anim 1s cubic-bezier(0.2,0.8,0.2,1) infinite}
+        @keyframes pulse-ring-anim{0%{width:100%;height:100%;opacity:.6}100%{width:220%;height:220%;opacity:0}}
+        .incoming-user-details{display:flex;flex-direction:column;gap:4px}
+        #incoming-name{font-weight:700;font-size:1.4rem;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        #incoming-device{font-size:1rem;color:var(--text-muted)}
+        .incoming-file-list{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;width:100%;padding:8px;margin-bottom:32px;box-shadow:var(--shadow);box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+        .incoming-file-item{display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:16px;background:var(--input-bg);text-align:left;transition:var(--transition)}
+        .file-preview-icon{width:44px;height:44px;border-radius:12px;background:var(--card-bg);color:var(--text-main);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.02)}
+        .file-details{flex:1;overflow:hidden}
+        .incoming-actions{width:100%;display:flex;flex-direction:column;gap:12px}
+        .btn-accept-huge{background:var(--primary);color:var(--primary-text);border-radius:100px;font-size:1.1rem;padding:20px;font-weight:600;width:100%;border:0;cursor:pointer;transition:transform .2s,background .2s,box-shadow .2s;margin:0}
+        .btn-accept-huge:hover{background:var(--primary-hover);transform:scale(1.02);box-shadow:0 10px 25px rgba(0,0,0,.1)}
+        .btn-decline-huge{background:transparent;color:var(--text-main);border-radius:100px;font-size:1.1rem;padding:20px;font-weight:600;width:100%;border:0;cursor:pointer;transition:background .2s;margin:0}
+        .btn-decline-huge:hover{background:var(--input-bg)}
+        #toast-container{position:fixed;bottom:calc(30px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+        .toast{background:rgba(30,30,30,.95);color:#fff;padding:14px 24px;border-radius:30px;font-size:.95rem;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;transform:translateY(20px);transition:all .4s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.1)}
+        .toast.show{opacity:1;transform:translateY(0)}
+        .toast.success .toast-icon{color:#34c759;fill:none}
+        .toast.error .toast-icon{color:#ff3b30;fill:none}
+        @media (max-width:900px){.layout-wrapper{flex-direction:column}.guide-pane{display:none}.app-content{padding-top:calc(20px + env(safe-area-inset-top));padding-bottom:calc(40px + env(safe-area-inset-bottom))}.ambient-glow{width:150vw;height:150vw;top:50%;left:50%}.modal-content{padding:calc(20px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom)) 20px}#scanner-modal .modal-content{height:100dvh;max-height:none;border-radius:0}.modal-overlay,.incoming-overlay{position:fixed;width:100vw;height:100dvh}html,body{height:auto!important;min-height:100dvh;overflow:visible!important;overscroll-behavior-y:auto}.layout-wrapper{height:auto;min-height:100dvh;overflow:visible}.app-pane{height:auto;min-height:100dvh;overflow-y:visible}.settings-container{overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}.settings-container::-webkit-scrollbar{display:none}}
     </style>
 </head>
 <body>
-
 <div class="layout-wrapper">
     <div class="guide-pane">
         <div class="guide-content">
             <div class="brand-badge animate-enter">PeerDrop Web</div>
             <h1 class="animate-enter delay-1">Share freely.</h1>
             <p class="subtitle animate-enter delay-2">Peer-to-peer file sharing directly from your browser. No servers, no file size limits, and completely private.</p>
-            
             <div class="step animate-enter delay-3">
                 <div class="step-number">1</div>
                 <div class="step-text">
@@ -711,7 +212,6 @@
                     <p>Enter a recipient's Device ID or scan their QR code. This creates a secure, direct WebRTC tunnel between your devices.</p>
                 </div>
             </div>
-            
             <div class="step animate-enter delay-4">
                 <div class="step-number">2</div>
                 <div class="step-text">
@@ -719,7 +219,6 @@
                     <p>Drag and drop multiple files or folders into the drop zone. You can review transfer speeds and estimated times live.</p>
                 </div>
             </div>
-            
             <div class="step animate-enter delay-5">
                 <div class="step-number">3</div>
                 <div class="step-text">
@@ -727,45 +226,30 @@
                     <p>Keep track of everything you send and receive. Use the history panel to clear incomplete files and manage your local storage.</p>
                 </div>
             </div>
-
             <div class="feature-grid animate-enter delay-6">
                 <div class="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    <div>
-                        <strong>Secure</strong>
-                        <span>End-to-end authentication</span>
-                    </div>
+                    <div><strong>Secure</strong><span>End-to-end authentication</span></div>
                 </div>
                 <div class="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    <div>
-                        <strong>Lightning Fast</strong>
-                        <span>Local network speeds</span>
-                    </div>
+                    <div><strong>Lightning Fast</strong><span>Local network speeds</span></div>
                 </div>
                 <div class="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                    <div>
-                        <strong>Cross-Platform</strong>
-                        <span>Works on any browser</span>
-                    </div>
+                    <div><strong>Cross-Platform</strong><span>Works on any browser</span></div>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="app-pane">
         <div class="ambient-glow"></div>
-        
         <div id="welcome-screen" class="app-content">
-            <div class="profile-avatar animate-enter">
-                <span id="avatar-initial">?</span>
-            </div>
+            <div class="profile-avatar animate-enter"><span id="avatar-initial">?</span></div>
             <div class="welcome-text animate-enter delay-1">
-                <h2>Welcome to <font style="font-family: 'Inter', sans-serif; ">PeerDrop</font></h2>
+                <h2>Welcome to <font style="font-family: 'Inter', sans-serif;">PeerDrop</font></h2>
                 <p>Set up your device to start sharing.</p>
             </div>
-            
             <div class="box animate-enter delay-2" style="padding: 30px;">
                 <div class="input-group">
                     <label>Full Name</label>
@@ -782,10 +266,9 @@
                 <button onclick="saveInitialProfile()">Get Started</button>
             </div>
         </div>
-
         <div id="main-app-screen" class="app-content hidden">
             <div class="header">
-                <h2 style="font-family: 'Inter', sans-serif; ">PeerDrop</h2>
+                <h2 style="font-family: 'Inter', sans-serif;">PeerDrop</h2>
                 <div class="header-controls">
                     <button class="btn-icon" onclick="toggleHistory()" aria-label="View History" title="Transfer History">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -798,7 +281,6 @@
                     </button>
                 </div>
             </div>
-            
             <div id="identity-section" class="box">
                 <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Your Device ID</p>
                 <div class="id-container">
@@ -808,7 +290,6 @@
                 <div class="qr-wrapper" id="qr-wrapper"><div id="qrcode"></div></div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; margin-bottom: 0;">Scan to connect directly</p>
             </div>
-
             <div id="connect-section">
                 <div style="display: flex; gap: 12px; margin-bottom: 16px; width: 100%;">
                     <input type="text" id="target-id" placeholder="Enter recipient's Device ID" autocomplete="off" style="margin-bottom: 0; flex: 1; border-radius: 100px; padding: 16px 24px;">
@@ -822,7 +303,6 @@
                 </div>
                 <button id="connect-btn" onclick="connectToPeer()" style="margin-top: 0; color: white; background-color: #0a84ff;">Connect</button>
             </div>
-
             <div id="active-connection" class="active-connection hidden">
                 <div class="peer-avatar" id="peer-avatar">?</div>
                 <div class="peer-info">
@@ -834,61 +314,37 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-
             <div id="share-section" class="hidden drop-zone">
                 <input type="file" id="file-input" multiple>
-
                 <div id="drop-ui-elements">
-                    <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
-                        <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
-                    </svg>
+                    <svg class="drop-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
                     <p id="drop-text">Select files to send</p>
                     <p id="drop-subtext">or drag and drop them here</p>
                 </div>
-                
                 <div id="transfer-active-ui" class="transfer-active-ui hidden">
                     <div class="transfer-header">
                         <h3 id="transfer-title">Transferring Files</h3>
                         <button class="btn-cancel-transfer" onclick="abortTransfer(event)" title="Cancel Transfer">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    
                     <div class="transfer-file-list" id="transfer-file-list"></div>
-
                     <div class="transfer-progress-section">
                         <div class="transfer-progress-info">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
-                            <div class="transfer-stats-right">
-                                <span id="speed-text">0 MB/s</span>
-                                <span class="stat-dot">&bull;</span>
-                                <span id="eta-text">--:--</span> left
-                            </div>
+                            <div class="transfer-stats-right"><span id="speed-text">0 MB/s</span><span class="stat-dot">&bull;</span><span id="eta-text">--:--</span> left</div>
                         </div>
-                        
-                        <div class="transfer-progress-track">
-                            <div class="transfer-progress-fill" id="custom-progress-bar"></div>
-                        </div>
-
-                        <div class="transfer-overall-stats">
-                            <span id="file-count-text">File 1 of 1</span>
-                            <span id="amount-text">0/0 MB</span>
-                        </div>
+                        <div class="transfer-progress-track"><div class="transfer-progress-fill" id="custom-progress-bar"></div></div>
+                        <div class="transfer-overall-stats"><span id="file-count-text">File 1 of 1</span><span id="amount-text">0/0 MB</span></div>
                     </div>
                 </div>
             </div>
-            
             <button id="send-btn" class="hidden" onclick="sendFile()">Send Files</button>
-
             <div id="status">
                 <div class="status-dot" id="status-dot"></div>
                 <span id="status-text">Waiting for connection...</span>
             </div>
         </div>
-
         <div id="scanner-modal" class="modal-overlay" onclick="handleModalClick(event, 'scanner-modal', stopScan)">
             <div class="modal-content" style="max-width: 440px; margin: auto;">
                 <div class="scanner-header">
@@ -897,49 +353,28 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
-                
                 <div id="reader-video-container">
                     <div id="reader-video"></div>
-                    <div class="scanner-overlay">
-                        <div class="viewfinder" id="viewfinder">
-                            <div class="viewfinder-inner"></div>
-                        </div>
-                    </div>
+                    <div class="scanner-overlay"><div class="viewfinder" id="viewfinder"><div class="viewfinder-inner"></div></div></div>
                 </div>
-
-                <div class="scanner-footer">
-                    <p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at recipient's PeerDrop QR code.</p>
-                </div>
+                <div class="scanner-footer"><p style="color: rgba(255,255,255,0.95); font-size: 0.95rem; margin: 0; font-weight: 500; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Point your camera at recipient's PeerDrop QR code.</p></div>
             </div>
         </div>
-
         <div id="incoming-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
-                <div class="incoming-brand-text" style="font-family: 'Inter', sans-serif; ">PeerDrop</div>
+                <div class="incoming-brand-text" style="font-family: 'Inter', sans-serif;">PeerDrop</div>
                 <h2 class="incoming-title" id="incoming-title">File Transfer Request</h2>
-
                 <div class="incoming-user-box">
-                    <div class="pulsing-avatar-container">
-                        <div class="pulse-ring"></div>
-                        <div class="peer-avatar incoming-avatar" id="incoming-avatar">?</div>
-                    </div>
-                    <div class="incoming-user-details">
-                        <div id="incoming-name">Sender Name</div>
-                        <div id="incoming-device">Device Name</div>
-                    </div>
+                    <div class="pulsing-avatar-container"><div class="pulse-ring"></div><div class="peer-avatar incoming-avatar" id="incoming-avatar">?</div></div>
+                    <div class="incoming-user-details"><div id="incoming-name">Sender Name</div><div id="incoming-device">Device Name</div></div>
                 </div>
-
-                <div class="incoming-file-list" id="incoming-file-list-container">
-                </div>
-
+                <div class="incoming-file-list" id="incoming-file-list-container"></div>
                 <div class="incoming-actions">
                     <button class="btn-accept-huge" onclick="acceptTransfer()">Accept</button>
                     <button class="btn-decline-huge" onclick="rejectTransfer()">Decline</button>
                 </div>
-
             </div>
         </div>
-
         <div id="history-modal" class="modal-overlay" onclick="handleModalClick(event, 'history-modal', toggleHistory)">
             <div class="modal-content">
                 <div class="modal-header">
@@ -948,15 +383,12 @@
                         <button class="btn-icon" onclick="clearHistory()" aria-label="Clear History" title="Clear History" style="color: var(--text-muted); background: transparent; box-shadow: none; border: none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
-                        <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">
-                            <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
+                        <button class="close-btn" onclick="toggleHistory()" aria-label="Close History"><svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                     </div>
                 </div>
                 <div class="history-list" id="history-list"></div>
             </div>
         </div>
-
         <div id="settings-modal" class="modal-overlay" onclick="handleModalClick(event, 'settings-modal', toggleSettings)">
             <div class="modal-content">
                 <div class="modal-header">
@@ -966,26 +398,13 @@
                     </button>
                 </div>
                 <div class="settings-container">
-                    <div class="profile-avatar settings-avatar">
-                        <span id="settings-avatar-initial">?</span>
-                    </div>
-                    
+                    <div class="profile-avatar settings-avatar"><span id="settings-avatar-initial">?</span></div>
                     <div class="box" style="padding: 30px; margin-bottom: 0;">
-                        <div class="input-group">
-                            <label>Name</label>
-                            <input type="text" id="edit-name" placeholder="Your Name" autocomplete="name">
-                        </div>
-                        <div class="input-group">
-                            <label>Device Name</label>
-                            <input type="text" id="edit-device" placeholder="Your Device Name">
-                        </div>
-                        <div class="input-group">
-                            <label>Email Address</label>
-                            <input type="email" id="edit-email" placeholder="name@example.com">
-                        </div>
+                        <div class="input-group"><label>Name</label><input type="text" id="edit-name" placeholder="Your Name" autocomplete="name"></div>
+                        <div class="input-group"><label>Device Name</label><input type="text" id="edit-device" placeholder="Your Device Name"></div>
+                        <div class="input-group"><label>Email Address</label><input type="email" id="edit-email" placeholder="name@example.com"></div>
                         <button onclick="saveSettingsProfile()" style="margin-top: 10px; margin-bottom: 0;">Save Changes</button>
                     </div>
-
                     <div class="box" style="padding: 24px; margin-top: 16px; margin-bottom: 20px;">
                         <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; text-align: left;">Storage Management</p>
                         <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-main); text-align: left; line-height: 1.4;">Free up space by deleting incomplete files from cancelled or dropped transfers.</p>
@@ -994,897 +413,322 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
-
 <div id="toast-container"></div>
 
 <script>
-    // --- UTILITIES & SVG ICONS ---
-    function getFileIconSVG(mimeType) {
-        if (!mimeType) mimeType = '';
-        if (mimeType.startsWith('image/')) {
-            return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
-        } else if (mimeType.startsWith('video/')) {
-            return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`;
-        } else if (mimeType.startsWith('audio/')) {
-            return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`;
-        } else if (mimeType.includes('zip') || mimeType.includes('tar') || mimeType.includes('rar')) {
-            return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
-        } else {
-            // Default Document
-            return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
-        }
-    }
+function getFileIconSVG(mimeType){if(!mimeType)mimeType='';if(mimeType.startsWith('image/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`}else if(mimeType.startsWith('video/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`}else if(mimeType.startsWith('audio/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`}else if(mimeType.includes('zip')||mimeType.includes('tar')||mimeType.includes('rar')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`}else{return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`}}
+function renderTransferFileList(files,isSending){document.getElementById('transfer-title').innerText=isSending?'Sending Files':'Receiving Files';const list=document.getElementById('transfer-file-list');list.innerHTML='';files.forEach((file,index)=>{const type=file.type||file.filetype||'';const svgIcon=getFileIconSVG(type);list.innerHTML+=`<div class="transfer-item" id="transfer-item-${index}"><div class="transfer-item-icon">${svgIcon}</div><div class="transfer-item-info"><div class="transfer-item-name">${file.name}</div><div class="transfer-item-size">${formatBytes(file.size)}</div></div><div class="transfer-item-status" id="transfer-item-status-${index}"></div></div>`})}
+function updateActiveTransferFile(index,totalFiles){document.querySelectorAll('.transfer-item').forEach(el=>el.classList.remove('active'));const activeItem=document.getElementById(`transfer-item-${index}`);if(activeItem){activeItem.classList.add('active');activeItem.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById(`transfer-item-status-${index}`).innerHTML=`<div class="spinner-ring"></div>`}document.getElementById('file-count-text').innerText=`File ${index+1} of ${totalFiles}`}
+function markTransferFileDone(index){const item=document.getElementById(`transfer-item-${index}`);if(item){item.classList.remove('active');item.classList.add('done');document.getElementById(`transfer-item-status-${index}`).innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`}}
 
-    // --- UI HELPER FUNCTIONS ---
-    function renderTransferFileList(files, isSending) {
-        document.getElementById('transfer-title').innerText = isSending ? 'Sending Files' : 'Receiving Files';
-        const list = document.getElementById('transfer-file-list');
-        list.innerHTML = '';
-        
-        files.forEach((file, index) => {
-            const type = file.type || file.filetype || ''; 
-            const svgIcon = getFileIconSVG(type);
-            
-            list.innerHTML += `
-                <div class="transfer-item" id="transfer-item-${index}">
-                    <div class="transfer-item-icon">${svgIcon}</div>
-                    <div class="transfer-item-info">
-                        <div class="transfer-item-name">${file.name}</div>
-                        <div class="transfer-item-size">${formatBytes(file.size)}</div>
-                    </div>
-                    <div class="transfer-item-status" id="transfer-item-status-${index}"></div>
-                </div>
-            `;
-        });
-    }
+let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
 
-    function updateActiveTransferFile(index, totalFiles) {
-        document.querySelectorAll('.transfer-item').forEach(el => el.classList.remove('active'));
-        
-        const activeItem = document.getElementById(`transfer-item-${index}`);
-        if (activeItem) {
-            activeItem.classList.add('active');
-            activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            document.getElementById(`transfer-item-status-${index}`).innerHTML = `<div class="spinner-ring"></div>`;
-        }
-        
-        document.getElementById('file-count-text').innerText = `File ${index + 1} of ${totalFiles}`;
-    }
+// --- NEW TRANSFER CONSTANTS ---
+const CHUNK_SIZE = 1024 * 1024; // 1MB chunks (Faster throughput)
+const MAX_BUFFER = 16 * 1024 * 1024; // 16MB Network Buffer Limit
+const MAX_IN_FLIGHT = 16 * 1024 * 1024; // 16MB Unacknowledged Data Limit
+const ACK_INTERVAL = 4 * 1024 * 1024; // Send ACK every 4MB written
 
-    function markTransferFileDone(index) {
-        const item = document.getElementById(`transfer-item-${index}`);
-        if (item) {
-            item.classList.remove('active');
-            item.classList.add('done');
-            document.getElementById(`transfer-item-status-${index}`).innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>`;
-        }
-    }
+let bytesConfirmedWritten = 0; // Tracks what the receiver safely saved
+let receiverBytesWritten = 0; // Tracks local writes on the receiver side
+// ------------------------------
 
-    // --- CORE VARIABLES ---
-    let myProfile = JSON.parse(localStorage.getItem('peerdrop_profile'));
-    let connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
-    let peer, conn;
-    let transferStartTime = 0;
-    let lastUpdateTime = 0;
-    let lastLoadedBytes = 0;
-    let smoothedSpeedBps = 0;
-    let isTransferring = false;
-    let cancelTransfer = false; 
-    let pendingFileTransfer = null; 
-    let html5QrCode = null; 
-    let pulseInterval = null; 
+let sendQueue=[]; let currentSendIndex=0; let receiveQueue=[]; let currentReceiveIndex=0; 
+let batchTotalSize=0; let batchSentSize=0; let batchReceivedSize=0;
+let resumeReading=null; let receivingFile=[]; let fileHandle=null; let fileWritable=null; 
+let writeQueue=Promise.resolve(); let receivingFileSize=0; let receivingFileName=''; let receivingFileType='';
 
-    // QUEUE SYSTEM VARIABLES
-    let sendQueue = [];
-    let currentSendIndex = 0;
-    let receiveQueue = [];
-    let currentReceiveIndex = 0;
-    let batchTotalSize = 0;
-    let batchSentSize = 0;
-    let batchReceivedSize = 0;
+function triggerHaptic(type='light'){if(!navigator.vibrate)return;try{switch(type){case 'light':navigator.vibrate(15);break;case 'medium':navigator.vibrate(40);break;case 'heavy':navigator.vibrate(80);break;case 'success':navigator.vibrate([30,60,40]);break;case 'error':navigator.vibrate([50,100,50,100,50]);break;case 'pulse':navigator.vibrate([30,60,30]);break}}catch(e){}}
+let wakeLock=null;
+async function requestWakeLock(){if('wakeLock' in navigator){try{wakeLock=await navigator.wakeLock.request('screen')}catch(err){}}}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'){requestWakeLock();if(isTransferring)showToast("Resumed. Keep app open for best speeds.")}});
+function showToast(message,type='success'){if(type==='error')triggerHaptic('error');const container=document.getElementById('toast-container');const toast=document.createElement('div');toast.className=`toast ${type}`;const icon=type==='success'?`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`:`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;toast.innerHTML=`${icon} <span>${message}</span>`;container.appendChild(toast);setTimeout(()=>toast.classList.add('show'),10);setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400)},3000)}
+function formatBytes(bytes,decimals=1){if(!+bytes)return '0.0 MB';const k=1024,dm=decimals<0?0:decimals,sizes=['B','KB','MB','GB'];const i=Math.floor(Math.log(bytes)/Math.log(k));return `${(bytes/Math.pow(k,i)).toFixed(dm)} ${sizes[i]}`}
+function formatTime(sec){if(!isFinite(sec)||sec<0)return "--:--";const m=Math.floor(sec/60);const s=Math.floor(sec%60);return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`}
+function formatDate(dateString){const date=new Date(dateString);return date.toLocaleDateString()+' at '+date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function handleModalClick(e,modalId,toggleFunction){if(e.target.id===modalId)toggleFunction()}
+function setTransferState(active){isTransferring=active;const dropUi=document.getElementById('drop-ui-elements');const transferUi=document.getElementById('transfer-active-ui');const sendBtn=document.getElementById('send-btn');const dropZone=document.getElementById('share-section');const fileInput=document.getElementById('file-input');if(active){dropUi.classList.add('hidden');sendBtn.classList.add('hidden');transferUi.classList.remove('hidden');dropZone.classList.remove('dragover');dropZone.style.border='none';dropZone.style.background='transparent';dropZone.style.boxShadow='none';dropZone.style.padding='0';fileInput.style.display='none'}else{dropUi.classList.remove('hidden');if(conn&&conn.open){sendBtn.classList.remove('hidden')}transferUi.classList.add('hidden');dropZone.style.border='2px dashed var(--border)';dropZone.style.background='var(--card-bg)';dropZone.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';dropZone.style.padding='40px 20px';fileInput.style.display='block'}}
+function resetTransferUI(){setTransferState(false);document.getElementById('custom-progress-bar').style.width='0%';document.getElementById('transfer-percentage').innerText='0%';document.getElementById('file-input').value='';updateFileText()}
+function startScan(){triggerHaptic('light');const modal=document.getElementById('scanner-modal');modal.classList.add('active');const viewfinder=document.getElementById('viewfinder');viewfinder.classList.remove('success');html5QrCode=new Html5Qrcode("reader-video");Html5Qrcode.getCameras().then(devices=>{if(devices&&devices.length){let cameraId=devices[0].id;let backCameras=devices.filter(d=>d.label.toLowerCase().includes("back")||d.label.toLowerCase().includes("environment"));if(backCameras.length>0)cameraId=backCameras[0].id;html5QrCode.start(cameraId,{fps:30},onScanSuccess).catch(e=>{showToast("Camera error.","error");stopScan()})}else{showToast("No cameras detected.","error");stopScan()}}).catch(e=>{showToast("Camera blocked.","error");stopScan()})}
+function stopScan(){triggerHaptic('light');document.getElementById('scanner-modal').classList.remove('active');if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop().then(()=>{html5QrCode.clear()}).catch(e=>{})}
+function onScanSuccess(decodedText){if(html5QrCode.isScanning===false)return;triggerHaptic('success');document.getElementById('viewfinder').classList.add('success');html5QrCode.pause();setTimeout(()=>{stopScan();let targetId=decodedText;try{const urlParams=new URLSearchParams(new URL(decodedText).search);if(urlParams.has('connect'))targetId=urlParams.get('connect')}catch(e){}document.getElementById('target-id').value=targetId;showToast("QR Code Scanned!");setTimeout(connectToPeer,300)},400)}
+function initApp(){const welcomeScreen=document.getElementById('welcome-screen');const mainScreen=document.getElementById('main-app-screen');if(myProfile&&myProfile.name&&myProfile.device){welcomeScreen.classList.add('hidden');mainScreen.classList.remove('hidden');const animatedEls=mainScreen.querySelectorAll('.box, .header, #connect-section, #status');animatedEls.forEach((el,index)=>el.classList.add('animate-enter',`delay-${index+1}`));requestWakeLock();initPeerJS();const urlParams=new URLSearchParams(window.location.search);if(urlParams.get('action')==='scan'){setTimeout(()=>{startScan();window.history.replaceState(null,'',window.location.pathname)},600)}}else{document.getElementById('setup-name').addEventListener('input',(e)=>{document.getElementById('avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'})}}
+function saveInitialProfile(){triggerHaptic('light');const name=document.getElementById('setup-name').value.trim();const device=document.getElementById('setup-device').value.trim();const email=document.getElementById('setup-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));showToast("Profile created successfully!");const welcomeScreen=document.getElementById('welcome-screen');welcomeScreen.style.opacity='0';welcomeScreen.style.transform='translateY(-20px)';welcomeScreen.style.transition='all 0.4s ease';setTimeout(()=>initApp(),400)}
+function toggleSettings(){triggerHaptic('light');const modal=document.getElementById('settings-modal');if(!modal.classList.contains('active')){document.getElementById('edit-name').value=myProfile.name||'';document.getElementById('edit-device').value=myProfile.device||'';document.getElementById('edit-email').value=myProfile.email||'';document.getElementById('settings-avatar-initial').innerText=myProfile.name?myProfile.name.charAt(0).toUpperCase():'?'}modal.classList.toggle('active')}
+document.getElementById('edit-name').addEventListener('input',(e)=>{document.getElementById('settings-avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'});
+function saveSettingsProfile(){triggerHaptic('light');const name=document.getElementById('edit-name').value.trim();const device=document.getElementById('edit-device').value.trim();const email=document.getElementById('edit-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));if(conn&&conn.open)conn.send({type:'profile_sync',profile:myProfile});showToast("Settings saved successfully!");toggleSettings()}
+async function clearOPFSCache(){triggerHaptic('medium');try{const root=await navigator.storage.getDirectory();let deletedCount=0;for await(const [name,handle] of root.entries()){await root.removeEntry(name,{recursive:true});deletedCount++}if(deletedCount>0){showToast(`Cleared ${deletedCount} incomplete files.`,"success");triggerHaptic('success')}else{showToast("Storage is already clean.","success")}}catch(e){showToast("Could not clear storage.","error");triggerHaptic('error')}}
+function saveToHistory(filename,filesize,type,peerInfo){let history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');history.unshift({id:Date.now(),filename,filesize:formatBytes(filesize),type,date:new Date().toISOString(),peer:peerInfo||{name:'Unknown',device:'Unknown',email:''}});if(history.length>50)history.pop();localStorage.setItem('peerdrop_history',JSON.stringify(history));renderHistory()}
+function renderHistory(){const list=document.getElementById('history-list');const history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');list.innerHTML='';if(history.length===0){list.innerHTML='<div class="empty-history">No past transfers found.</div>';return}history.forEach(item=>{const isSent=item.type==='sent';const actionText=isSent?'Sent to':'From';const iconSvg=isSent?`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;const peerDisplay=item.peer&&item.peer.device?`${item.peer.name||'Unknown'} (${item.peer.device})`:`${item.peer&&item.peer.name?item.peer.name:'Unknown'}`;const emailDisplay=item.peer&&item.peer.email?`<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>`:'';list.innerHTML+=`<div class="history-item"><div class="history-icon ${isSent?'':'received'}">${iconSvg}</div><div class="history-details"><p class="history-name" title="${item.filename}">${item.filename}</p><p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p><p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p></div></div>`})}
+function toggleHistory(){triggerHaptic('light');const modal=document.getElementById('history-modal');if(!modal.classList.contains('active'))renderHistory();modal.classList.toggle('active')}
+function clearHistory(){triggerHaptic('medium');if(confirm("Are you sure you want to clear all your transfer history?")){localStorage.removeItem('peerdrop_history');renderHistory();showToast("History cleared successfully!")}}
+renderHistory();const themeIcon=document.getElementById('theme-icon');let currentShareUrl="";
+function updateThemeIcon(isDark){if(isDark){themeIcon.innerHTML=`<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;themeIcon.setAttribute('fill','none');themeIcon.setAttribute('stroke','currentColor');themeIcon.setAttribute('stroke-width','2')}else{themeIcon.innerHTML=`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;themeIcon.removeAttribute('stroke');themeIcon.setAttribute('fill','currentColor')}}
+function renderQR(url){currentShareUrl=url;const qrContainer=document.getElementById("qrcode");const qrWrapper=document.getElementById("qr-wrapper");qrContainer.innerHTML="";const isDark=document.body.classList.contains('dark-mode');qrWrapper.style.backgroundColor=isDark?'#1a1a1a':'#ffffff';qrWrapper.style.borderColor=isDark?'#333':'#e5e5ea';new QRCode(qrContainer,{text:url,width:240,height:240,colorDark:isDark?"#ffffff":"#000000",colorLight:isDark?"#1a1a1a":"#ffffff",correctLevel:QRCode.CorrectLevel.H})}
+if(localStorage.getItem('darkMode')==='true'){document.body.classList.add('dark-mode');updateThemeIcon(true);document.getElementById('theme-color-meta').setAttribute('content','#000000')}
+function toggleDarkMode(){triggerHaptic('light');const isDark=document.body.classList.toggle('dark-mode');try{localStorage.setItem('darkMode',isDark)}catch(e){}updateThemeIcon(isDark);if(currentShareUrl)renderQR(currentShareUrl);document.getElementById('theme-color-meta').setAttribute('content',isDark?'#000000':'#f5f5f7')}
+function copyId(){triggerHaptic('success');navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(()=>{showToast("Device ID copied!");const copyBtn=document.getElementById('copy-btn');copyBtn.innerText='Copied!';copyBtn.style.background='var(--accent)';copyBtn.style.color='#fff';setTimeout(()=>{copyBtn.innerText='Copy';copyBtn.style.background='transparent';copyBtn.style.color='var(--text-main)'},2000)}).catch(()=>showToast("Could not copy ID.","error"))}
+const dropZone=document.getElementById('share-section'),fileInput=document.getElementById('file-input');const dropText=document.getElementById('drop-text'),dropSubtext=document.getElementById('drop-subtext');
+['dragenter','dragover','dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation()},false));
+['dragenter','dragover'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.add('dragover')},false));
+['dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.remove('dragover')},false));
+dropZone.addEventListener('drop',(e)=>{if(isTransferring)return;if(e.dataTransfer.files.length>0){fileInput.files=e.dataTransfer.files;updateFileText()}});
+fileInput.addEventListener('change',updateFileText);
+function updateFileText(){if(fileInput.files.length===1){triggerHaptic('light');const file=fileInput.files[0];dropText.innerHTML=`<strong style="color: var(--text-main)">${file.name}</strong>`;dropSubtext.innerHTML=formatBytes(file.size);dropSubtext.classList.remove('hidden')}else if(fileInput.files.length>1){triggerHaptic('light');let totalSize=0;for(let i=0;i<fileInput.files.length;i++)totalSize+=fileInput.files[i].size;dropText.innerHTML=`<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;dropSubtext.innerHTML=`Total Size: ${formatBytes(totalSize)}`;dropSubtext.classList.remove('hidden')}else{dropText.innerHTML=`Select files to send`;dropSubtext.innerHTML=`or drag and drop them here`;dropSubtext.classList.remove('hidden')}}
+const statusTextEl=document.getElementById('status-text'),statusDotEl=document.getElementById('status-dot');const connectSection=document.getElementById('connect-section'),identitySection=document.getElementById('identity-section');const sendBtn=document.getElementById('send-btn'),copyBtn=document.getElementById('copy-btn');const speedText=document.getElementById('speed-text'),amountText=document.getElementById('amount-text');
+function updateStatus(message,color="var(--text-muted)",shadowColor="transparent"){statusTextEl.innerText=message;statusDotEl.style.backgroundColor=color;statusDotEl.style.boxShadow=`0 0 8px ${shadowColor==="transparent"?color:shadowColor}`}
+function updateStats(loadedBytes,totalBytes){const now=Date.now();if(loadedBytes===0){lastUpdateTime=now;lastLoadedBytes=0;smoothedSpeedBps=0;speedText.innerText=`0 B/s`;amountText.innerText=`0 B / ${formatBytes(totalBytes)}`;document.getElementById('transfer-percentage').innerText=`0%`;document.getElementById('custom-progress-bar').style.width=`0%`;document.getElementById('eta-text').innerText="--:--";return}const elapsedSinceLastUpdate=(now-lastUpdateTime)/1000;if(elapsedSinceLastUpdate>=0.25||loadedBytes===totalBytes){const bytesSinceLast=loadedBytes-lastLoadedBytes;const currentInstantSpeed=elapsedSinceLastUpdate>0?bytesSinceLast/elapsedSinceLastUpdate:0;if(smoothedSpeedBps===0){smoothedSpeedBps=currentInstantSpeed}else{smoothedSpeedBps=(currentInstantSpeed*0.3)+(smoothedSpeedBps*0.7)}speedText.innerText=`${formatBytes(smoothedSpeedBps)}/s`;const remainingBytes=totalBytes-loadedBytes;const etaSeconds=smoothedSpeedBps>0?remainingBytes/smoothedSpeedBps:0;document.getElementById('eta-text').innerText=formatTime(etaSeconds);lastUpdateTime=now;lastLoadedBytes=loadedBytes}amountText.innerText=`${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;const percent=totalBytes>0?Math.min(100,Math.floor((loadedBytes/totalBytes)*100)):0;document.getElementById('transfer-percentage').innerText=`${percent}%`;document.getElementById('custom-progress-bar').style.width=`${percent}%`}
+function initPeerJS(){peer=new Peer({config:{'iceServers':[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});peer.on('open',(id)=>{document.getElementById('my-id').innerText=id;copyBtn.classList.remove('hidden');const shareUrl=window.location.href.split('?')[0]+'?connect='+id;renderQR(shareUrl);const connectId=new URLSearchParams(window.location.search).get('connect');if(connectId){document.getElementById('target-id').value=connectId;setTimeout(connectToPeer,500)}});peer.on('connection',(connection)=>{conn=connection;setupConnection()})}
+function connectToPeer(){triggerHaptic('light');const targetId=document.getElementById('target-id').value.trim();if(!targetId)return showToast("Please enter a Device ID","error");updateStatus("Connecting...","#f59e0b");conn=peer.connect(targetId,{reliable:true});setupConnection()}
+function disconnectPeer(){triggerHaptic('medium');if(conn)conn.close();resetTransferUI();document.getElementById('active-connection').classList.add('hidden');document.getElementById('share-section').classList.add('hidden');document.getElementById('send-btn').classList.add('hidden');connectSection.classList.remove('hidden');identitySection.classList.remove('hidden');connectSection.style.opacity='1';identitySection.style.opacity='1';updateStatus("Waiting for connection...","var(--text-muted)");connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''}}
+async function abortTransfer(event){if(event){event.preventDefault();event.stopPropagation()}if(!isTransferring)return;triggerHaptic('error');cancelTransfer=true;if(fileWritable){try{await fileWritable.abort()}catch(e){}fileWritable=null;fileHandle=null}receivingFile=[];if(conn&&conn.open){conn.send({type:'transfer_response',accepted:false,reason:'cancelled_mid_transfer'})}resetTransferUI();showToast("Transfer cancelled","error");updateStatus("Ready to share.","#34c759","rgba(52, 199, 89, 0.4)")}
+function acceptTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');if(!pendingFileTransfer)return;cancelTransfer=false;receiveQueue=pendingFileTransfer.files;currentReceiveIndex=0;batchTotalSize=pendingFileTransfer.totalSize;batchReceivedSize=0;renderTransferFileList(receiveQueue,false);setTransferState(true);updateStats(0,batchTotalSize);transferStartTime=Date.now();updateStatus(`Receiving 1 of ${receiveQueue.length}...`,"var(--accent)");conn.send({type:'transfer_response',accepted:true})}
+function rejectTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');pendingFileTransfer=null;conn.send({type:'transfer_response',accepted:false,reason:'declined'})}
 
-    // ACK Flow Control Variables
-    let unackedChunks = 0;
-    const MAX_IN_FLIGHT = 32; 
-    let resumeReading = null; 
-
-    let receivingFile = []; 
-    let fileHandle = null;
-    let fileWritable = null;
-    let writeQueue = Promise.resolve();
-
-    let receivingFileSize = 0;
-    let receivingFileName = '';
-    let receivingFileType = '';
-
-    function triggerHaptic(type = 'light') {
-        if (!navigator.vibrate) return;
-        try {
-            switch(type) {
-                case 'light': navigator.vibrate(15); break; 
-                case 'medium': navigator.vibrate(40); break; 
-                case 'heavy': navigator.vibrate(80); break; 
-                case 'success': navigator.vibrate([30, 60, 40]); break; 
-                case 'error': navigator.vibrate([50, 100, 50, 100, 50]); break; 
-                case 'pulse': navigator.vibrate([30, 60, 30]); break;
-            }
-        } catch (e) { }
-    }
-
-    let wakeLock = null;
-
-    async function requestWakeLock() {
-        if ('wakeLock' in navigator) {
-            try {
-                wakeLock = await navigator.wakeLock.request('screen');
-            } catch (err) {}
-        }
-    }
-
-    document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible') {
-            requestWakeLock();
-            if (isTransferring) showToast("Resumed. Keep app open for best speeds.");
-        }
-    });
-
-    function showToast(message, type = 'success') {
-        if (type === 'error') triggerHaptic('error'); 
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        const icon = type === 'success' ? 
-            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : 
-            `<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
-        toast.innerHTML = `${icon} <span>${message}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
-    }
-
-    function formatBytes(bytes, decimals = 1) {
-        if (!+bytes) return '0.0 MB';
-        const k = 1024, dm = decimals < 0 ? 0 : decimals, sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return `${(bytes / Math.pow(k, i)).toFixed(dm)} ${sizes[i]}`;
-    }
-
-    function formatTime(sec) {
-        if (!isFinite(sec) || sec < 0) return "--:--";
-        const m = Math.floor(sec / 60);
-        const s = Math.floor(sec % 60);
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }
-
-    function handleModalClick(e, modalId, toggleFunction) {
-        if (e.target.id === modalId) toggleFunction();
-    }
-
-    function setTransferState(active) {
-        isTransferring = active;
-        const dropUi = document.getElementById('drop-ui-elements');
-        const transferUi = document.getElementById('transfer-active-ui');
-        const sendBtn = document.getElementById('send-btn');
-        const dropZone = document.getElementById('share-section');
-        const fileInput = document.getElementById('file-input');
-
-        if (active) {
-            dropUi.classList.add('hidden');
-            sendBtn.classList.add('hidden');
-            transferUi.classList.remove('hidden');
-            dropZone.classList.remove('dragover');
-            dropZone.style.border = 'none';
-            dropZone.style.background = 'transparent';
-            dropZone.style.boxShadow = 'none';
-            dropZone.style.padding = '0';
-            fileInput.style.display = 'none'; 
-        } else {
-            dropUi.classList.remove('hidden');
-            if (conn && conn.open) { sendBtn.classList.remove('hidden'); }
-            transferUi.classList.add('hidden');
-            dropZone.style.border = '2px dashed var(--border)';
-            dropZone.style.background = 'var(--card-bg)';
-            dropZone.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)';
-            dropZone.style.padding = '40px 20px';
-            fileInput.style.display = 'block';
-        }
-    }
-
-    function resetTransferUI() {
-        setTransferState(false);
-        document.getElementById('custom-progress-bar').style.width = '0%';
-        document.getElementById('transfer-percentage').innerText = '0%';
-        document.getElementById('file-input').value = '';
-        updateFileText();
-    }
-
-    function startScan() {
-        triggerHaptic('light');
-        const modal = document.getElementById('scanner-modal');
-        modal.classList.add('active');
-        const viewfinder = document.getElementById('viewfinder');
-        viewfinder.classList.remove('success');
-
-        html5QrCode = new Html5Qrcode("reader-video");
-        Html5Qrcode.getCameras().then(devices => {
-            if (devices && devices.length) {
-                let cameraId = devices[0].id; 
-                let backCameras = devices.filter(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment"));
-                if (backCameras.length > 0) cameraId = backCameras[0].id;
-                html5QrCode.start(cameraId, { fps: 30 }, onScanSuccess).catch(e => { showToast("Camera error.", "error"); stopScan(); });
-            } else { showToast("No cameras detected.", "error"); stopScan(); }
-        }).catch(e => { showToast("Camera blocked.", "error"); stopScan(); });
-    }
-
-    function stopScan() {
-        triggerHaptic('light');
-        document.getElementById('scanner-modal').classList.remove('active');
-        if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => {});
-    }
-
-    function onScanSuccess(decodedText) {
-        if(html5QrCode.isScanning === false) return; 
-        triggerHaptic('success'); 
-        document.getElementById('viewfinder').classList.add('success');
-        html5QrCode.pause();
-        setTimeout(() => {
-            stopScan();
-            let targetId = decodedText;
-            try { const urlParams = new URLSearchParams(new URL(decodedText).search); if (urlParams.has('connect')) targetId = urlParams.get('connect'); } catch (e) {}
-            document.getElementById('target-id').value = targetId;
-            showToast("QR Code Scanned!");
-            setTimeout(connectToPeer, 300); 
-        }, 400); 
-    }
-
-    function initApp() {
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const mainScreen = document.getElementById('main-app-screen');
-        
-        if (myProfile && myProfile.name && myProfile.device) {
-            welcomeScreen.classList.add('hidden');
-            mainScreen.classList.remove('hidden');
-            const animatedEls = mainScreen.querySelectorAll('.box, .header, #connect-section, #status');
-            animatedEls.forEach((el, index) => el.classList.add('animate-enter', `delay-${index+1}`));
-            requestWakeLock();
-            initPeerJS();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('action') === 'scan') {
-                setTimeout(() => {
-                    startScan();
-                    window.history.replaceState(null, '', window.location.pathname);
-                }, 600); 
-            }
-
-        } else {
-            document.getElementById('setup-name').addEventListener('input', (e) => {
-                document.getElementById('avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?';
-            });
-        }
-    }
-
-    function saveInitialProfile() {
-        triggerHaptic('light');
-        const name = document.getElementById('setup-name').value.trim();
-        const device = document.getElementById('setup-device').value.trim();
-        const email = document.getElementById('setup-email').value.trim();
-
-        if (!name || !device) return showToast("Name and Device are required.", "error");
-
-        myProfile = { name, device, email };
-        localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
-        showToast("Profile created successfully!");
-        
-        const welcomeScreen = document.getElementById('welcome-screen');
-        welcomeScreen.style.opacity = '0';
-        welcomeScreen.style.transform = 'translateY(-20px)';
-        welcomeScreen.style.transition = 'all 0.4s ease';
-        setTimeout(() => initApp(), 400);
-    }
-
-    function toggleSettings() {
-        triggerHaptic('light');
-        const modal = document.getElementById('settings-modal');
-        if (!modal.classList.contains('active')) {
-            document.getElementById('edit-name').value = myProfile.name || '';
-            document.getElementById('edit-device').value = myProfile.device || '';
-            document.getElementById('edit-email').value = myProfile.email || '';
-            document.getElementById('settings-avatar-initial').innerText = myProfile.name ? myProfile.name.charAt(0).toUpperCase() : '?';
-        }
-        modal.classList.toggle('active');
-    }
-
-    document.getElementById('edit-name').addEventListener('input', (e) => { document.getElementById('settings-avatar-initial').innerText = e.target.value.charAt(0).toUpperCase() || '?'; });
-
-    function saveSettingsProfile() {
-        triggerHaptic('light');
-        const name = document.getElementById('edit-name').value.trim();
-        const device = document.getElementById('edit-device').value.trim();
-        const email = document.getElementById('edit-email').value.trim();
-        if (!name || !device) return showToast("Name and Device are required.", "error");
-        myProfile = { name, device, email };
-        localStorage.setItem('peerdrop_profile', JSON.stringify(myProfile));
-        if (conn && conn.open) conn.send({ type: 'profile_sync', profile: myProfile });
-        showToast("Settings saved successfully!");
-        toggleSettings();
-    }
-
-    async function clearOPFSCache() {
-        triggerHaptic('medium');
-        try {
-            const root = await navigator.storage.getDirectory();
-            let deletedCount = 0;
-            for await (const [name, handle] of root.entries()) {
-                await root.removeEntry(name, { recursive: true });
-                deletedCount++;
-            }
-            if (deletedCount > 0) {
-                showToast(`Cleared ${deletedCount} incomplete files.`, "success");
-                triggerHaptic('success');
-            } else {
-                showToast("Storage is already clean.", "success");
-            }
-        } catch (e) {
-            console.error("Failed to clear OPFS:", e);
-            showToast("Could not clear storage.", "error");
-            triggerHaptic('error');
-        }
-    }
-
-    function saveToHistory(filename, filesize, type, peerInfo) {
-        let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
-        history.unshift({ id: Date.now(), filename, filesize: formatBytes(filesize), type, date: new Date().toISOString(), peer: peerInfo || { name: 'Unknown', device: 'Unknown', email: '' } });
-        if (history.length > 50) history.pop(); 
-        localStorage.setItem('peerdrop_history', JSON.stringify(history));
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const list = document.getElementById('history-list');
-        const history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
-        list.innerHTML = '';
-        if (history.length === 0) { list.innerHTML = '<div class="empty-history">No past transfers found.</div>'; return; }
-        history.forEach(item => {
-            const isSent = item.type === 'sent';
-            const actionText = isSent ? 'Sent to' : 'From';
-            const iconSvg = isSent ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
-            const peerDisplay = item.peer && item.peer.device ? `${item.peer.name || 'Unknown'} (${item.peer.device})` : `${item.peer && item.peer.name ? item.peer.name : 'Unknown'}`;
-            const emailDisplay = item.peer && item.peer.email ? `<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>` : '';
-
-            list.innerHTML += `
-                <div class="history-item">
-                    <div class="history-icon ${isSent ? '' : 'received'}">${iconSvg}</div>
-                    <div class="history-details">
-                        <p class="history-name" title="${item.filename}">${item.filename}</p>
-                        <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
-                        <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
-                    </div>
-                </div>`;
-        });
-    }
-
-    function toggleHistory() {
-        triggerHaptic('light');
-        const modal = document.getElementById('history-modal');
-        if (!modal.classList.contains('active')) renderHistory();
-        modal.classList.toggle('active');
-    }
-
-    function clearHistory() {
-        triggerHaptic('medium');
-        if(confirm("Are you sure you want to clear all your transfer history?")) {
-            localStorage.removeItem('peerdrop_history'); renderHistory(); showToast("History cleared successfully!");
-        }
-    }
-
-    renderHistory();
-    const themeIcon = document.getElementById('theme-icon'); let currentShareUrl = ""; 
-    
-    function updateThemeIcon(isDark) {
-        if (isDark) {
-            themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
-            themeIcon.setAttribute('fill', 'none'); themeIcon.setAttribute('stroke', 'currentColor'); themeIcon.setAttribute('stroke-width', '2');
-        } else {
-            themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
-            themeIcon.removeAttribute('stroke'); themeIcon.setAttribute('fill', 'currentColor');
-        }
-    }
-
-    function renderQR(url) {
-        currentShareUrl = url;
-        const qrContainer = document.getElementById("qrcode"); const qrWrapper = document.getElementById("qr-wrapper");
-        qrContainer.innerHTML = ""; 
-        const isDark = document.body.classList.contains('dark-mode');
-        qrWrapper.style.backgroundColor = isDark ? '#1a1a1a' : '#ffffff'; qrWrapper.style.borderColor = isDark ? '#333' : '#e5e5ea';
-        new QRCode(qrContainer, { text: url, width: 240, height: 240, colorDark : isDark ? "#ffffff" : "#000000", colorLight : isDark ? "#1a1a1a" : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
-    }
-
-    if (localStorage.getItem('darkMode') === 'true') { 
-        document.body.classList.add('dark-mode'); 
-        updateThemeIcon(true); 
-        document.getElementById('theme-color-meta').setAttribute('content', '#000000');
-    }
-
-    function toggleDarkMode() {
-        triggerHaptic('light');
-        const isDark = document.body.classList.toggle('dark-mode');
-        try { localStorage.setItem('darkMode', isDark); } catch (e) {}
-        updateThemeIcon(isDark); if (currentShareUrl) renderQR(currentShareUrl);
-        document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#f5f5f7');
-    }
-
-    function copyId() {
+function sendNextFile() {
+    if (cancelTransfer) return;
+    if (currentSendIndex >= sendQueue.length) {
+        conn.send({ type: 'batch_done' });
         triggerHaptic('success');
-        navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(() => {
-            showToast("Device ID copied!");
-            const copyBtn = document.getElementById('copy-btn'); copyBtn.innerText = 'Copied!'; copyBtn.style.background = 'var(--accent)'; copyBtn.style.color = '#fff';
-            setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.background = 'transparent'; copyBtn.style.color = 'var(--text-main)'; }, 2000);
-        }).catch(() => showToast("Could not copy ID.", "error"));
+        updateStatus(`Sent ${sendQueue.length} files to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
+        showToast("All files sent successfully!");
+        setTimeout(() => {
+            resetTransferUI();
+            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+        }, 3000);
+        return;
     }
 
-    const dropZone = document.getElementById('share-section'), fileInput = document.getElementById('file-input');
-    const dropText = document.getElementById('drop-text'), dropSubtext = document.getElementById('drop-subtext');
+    const file = sendQueue[currentSendIndex];
+    updateActiveTransferFile(currentSendIndex, sendQueue.length);
+    conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false));
-    ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => { if(!isTransferring) dropZone.classList.add('dragover'); }, false));
-    ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, () => { if(!isTransferring) dropZone.classList.remove('dragover'); }, false));
+    let offset = 0;
+    bytesConfirmedWritten = 0; // Reset for the new file
+    let isReading = false;
 
-    dropZone.addEventListener('drop', (e) => { 
-        if(isTransferring) return;
-        if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; updateFileText(); } 
-    });
-    
-    fileInput.addEventListener('change', updateFileText);
+    resumeReading = () => {
+        if (cancelTransfer || isReading || offset >= file.size) return;
 
-    function updateFileText() {
-        if (fileInput.files.length === 1) {
-            triggerHaptic('light');
-            const file = fileInput.files[0];
-            dropText.innerHTML = `<strong style="color: var(--text-main)">${file.name}</strong>`;
-            dropSubtext.innerHTML = formatBytes(file.size); dropSubtext.classList.remove('hidden');
-        } else if (fileInput.files.length > 1) {
-            triggerHaptic('light');
-            let totalSize = 0;
-            for(let i=0; i<fileInput.files.length; i++) totalSize += fileInput.files[i].size;
-            dropText.innerHTML = `<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;
-            dropSubtext.innerHTML = `Total Size: ${formatBytes(totalSize)}`; dropSubtext.classList.remove('hidden');
-        } else {
-            dropText.innerHTML = `Select files to send`; dropSubtext.innerHTML = `or drag and drop them here`; dropSubtext.classList.remove('hidden');
-        }
-    }
-
-    const statusTextEl = document.getElementById('status-text'), statusDotEl = document.getElementById('status-dot');
-    const connectSection = document.getElementById('connect-section'), identitySection = document.getElementById('identity-section');
-    const sendBtn = document.getElementById('send-btn'), copyBtn = document.getElementById('copy-btn');
-    const speedText = document.getElementById('speed-text'), amountText = document.getElementById('amount-text');
-
-    function updateStatus(message, color = "var(--text-muted)", shadowColor = "transparent") {
-        statusTextEl.innerText = message; statusDotEl.style.backgroundColor = color;
-        statusDotEl.style.boxShadow = `0 0 8px ${shadowColor === "transparent" ? color : shadowColor}`;
-    }
-
-    function updateStats(loadedBytes, totalBytes) {
-        const now = Date.now();
-        
-        if (loadedBytes === 0) {
-            lastUpdateTime = now;
-            lastLoadedBytes = 0;
-            smoothedSpeedBps = 0;
-            speedText.innerText = `0 B/s`;
-            amountText.innerText = `0 B / ${formatBytes(totalBytes)}`;
-            document.getElementById('transfer-percentage').innerText = `0%`;
-            document.getElementById('custom-progress-bar').style.width = `0%`;
-            document.getElementById('eta-text').innerText = "--:--";
-            return;
+        // 1. Check Network Backpressure (Is the browser's sending queue full?)
+        if (conn.dataChannel.bufferedAmount > MAX_BUFFER) {
+            return; // Pause reading until onbufferedamountlow fires
         }
 
-        const elapsedSinceLastUpdate = (now - lastUpdateTime) / 1000; 
-
-        if (elapsedSinceLastUpdate >= 0.25 || loadedBytes === totalBytes) {
-            const bytesSinceLast = loadedBytes - lastLoadedBytes;
-            const currentInstantSpeed = elapsedSinceLastUpdate > 0 ? bytesSinceLast / elapsedSinceLastUpdate : 0;
-            
-            if (smoothedSpeedBps === 0) {
-                smoothedSpeedBps = currentInstantSpeed;
-            } else {
-                smoothedSpeedBps = (currentInstantSpeed * 0.3) + (smoothedSpeedBps * 0.7);
-            }
-            
-            speedText.innerText = `${formatBytes(smoothedSpeedBps)}/s`;
-            
-            const remainingBytes = totalBytes - loadedBytes;
-            const etaSeconds = smoothedSpeedBps > 0 ? remainingBytes / smoothedSpeedBps : 0;
-            document.getElementById('eta-text').innerText = formatTime(etaSeconds);
-
-            lastUpdateTime = now;
-            lastLoadedBytes = loadedBytes;
+        // 2. Check Receiver Backpressure (Is the receiver's disk falling behind?)
+        let unacknowledgedBytes = offset - bytesConfirmedWritten;
+        if (unacknowledgedBytes > MAX_IN_FLIGHT) {
+            return; // Pause reading until we get a cumulative_ack
         }
 
-        amountText.innerText = `${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
-        const percent = totalBytes > 0 ? Math.min(100, Math.floor((loadedBytes / totalBytes) * 100)) : 0;
-        document.getElementById('transfer-percentage').innerText = `${percent}%`;
-        document.getElementById('custom-progress-bar').style.width = `${percent}%`;
-    }
+        isReading = true;
+        const slice = file.slice(offset, offset + CHUNK_SIZE);
+        const reader = new FileReader();
 
-    function initPeerJS() {
-        peer = new Peer({ config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }, debug: 1 });
-        peer.on('open', (id) => {
-            document.getElementById('my-id').innerText = id; copyBtn.classList.remove('hidden'); 
-            const shareUrl = window.location.href.split('?')[0] + '?connect=' + id; renderQR(shareUrl); 
-            const connectId = new URLSearchParams(window.location.search).get('connect');
-            if (connectId) { document.getElementById('target-id').value = connectId; setTimeout(connectToPeer, 500); }
-        });
-        peer.on('connection', (connection) => { conn = connection; setupConnection(); });
-    }
+        reader.onload = (e) => {
+            isReading = false;
+            if (cancelTransfer) return;
 
-    function connectToPeer() {
-        triggerHaptic('light');
-        const targetId = document.getElementById('target-id').value.trim();
-        if (!targetId) return showToast("Please enter a Device ID", "error");
-        updateStatus("Connecting...", "#f59e0b");
-        conn = peer.connect(targetId, { reliable: true }); setupConnection();
-    }
-
-    function disconnectPeer() {
-        triggerHaptic('medium');
-        if (conn) conn.close(); resetTransferUI();
-        document.getElementById('active-connection').classList.add('hidden');
-        document.getElementById('share-section').classList.add('hidden');
-        document.getElementById('send-btn').classList.add('hidden');
-        connectSection.classList.remove('hidden'); identitySection.classList.remove('hidden');
-        connectSection.style.opacity = '1'; identitySection.style.opacity = '1';
-        updateStatus("Waiting for connection...", "var(--text-muted)");
-        connectedPeerProfile = { name: 'Unknown Peer', device: 'Unknown Device', email: '' };
-    }
-
-    async function abortTransfer(event) {
-        if(event) { event.preventDefault(); event.stopPropagation(); }
-        if (!isTransferring) return;
-        
-        triggerHaptic('error'); 
-        cancelTransfer = true; 
-        
-        if (fileWritable) {
-            try { await fileWritable.abort(); } catch(e) { console.warn("Failed to abort OPFS write:", e); }
-            fileWritable = null;
-            fileHandle = null;
-        }
-        receivingFile = []; 
-
-        if (conn && conn.open) {
-            conn.send({ type: 'transfer_response', accepted: false, reason: 'cancelled_mid_transfer' }); 
-        }
-        
-        resetTransferUI(); 
-        showToast("Transfer cancelled", "error"); 
-        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-    }
-
-    function acceptTransfer() {
-        if (pulseInterval) clearInterval(pulseInterval);
-        triggerHaptic('medium');
-        document.getElementById('incoming-modal').classList.remove('active');
-        if (!pendingFileTransfer) return;
-
-        cancelTransfer = false;
-        receiveQueue = pendingFileTransfer.files;
-        currentReceiveIndex = 0;
-        batchTotalSize = pendingFileTransfer.totalSize;
-        batchReceivedSize = 0;
-
-        renderTransferFileList(receiveQueue, false);
-        setTransferState(true);
-        
-        updateStats(0, batchTotalSize);
-        transferStartTime = Date.now();
-        updateStatus(`Receiving 1 of ${receiveQueue.length}...`, "var(--accent)");
-
-        conn.send({ type: 'transfer_response', accepted: true });
-    }
-
-    function rejectTransfer() {
-        if (pulseInterval) clearInterval(pulseInterval);
-        triggerHaptic('medium');
-        document.getElementById('incoming-modal').classList.remove('active');
-        pendingFileTransfer = null;
-        conn.send({ type: 'transfer_response', accepted: false, reason: 'declined' });
-    }
-
-    function sendNextFile() {
-        if (cancelTransfer) return;
-        
-        if (currentSendIndex >= sendQueue.length) {
-            conn.send({ type: 'batch_done' });
-            triggerHaptic('success');
-            updateStatus(`Sent ${sendQueue.length} files to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-            showToast("All files sent successfully!");
-            setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
-            return;
-        }
-
-        const file = sendQueue[currentSendIndex];
-        updateActiveTransferFile(currentSendIndex, sendQueue.length);
-
-        conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
-
-        let offset = 0; 
-        const chunkSize = 256 * 1024;
-        
-        unackedChunks = 0; 
-        let isReading = false; 
-        
-        resumeReading = () => {
-            if (cancelTransfer || isReading || offset >= file.size || unackedChunks >= MAX_IN_FLIGHT) return;
-            
-            isReading = true;
-            const slice = file.slice(offset, offset + chunkSize);
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                isReading = false; 
-                if (cancelTransfer) return; 
-
+            try {
                 conn.send({ type: 'chunk', data: e.target.result });
-                offset += slice.size; 
-                batchSentSize += slice.size;
-                unackedChunks++; 
+                offset += slice.size;
                 
-                if (offset % (chunkSize * 5) === 0 || offset >= file.size) {
-                    updateStats(batchSentSize, batchTotalSize);
-                }
+                // Immediately try reading the next chunk if limits allow
+                resumeReading(); 
+            } catch (err) {
+                // If buffer accidentally overflows, wait and retry
+                setTimeout(resumeReading, 50);
+            }
+        };
+        reader.readAsArrayBuffer(slice);
+    };
 
-                if (offset < file.size) {
-                    resumeReading(); 
-                } else {
-                    conn.send({ type: 'file_done' });
-                    saveToHistory(file.name, file.size, 'sent', connectedPeerProfile);
-                    markTransferFileDone(currentSendIndex);
-                    currentSendIndex++;
-                    sendNextFile();
+    resumeReading(); // Start the loop
+}
+
+function setupConnection() {
+    conn.on('open', () => {
+        conn.send({ type: 'profile_sync', profile: myProfile });
+        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+        
+        connectSection.style.opacity = '0';
+        identitySection.style.opacity = '0';
+        setTimeout(() => {
+            connectSection.classList.add('hidden');
+            identitySection.classList.add('hidden');
+            document.getElementById('active-connection').classList.remove('hidden');
+            dropZone.classList.remove('hidden');
+            sendBtn.classList.remove('hidden');
+            void dropZone.offsetWidth;
+            document.getElementById('active-connection').classList.add('animate-enter');
+            dropZone.classList.add('animate-enter');
+            sendBtn.classList.add('animate-enter');
+        }, 300);
+
+        // --- NEW: WAKE SENDER WHEN BUFFER DRAINS ---
+        if (conn.dataChannel) {
+            conn.dataChannel.bufferedAmountLowThreshold = 8 * 1024 * 1024; // 8MB
+            conn.dataChannel.onbufferedamountlow = () => {
+                if (resumeReading) resumeReading();
+            };
+        }
+    });
+
+    conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
+        const state = conn.peerConnection.iceConnectionState;
+        if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+            if (isTransferring) {
+                cancelTransfer = true;
+                if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
+                receivingFile = [];
+                showToast("Transfer failed: Wi-Fi dropped", "error");
+            } else {
+                showToast("Connection lost", "error");
+            }
+            disconnectPeer();
+        }
+    });
+
+    conn.on('data', async (data) => {
+        if (data.type === 'profile_sync') {
+            triggerHaptic('success');
+            connectedPeerProfile = data.profile;
+            showToast(`Connected to ${connectedPeerProfile.name}`);
+            document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
+            document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
+            const emailEl = document.getElementById('peer-email-display');
+            if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } 
+            else { emailEl.style.display = 'none'; }
+        } 
+        else if (data.type === 'batch_header') {
+            if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
+            triggerHaptic('heavy');
+            if (pulseInterval) clearInterval(pulseInterval);
+            pulseInterval = setInterval(() => { triggerHaptic('pulse') }, 1000);
+            pendingFileTransfer = data;
+            document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
+            document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
+            document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
+            document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
+            
+            const fileListContainer = document.getElementById('incoming-file-list-container');
+            fileListContainer.innerHTML = '';
+            data.files.forEach(f => {
+                fileListContainer.innerHTML += `<div class="incoming-file-item"><div class="file-preview-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><div class="file-details"><div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div><div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div></div></div>`;
+            });
+            document.getElementById('incoming-modal').classList.add('active');
+        } 
+        else if (data.type === 'transfer_response') {
+            if (data.accepted) {
+                updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
+                transferStartTime = Date.now();
+                sendNextFile();
+            } else {
+                if (isTransferring) { cancelTransfer = true; receivingFile = []; }
+                resetTransferUI();
+                let msg = "Transfer cancelled";
+                if (data.reason === 'declined') msg = "Transfer declined by peer";
+                if (data.reason === 'busy') msg = "Peer is busy receiving another file";
+                if (data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
+                showToast(msg, "error");
+                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+            }
+        } 
+        else if (data.type === 'file_header') {
+            receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
+            receiverBytesWritten = 0; // NEW: Reset write counter for new file
+            try {
+                const root = await navigator.storage.getDirectory();
+                try { await root.removeEntry(data.name); } catch(e){}
+                fileHandle = await root.getFileHandle(data.name, { create: true });
+                fileWritable = await fileHandle.createWritable();
+            } catch(e) { fileWritable = null; receivingFile = []; }
+            updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
+            updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
+        } 
+        else if (data.type === 'chunk') {
+            if (cancelTransfer) return;
+            batchReceivedSize += data.data.byteLength;
+            
+            // --- NEW: CUMULATIVE ACK LOGIC ---
+            const handleChunkWritten = () => {
+                receiverBytesWritten += data.data.byteLength;
+                if (receiverBytesWritten % ACK_INTERVAL === 0 || receiverBytesWritten >= receivingFileSize) {
+                    conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
                 }
             };
-            reader.readAsArrayBuffer(slice);
-        };
-        
-        resumeReading(); 
-    }
 
-    function setupConnection() {
-        conn.on('open', () => {
-            conn.send({ type: 'profile_sync', profile: myProfile });
-            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-            connectSection.style.opacity = '0'; identitySection.style.opacity = '0';
-            setTimeout(() => {
-                connectSection.classList.add('hidden'); identitySection.classList.add('hidden'); 
-                document.getElementById('active-connection').classList.remove('hidden');
-                dropZone.classList.remove('hidden'); sendBtn.classList.remove('hidden');
-                void dropZone.offsetWidth; 
-                document.getElementById('active-connection').classList.add('animate-enter');
-                dropZone.classList.add('animate-enter'); sendBtn.classList.add('animate-enter');
-            }, 300);
-        });
-
-        conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
-            const state = conn.peerConnection.iceConnectionState;
-            
-            if (state === 'disconnected' || state === 'failed' || state === 'closed') {
-                console.log("WebRTC Connection Lost:", state);
-                
-                if (isTransferring) {
-                    cancelTransfer = true;
-                    if (fileWritable) {
-                        try { await fileWritable.abort(); } catch(e) {}
-                        fileWritable = null;
-                        fileHandle = null;
-                    }
-                    receivingFile = [];
-                    showToast("Transfer failed: Wi-Fi dropped", "error");
-                } else {
-                    showToast("Connection lost", "error");
-                }
-                
-                disconnectPeer(); 
+            if (fileWritable) {
+                writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(handleChunkWritten);
+            } else {
+                receivingFile.push(data.data);
+                handleChunkWritten();
             }
-        });
-
-        conn.on('data', async (data) => {
-            if (data.type === 'profile_sync') {
-                triggerHaptic('success'); connectedPeerProfile = data.profile; showToast(`Connected to ${connectedPeerProfile.name}`);
-                document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
-                document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
-                const emailEl = document.getElementById('peer-email-display');
-                if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } else { emailEl.style.display = 'none'; }
-
-            } else if (data.type === 'batch_header') {
-                if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
-                
-                triggerHaptic('heavy'); 
-
-                if (pulseInterval) clearInterval(pulseInterval);
-                pulseInterval = setInterval(() => {
-                    triggerHaptic('pulse');
-                }, 1000);
-                
-                pendingFileTransfer = data; 
-                document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
-                document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
-                document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
-                
-                document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
-
-                const fileListContainer = document.getElementById('incoming-file-list-container');
-                fileListContainer.innerHTML = '';
-                data.files.forEach(f => {
-                    fileListContainer.innerHTML += `
-                        <div class="incoming-file-item">
-                            <div class="file-preview-icon">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                            </div>
-                            <div class="file-details">
-                                <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div>
-                            </div>
-                        </div>`;
-                });
-                document.getElementById('incoming-modal').classList.add('active');
-
-            } else if (data.type === 'transfer_response') {
-                if (data.accepted) {
-                    updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
-                    transferStartTime = Date.now();
-                    sendNextFile();
-                } else {
-                    if (isTransferring) { cancelTransfer = true; receivingFile = []; }
-                    resetTransferUI();
-                    let msg = "Transfer cancelled";
-                    if(data.reason === 'declined') msg = "Transfer declined by peer";
-                    if(data.reason === 'busy') msg = "Peer is busy receiving another file";
-                    if(data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
-                    showToast(msg, "error"); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-                }
-
-            } else if (data.type === 'file_header') {
-                receivingFileSize = data.size;
-                receivingFileName = data.name;
-                receivingFileType = data.filetype; 
-                currentReceiveIndex = data.index;
-
-                try {
-                    const root = await navigator.storage.getDirectory();
-                    try { await root.removeEntry(data.name); } catch(e){} 
-                    fileHandle = await root.getFileHandle(data.name, { create: true });
-                    fileWritable = await fileHandle.createWritable();
-                } catch (e) {
-                    console.warn("OPFS Disk Write not supported. Falling back to RAM.", e);
-                    fileWritable = null;
-                    receivingFile = []; 
-                }
-
-                updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
-                updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
-
-            } else if (data.type === 'chunk') {
-                if (cancelTransfer) return;
-                
-                batchReceivedSize += data.data.byteLength;
-
-                if (fileWritable) {
-                    writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(() => {
-                        conn.send({ type: 'ack' });
-                    });
-                } else {
-                    receivingFile.push(data.data); 
-                    conn.send({ type: 'ack' });
-                }
-
-                if (batchReceivedSize % (256 * 1024 * 5) === 0 || batchReceivedSize >= batchTotalSize) {
-                    updateStats(batchReceivedSize, batchTotalSize);
-                }
-
-            } else if (data.type === 'file_done') {
-                if (cancelTransfer) return;
-                
-                let url;
-                
-                if (fileWritable) {
-                    await writeQueue;
-                    await fileWritable.close();
-                    
-                    const diskFile = await fileHandle.getFile();
-                    url = URL.createObjectURL(diskFile);
-                    
-                    fileWritable = null;
-                    fileHandle = null;
-                } else {
-                    const safeType = receivingFileType || 'application/octet-stream';
-                    const blob = new Blob(receivingFile, { type: safeType });
-                    url = URL.createObjectURL(blob); 
-                }
-                
-                const a = document.createElement('a'); 
-                a.style.display = 'none'; 
-                a.href = url; 
-                a.download = receivingFileName; 
-                
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 2000); 
-                
-                markTransferFileDone(currentReceiveIndex);
-                saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
-
-            } else if (data.type === 'batch_done') {
-                triggerHaptic('success'); 
-                updateStatus(`Received ${receiveQueue.length} files from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-                showToast("All files received", "success");
-                setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
+            // Update receiver's UI
+            updateStats(batchReceivedSize, batchTotalSize);
+        } 
+        else if (data.type === 'cumulative_ack') {
+            // --- NEW: SENDER RECEIVES ACK AND UPDATES UI ---
+            bytesConfirmedWritten = data.bytesWritten;
             
-            } else if (data.type === 'ack') {
-                unackedChunks--; 
-                if (resumeReading) resumeReading(); 
+            // Sync the Sender's UI directly to what the receiver has saved
+            updateStats(data.batchReceivedSize, batchTotalSize); 
+
+            // If the receiver has written the entire file, sender can move on
+            if (bytesConfirmedWritten >= sendQueue[currentSendIndex].size) {
+                conn.send({ type: 'file_done' });
+                saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile);
+                markTransferFileDone(currentSendIndex);
+                currentSendIndex++;
+                sendNextFile(); 
+            } else {
+                if (resumeReading) resumeReading(); // Wake up sender if it was paused
             }
-        });
-
-        conn.on('close', async () => { 
-            if (pulseInterval) clearInterval(pulseInterval);
-            
-            if (isTransferring && !cancelTransfer) {
-                cancelTransfer = true;
-                if (fileWritable) {
-                    try { await fileWritable.abort(); } catch(e) {}
-                    fileWritable = null;
-                    fileHandle = null;
-                }
-                showToast("Connection ended abruptly", "error"); 
+        } 
+        else if (data.type === 'file_done') {
+            if (cancelTransfer) return;
+            let url;
+            if (fileWritable) {
+                await writeQueue;
+                await fileWritable.close();
+                const diskFile = await fileHandle.getFile();
+                url = URL.createObjectURL(diskFile);
+                fileWritable = null; fileHandle = null;
+            } else {
+                const safeType = receivingFileType || 'application/octet-stream';
+                const blob = new Blob(receivingFile, { type: safeType });
+                url = URL.createObjectURL(blob);
             }
-            
-            disconnectPeer(); 
-        });
-    }
+            const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = receivingFileName;
+            document.body.appendChild(a); a.click();
+            setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
+            markTransferFileDone(currentReceiveIndex);
+            saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
+        } 
+        else if (data.type === 'batch_done') {
+            triggerHaptic('success');
+            updateStatus(`Received ${receiveQueue.length} files from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
+            showToast("All files received", "success");
+            setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
+        }
+    });
 
-    function sendFile() {
-        triggerHaptic('light');
-        if (isTransferring) return showToast("Transfer already in progress.", "error");
-        if (fileInput.files.length === 0) return showToast("Please select files first.", "error");
-        
-        if (conn && conn.open) {
-            cancelTransfer = false;
-            sendQueue = Array.from(fileInput.files);
-            currentSendIndex = 0;
-            batchTotalSize = sendQueue.reduce((acc, file) => acc + file.size, 0);
-            batchSentSize = 0;
+    conn.on('close', async () => {
+        if (pulseInterval) clearInterval(pulseInterval);
+        if (isTransferring && !cancelTransfer) {
+            cancelTransfer = true;
+            if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
+            showToast("Connection ended abruptly", "error");
+        }
+        disconnectPeer();
+    });
+}
 
-            renderTransferFileList(sendQueue, true);
-            setTransferState(true);
-            
-            updateStats(0, batchTotalSize);
-            updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`, "#f59e0b");
-            
-            const filesMetadata = sendQueue.map(f => ({ name: f.name, size: f.size, type: f.type }));
-            conn.send({ type: 'batch_header', files: filesMetadata, totalSize: batchTotalSize });
-        } else showToast("No active connection.", "error");
-    }
-
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e => {}));
-    initApp();
-
+function sendFile(){triggerHaptic('light');if(isTransferring)return showToast("Transfer already in progress.","error");if(fileInput.files.length===0)return showToast("Please select files first.","error");if(conn&&conn.open){cancelTransfer=false;sendQueue=Array.from(fileInput.files);currentSendIndex=0;batchTotalSize=sendQueue.reduce((acc,file)=>acc+file.size,0);batchSentSize=0;renderTransferFileList(sendQueue,true);setTransferState(true);updateStats(0,batchTotalSize);updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`,"#f59e0b");const filesMetadata=sendQueue.map(f=>({name:f.name,size:f.size,type:f.type}));conn.send({type:'batch_header',files:filesMetadata,totalSize:batchTotalSize})}else showToast("No active connection.","error")}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>{}));
+initApp();
 </script>
-
 </body>
 </html>

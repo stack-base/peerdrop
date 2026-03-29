@@ -332,7 +332,7 @@
                     <div class="transfer-progress-section">
                         <div class="transfer-progress-info">
                             <div class="transfer-percentage" id="transfer-percentage">0%</div>
-                            <div class="transfer-stats-right"><span id="speed-text">0 MB/s</span><span class="stat-dot">&bull;</span><span id="eta-text">--:--</span> left</div>
+                            <div class="transfer-stats-right"><span id="speed-text">0 MB/s</span><span class="stat-dot">&bull;</span><span id="eta-text">--:--</span><span id="eta-suffix"> left</span></div>
                         </div>
                         <div class="transfer-progress-track"><div class="transfer-progress-fill" id="custom-progress-bar"></div></div>
                         <div class="transfer-overall-stats"><span id="file-count-text">File 1 of 1</span><span id="amount-text">0/0 MB</span></div>
@@ -413,6 +413,27 @@
                 </div>
             </div>
         </div>
+
+        <div id="completion-modal" class="modal-overlay" style="z-index: 10000;">
+            <div class="modal-content" style="max-width: 400px; margin: auto; height: auto; padding: 32px 24px; text-align: center; border-radius: 24px; display: flex; flex-direction: column;">
+                <div style="width: 64px; height: 64px; background: rgba(52, 199, 89, 0.1); color: #34c759; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h2 style="margin: 0 0 8px 0; font-size: 1.5rem; font-family: 'Inter', sans-serif;">Transfer Complete</h2>
+                <p id="completion-subtitle" style="color: var(--text-muted); margin: 0 0 24px 0; font-size: 0.95rem;">Successfully sent</p>
+                <div style="background: var(--input-bg); border-radius: 16px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; text-align: center; border: 1px solid var(--border);">
+                    <div style="flex: 1;"><div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Size</div><div id="completion-size" style="font-weight: 700; font-size: 1.05rem; margin-top: 4px; color: var(--text-main);">0 MB</div></div>
+                    <div style="width: 1px; background: var(--border);"></div>
+                    <div style="flex: 1;"><div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Time</div><div id="completion-time" style="font-weight: 700; font-size: 1.05rem; margin-top: 4px; color: var(--text-main);">00:00</div></div>
+                    <div style="width: 1px; background: var(--border);"></div>
+                    <div style="flex: 1;"><div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Speed</div><div id="completion-speed" style="font-weight: 700; font-size: 1.05rem; margin-top: 4px; color: var(--text-main);">0 MB/s</div></div>
+                </div>
+                <div style="text-align: left; margin-bottom: 12px; font-size: 0.9rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px;">Summary</div>
+                <div id="completion-files" style="max-height: 160px; overflow-y: auto; text-align: left; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;"></div>
+                <button onclick="closeCompletionScreen()" style="margin: 0; width: 100%;">Done</button>
+            </div>
+        </div>
+
     </div>
 </div>
 <div id="toast-container"></div>
@@ -425,15 +446,13 @@ function markTransferFileDone(index){const item=document.getElementById(`transfe
 
 let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
 
-const CHUNK_SIZE = 64 * 1024; // 512KB chunks
-const MAX_BUFFER = 16 * 1024 * 1024; // 8MB Network Buffer Limit
-const MAX_IN_FLIGHT = 16 * 1024 * 1024; // 8MB Unacknowledged Data Limit
-const ACK_INTERVAL = 8 * 1024 * 1024; // Send ACK every 4MB written
-// ----------------------------------
+const CHUNK_SIZE = 64 * 1024;
+const MAX_BUFFER = 16 * 1024 * 1024;
+const MAX_IN_FLIGHT = 16 * 1024 * 1024;
+const ACK_INTERVAL = 8 * 1024 * 1024;
 
-let bytesConfirmedWritten = 0; // Tracks what the receiver safely saved
-let receiverBytesWritten = 0; // Tracks local writes on the receiver side
-// ------------------------------
+let bytesConfirmedWritten = 0;
+let receiverBytesWritten = 0;
 
 let sendQueue=[]; let currentSendIndex=0; let receiveQueue=[]; let currentReceiveIndex=0; 
 let batchTotalSize=0; let batchSentSize=0; let batchReceivedSize=0;
@@ -479,7 +498,58 @@ fileInput.addEventListener('change',updateFileText);
 function updateFileText(){if(fileInput.files.length===1){triggerHaptic('light');const file=fileInput.files[0];dropText.innerHTML=`<strong style="color: var(--text-main)">${file.name}</strong>`;dropSubtext.innerHTML=formatBytes(file.size);dropSubtext.classList.remove('hidden')}else if(fileInput.files.length>1){triggerHaptic('light');let totalSize=0;for(let i=0;i<fileInput.files.length;i++)totalSize+=fileInput.files[i].size;dropText.innerHTML=`<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;dropSubtext.innerHTML=`Total Size: ${formatBytes(totalSize)}`;dropSubtext.classList.remove('hidden')}else{dropText.innerHTML=`Select files to send`;dropSubtext.innerHTML=`or drag and drop them here`;dropSubtext.classList.remove('hidden')}}
 const statusTextEl=document.getElementById('status-text'),statusDotEl=document.getElementById('status-dot');const connectSection=document.getElementById('connect-section'),identitySection=document.getElementById('identity-section');const sendBtn=document.getElementById('send-btn'),copyBtn=document.getElementById('copy-btn');const speedText=document.getElementById('speed-text'),amountText=document.getElementById('amount-text');
 function updateStatus(message,color="var(--text-muted)",shadowColor="transparent"){statusTextEl.innerText=message;statusDotEl.style.backgroundColor=color;statusDotEl.style.boxShadow=`0 0 8px ${shadowColor==="transparent"?color:shadowColor}`}
-function updateStats(loadedBytes,totalBytes){const now=Date.now();if(loadedBytes===0){lastUpdateTime=now;lastLoadedBytes=0;smoothedSpeedBps=0;speedText.innerText=`0 B/s`;amountText.innerText=`0 B / ${formatBytes(totalBytes)}`;document.getElementById('transfer-percentage').innerText=`0%`;document.getElementById('custom-progress-bar').style.width=`0%`;document.getElementById('eta-text').innerText="--:--";return}const elapsedSinceLastUpdate=(now-lastUpdateTime)/1000;if(elapsedSinceLastUpdate>=0.25||loadedBytes===totalBytes){const bytesSinceLast=loadedBytes-lastLoadedBytes;const currentInstantSpeed=elapsedSinceLastUpdate>0?bytesSinceLast/elapsedSinceLastUpdate:0;if(smoothedSpeedBps===0){smoothedSpeedBps=currentInstantSpeed}else{smoothedSpeedBps=(currentInstantSpeed*0.3)+(smoothedSpeedBps*0.7)}speedText.innerText=`${formatBytes(smoothedSpeedBps)}/s`;const remainingBytes=totalBytes-loadedBytes;const etaSeconds=smoothedSpeedBps>0?remainingBytes/smoothedSpeedBps:0;document.getElementById('eta-text').innerText=formatTime(etaSeconds);lastUpdateTime=now;lastLoadedBytes=loadedBytes}amountText.innerText=`${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;const percent=totalBytes>0?Math.min(100,Math.floor((loadedBytes/totalBytes)*100)):0;document.getElementById('transfer-percentage').innerText=`${percent}%`;document.getElementById('custom-progress-bar').style.width=`${percent}%`}
+
+function updateStats(loadedBytes,totalBytes){
+    const now=Date.now();
+    if(loadedBytes===0){
+        lastUpdateTime=now;lastLoadedBytes=0;smoothedSpeedBps=0;
+        speedText.innerText=`0 B/s`;
+        amountText.innerText=`0 B / ${formatBytes(totalBytes)}`;
+        document.getElementById('transfer-percentage').innerText=`0%`;
+        document.getElementById('custom-progress-bar').style.width=`0%`;
+        document.getElementById('eta-text').innerText="--:--";
+        document.getElementById('eta-suffix').innerText=" left";
+        return;
+    }
+    const elapsedSinceLastUpdate=(now-lastUpdateTime)/1000;
+    if(elapsedSinceLastUpdate>=0.25||loadedBytes===totalBytes){
+        const bytesSinceLast=loadedBytes-lastLoadedBytes;
+        const currentInstantSpeed=elapsedSinceLastUpdate>0?bytesSinceLast/elapsedSinceLastUpdate:0;
+        if(smoothedSpeedBps===0){smoothedSpeedBps=currentInstantSpeed}else{smoothedSpeedBps=(currentInstantSpeed*0.3)+(smoothedSpeedBps*0.7)}
+        speedText.innerText=`${formatBytes(smoothedSpeedBps)}/s`;
+        const remainingBytes=totalBytes-loadedBytes;
+        const etaSeconds=smoothedSpeedBps>0?remainingBytes/smoothedSpeedBps:0;
+        document.getElementById('eta-text').innerText=formatTime(etaSeconds);
+        lastUpdateTime=now;lastLoadedBytes=loadedBytes
+    }
+    amountText.innerText=`${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
+    const percent=totalBytes>0?Math.min(100,Math.floor((loadedBytes/totalBytes)*100)):0;
+    document.getElementById('transfer-percentage').innerText=`${percent}%`;
+    document.getElementById('custom-progress-bar').style.width=`${percent}%`
+}
+
+// NEW: Completion Handlers
+function showCompletionScreen(isSending, peerName, totalSize, startTime, files) {
+    const totalTime = (Date.now() - startTime) / 1000;
+    const avgSpeed = totalSize / (totalTime || 1);
+    document.getElementById('completion-subtitle').innerText = isSending ? `Successfully sent to ${peerName}` : `Successfully received from ${peerName}`;
+    document.getElementById('completion-size').innerText = formatBytes(totalSize);
+    document.getElementById('completion-time').innerText = formatTime(totalTime);
+    document.getElementById('completion-speed').innerText = `${formatBytes(avgSpeed)}/s`;
+    const fileList = document.getElementById('completion-files');
+    fileList.innerHTML = '';
+    Array.from(files).forEach(file => {
+        fileList.innerHTML += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;"><span style="font-size: 0.95rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; color: var(--text-main);">${file.name}</span><span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(file.size)}</span></div>`;
+    });
+    document.getElementById('completion-modal').classList.add('active');
+}
+function closeCompletionScreen() {
+    triggerHaptic('light');
+    document.getElementById('completion-modal').classList.remove('active');
+    resetTransferUI();
+    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+}
+
 function initPeerJS(){peer=new Peer({config:{'iceServers':[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});peer.on('open',(id)=>{document.getElementById('my-id').innerText=id;copyBtn.classList.remove('hidden');const shareUrl=window.location.href.split('?')[0]+'?connect='+id;renderQR(shareUrl);const connectId=new URLSearchParams(window.location.search).get('connect');if(connectId){document.getElementById('target-id').value=connectId;setTimeout(connectToPeer,500)}});peer.on('connection',(connection)=>{conn=connection;setupConnection()})}
 function connectToPeer(){triggerHaptic('light');const targetId=document.getElementById('target-id').value.trim();if(!targetId)return showToast("Please enter a Device ID","error");updateStatus("Connecting...","#f59e0b");conn=peer.connect(targetId,{reliable:true});setupConnection()}
 function disconnectPeer(){triggerHaptic('medium');if(conn)conn.close();resetTransferUI();document.getElementById('active-connection').classList.add('hidden');document.getElementById('share-section').classList.add('hidden');document.getElementById('send-btn').classList.add('hidden');connectSection.classList.remove('hidden');identitySection.classList.remove('hidden');connectSection.style.opacity='1';identitySection.style.opacity='1';updateStatus("Waiting for connection...","var(--text-muted)");connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''}}
@@ -492,67 +562,43 @@ function sendNextFile() {
     if (currentSendIndex >= sendQueue.length) {
         conn.send({ type: 'batch_done' });
         triggerHaptic('success');
-        updateStatus(`Sent ${sendQueue.length} files to ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-        showToast("All files sent successfully!");
-        setTimeout(() => {
-            resetTransferUI();
-            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-        }, 3000);
+        showCompletionScreen(true, connectedPeerProfile.name, batchTotalSize, transferStartTime, sendQueue);
         return;
     }
-
     const file = sendQueue[currentSendIndex];
     updateActiveTransferFile(currentSendIndex, sendQueue.length);
     conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
-
     let offset = 0;
-    bytesConfirmedWritten = 0; // Reset for the new file
+    bytesConfirmedWritten = 0;
     let isReading = false;
-
     resumeReading = () => {
         if (cancelTransfer || isReading || offset >= file.size) return;
-
-        // 1. Check Network Backpressure (Is the browser's sending queue full?)
-        if (conn.dataChannel.bufferedAmount > MAX_BUFFER) {
-            return; // Pause reading until onbufferedamountlow fires
-        }
-
-        // 2. Check Receiver Backpressure (Is the receiver's disk falling behind?)
+        if (conn.dataChannel.bufferedAmount > MAX_BUFFER) return;
         let unacknowledgedBytes = offset - bytesConfirmedWritten;
-        if (unacknowledgedBytes > MAX_IN_FLIGHT) {
-            return; // Pause reading until we get a cumulative_ack
-        }
-
+        if (unacknowledgedBytes > MAX_IN_FLIGHT) return;
         isReading = true;
         const slice = file.slice(offset, offset + CHUNK_SIZE);
         const reader = new FileReader();
-
         reader.onload = (e) => {
             isReading = false;
             if (cancelTransfer) return;
-
             try {
                 conn.send({ type: 'chunk', data: e.target.result });
                 offset += slice.size;
-                
-                // Immediately try reading the next chunk if limits allow
                 resumeReading(); 
             } catch (err) {
-                // If buffer accidentally overflows, wait and retry
                 setTimeout(resumeReading, 50);
             }
         };
         reader.readAsArrayBuffer(slice);
     };
-
-    resumeReading(); // Start the loop
+    resumeReading();
 }
 
 function setupConnection() {
     conn.on('open', () => {
         conn.send({ type: 'profile_sync', profile: myProfile });
         updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-        
         connectSection.style.opacity = '0';
         identitySection.style.opacity = '0';
         setTimeout(() => {
@@ -566,16 +612,11 @@ function setupConnection() {
             dropZone.classList.add('animate-enter');
             sendBtn.classList.add('animate-enter');
         }, 300);
-
-        // --- NEW: WAKE SENDER WHEN BUFFER DRAINS ---
         if (conn.dataChannel) {
-            conn.dataChannel.bufferedAmountLowThreshold = 8 * 1024 * 1024; // 8MB
-            conn.dataChannel.onbufferedamountlow = () => {
-                if (resumeReading) resumeReading();
-            };
+            conn.dataChannel.bufferedAmountLowThreshold = 12 * 1024 * 1024;
+            conn.dataChannel.onbufferedamountlow = () => { if (resumeReading) resumeReading(); };
         }
     });
-
     conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
         const state = conn.peerConnection.iceConnectionState;
         if (state === 'disconnected' || state === 'failed' || state === 'closed') {
@@ -584,13 +625,10 @@ function setupConnection() {
                 if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
                 receivingFile = [];
                 showToast("Transfer failed: Wi-Fi dropped", "error");
-            } else {
-                showToast("Connection lost", "error");
-            }
+            } else { showToast("Connection lost", "error"); }
             disconnectPeer();
         }
     });
-
     conn.on('data', async (data) => {
         if (data.type === 'profile_sync') {
             triggerHaptic('success');
@@ -601,8 +639,7 @@ function setupConnection() {
             const emailEl = document.getElementById('peer-email-display');
             if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } 
             else { emailEl.style.display = 'none'; }
-        } 
-        else if (data.type === 'batch_header') {
+        } else if (data.type === 'batch_header') {
             if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
             triggerHaptic('heavy');
             if (pulseInterval) clearInterval(pulseInterval);
@@ -612,15 +649,13 @@ function setupConnection() {
             document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
             document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
             document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
-            
             const fileListContainer = document.getElementById('incoming-file-list-container');
             fileListContainer.innerHTML = '';
             data.files.forEach(f => {
                 fileListContainer.innerHTML += `<div class="incoming-file-item"><div class="file-preview-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><div class="file-details"><div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div><div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div></div></div>`;
             });
             document.getElementById('incoming-modal').classList.add('active');
-        } 
-        else if (data.type === 'transfer_response') {
+        } else if (data.type === 'transfer_response') {
             if (data.accepted) {
                 updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
                 transferStartTime = Date.now();
@@ -635,10 +670,9 @@ function setupConnection() {
                 showToast(msg, "error");
                 updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
             }
-        } 
-        else if (data.type === 'file_header') {
+        } else if (data.type === 'file_header') {
             receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
-            receiverBytesWritten = 0; // NEW: Reset write counter for new file
+            receiverBytesWritten = 0;
             try {
                 const root = await navigator.storage.getDirectory();
                 try { await root.removeEntry(data.name); } catch(e){}
@@ -647,47 +681,29 @@ function setupConnection() {
             } catch(e) { fileWritable = null; receivingFile = []; }
             updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
             updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
-        } 
-        else if (data.type === 'chunk') {
+        } else if (data.type === 'chunk') {
             if (cancelTransfer) return;
             batchReceivedSize += data.data.byteLength;
-            
-            // --- NEW: CUMULATIVE ACK LOGIC ---
             const handleChunkWritten = () => {
                 receiverBytesWritten += data.data.byteLength;
                 if (receiverBytesWritten % ACK_INTERVAL === 0 || receiverBytesWritten >= receivingFileSize) {
                     conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
                 }
             };
-
-            if (fileWritable) {
-                writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(handleChunkWritten);
-            } else {
-                receivingFile.push(data.data);
-                handleChunkWritten();
-            }
-            // Update receiver's UI
+            if (fileWritable) { writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(handleChunkWritten); } 
+            else { receivingFile.push(data.data); handleChunkWritten(); }
             updateStats(batchReceivedSize, batchTotalSize);
-        } 
-        else if (data.type === 'cumulative_ack') {
-            // --- NEW: SENDER RECEIVES ACK AND UPDATES UI ---
+        } else if (data.type === 'cumulative_ack') {
             bytesConfirmedWritten = data.bytesWritten;
-            
-            // Sync the Sender's UI directly to what the receiver has saved
             updateStats(data.batchReceivedSize, batchTotalSize); 
-
-            // If the receiver has written the entire file, sender can move on
             if (bytesConfirmedWritten >= sendQueue[currentSendIndex].size) {
                 conn.send({ type: 'file_done' });
                 saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile);
                 markTransferFileDone(currentSendIndex);
                 currentSendIndex++;
                 sendNextFile(); 
-            } else {
-                if (resumeReading) resumeReading(); // Wake up sender if it was paused
-            }
-        } 
-        else if (data.type === 'file_done') {
+            } else { if (resumeReading) resumeReading(); }
+        } else if (data.type === 'file_done') {
             if (cancelTransfer) return;
             let url;
             if (fileWritable) {
@@ -706,15 +722,11 @@ function setupConnection() {
             setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
             markTransferFileDone(currentReceiveIndex);
             saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
-        } 
-        else if (data.type === 'batch_done') {
+        } else if (data.type === 'batch_done') {
             triggerHaptic('success');
-            updateStatus(`Received ${receiveQueue.length} files from ${connectedPeerProfile.name}!`, "#34c759", "rgba(52, 199, 89, 0.4)");
-            showToast("All files received", "success");
-            setTimeout(() => { resetTransferUI(); updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)"); }, 3000);
+            showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
         }
     });
-
     conn.on('close', async () => {
         if (pulseInterval) clearInterval(pulseInterval);
         if (isTransferring && !cancelTransfer) {

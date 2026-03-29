@@ -406,8 +406,11 @@
                         <button onclick="saveSettingsProfile()" style="margin-top: 10px; margin-bottom: 0;">Save Changes</button>
                     </div>
                     <div class="box" style="padding: 24px; margin-top: 16px; margin-bottom: 20px;">
-                        <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; text-align: left;">Storage Management</p>
-                        <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-main); text-align: left; line-height: 1.4;">Free up space by deleting incomplete files from cancelled or dropped transfers.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Storage Management</p>
+                            <span id="storage-usage-label" style="font-size: 0.85rem; font-weight: 700; color: var(--accent); background: rgba(10, 132, 255, 0.1); padding: 4px 10px; border-radius: 100px;">Calculating...</span>
+                        </div>
+                        <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-main); text-align: left; line-height: 1.4;">Free up space by deleting cached transfers and incomplete files.</p>
                         <button onclick="clearOPFSCache()" style="background: rgba(255, 59, 48, 0.1); color: #ff3b30; margin: 0; transition: all 0.2s;">Clear Temporary Files</button>
                     </div>
                 </div>
@@ -416,14 +419,11 @@
 
         <div id="completion-modal" class="incoming-overlay">
             <div class="incoming-content-wrapper">
-                
                 <div style="width: 88px; height: 88px; background: linear-gradient(135deg, #34c759, #30b053); color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; box-shadow: 0 10px 30px rgba(52, 199, 89, 0.3);">
                     <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                
                 <h2 class="incoming-title" style="margin-bottom: 8px;">Transfer Complete</h2>
                 <p id="completion-subtitle" style="color: var(--text-muted); margin: 0 0 32px 0; font-size: 1.1rem; font-weight: 500;">Successfully sent</p>
-
                 <div style="background: var(--card-bg); border-radius: 24px; padding: 20px; margin-bottom: 32px; display: flex; justify-content: space-between; text-align: center; border: 1px solid var(--border); width: 100%; box-shadow: var(--shadow); box-sizing: border-box;">
                     <div style="flex: 1;">
                         <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Size</div>
@@ -440,11 +440,8 @@
                         <div id="completion-speed" style="font-weight: 700; font-size: 1.2rem; margin-top: 4px; color: var(--text-main);">0 MB/s</div>
                     </div>
                 </div>
-
                 <div style="width: 100%; text-align: left; margin-bottom: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px;">Summary</div>
-                <div id="completion-files" style="width: 100%; max-height: 220px; overflow-y: auto; text-align: left; margin-bottom: 32px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; box-sizing: border-box;">
-                    </div>
-
+                <div id="completion-files" style="width: 100%; max-height: 220px; overflow-y: auto; text-align: left; margin-bottom: 32px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; box-sizing: border-box;"></div>
                 <button onclick="closeCompletionScreen()" class="btn-accept-huge">Done</button>
             </div>
         </div>
@@ -490,12 +487,141 @@ function stopScan(){triggerHaptic('light');document.getElementById('scanner-moda
 function onScanSuccess(decodedText){if(html5QrCode.isScanning===false)return;triggerHaptic('success');document.getElementById('viewfinder').classList.add('success');html5QrCode.pause();setTimeout(()=>{stopScan();let targetId=decodedText;try{const urlParams=new URLSearchParams(new URL(decodedText).search);if(urlParams.has('connect'))targetId=urlParams.get('connect')}catch(e){}document.getElementById('target-id').value=targetId;showToast("QR Code Scanned!");setTimeout(connectToPeer,300)},400)}
 function initApp(){const welcomeScreen=document.getElementById('welcome-screen');const mainScreen=document.getElementById('main-app-screen');if(myProfile&&myProfile.name&&myProfile.device){welcomeScreen.classList.add('hidden');mainScreen.classList.remove('hidden');const animatedEls=mainScreen.querySelectorAll('.box, .header, #connect-section, #status');animatedEls.forEach((el,index)=>el.classList.add('animate-enter',`delay-${index+1}`));requestWakeLock();initPeerJS();const urlParams=new URLSearchParams(window.location.search);if(urlParams.get('action')==='scan'){setTimeout(()=>{startScan();window.history.replaceState(null,'',window.location.pathname)},600)}}else{document.getElementById('setup-name').addEventListener('input',(e)=>{document.getElementById('avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'})}}
 function saveInitialProfile(){triggerHaptic('light');const name=document.getElementById('setup-name').value.trim();const device=document.getElementById('setup-device').value.trim();const email=document.getElementById('setup-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));showToast("Profile created successfully!");const welcomeScreen=document.getElementById('welcome-screen');welcomeScreen.style.opacity='0';welcomeScreen.style.transform='translateY(-20px)';welcomeScreen.style.transition='all 0.4s ease';setTimeout(()=>initApp(),400)}
-function toggleSettings(){triggerHaptic('light');const modal=document.getElementById('settings-modal');if(!modal.classList.contains('active')){document.getElementById('edit-name').value=myProfile.name||'';document.getElementById('edit-device').value=myProfile.device||'';document.getElementById('edit-email').value=myProfile.email||'';document.getElementById('settings-avatar-initial').innerText=myProfile.name?myProfile.name.charAt(0).toUpperCase():'?'}modal.classList.toggle('active')}
+function toggleSettings(){
+    triggerHaptic('light');
+    const modal=document.getElementById('settings-modal');
+    if(!modal.classList.contains('active')){
+        document.getElementById('edit-name').value=myProfile.name||'';
+        document.getElementById('edit-device').value=myProfile.device||'';
+        document.getElementById('edit-email').value=myProfile.email||'';
+        document.getElementById('settings-avatar-initial').innerText=myProfile.name?myProfile.name.charAt(0).toUpperCase():'?';
+        updateStorageUsageDisplay();
+    }
+    modal.classList.toggle('active')
+}
 document.getElementById('edit-name').addEventListener('input',(e)=>{document.getElementById('settings-avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'});
 function saveSettingsProfile(){triggerHaptic('light');const name=document.getElementById('edit-name').value.trim();const device=document.getElementById('edit-device').value.trim();const email=document.getElementById('edit-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));if(conn&&conn.open)conn.send({type:'profile_sync',profile:myProfile});showToast("Settings saved successfully!");toggleSettings()}
-async function clearOPFSCache(){triggerHaptic('medium');try{const root=await navigator.storage.getDirectory();let deletedCount=0;for await(const [name,handle] of root.entries()){await root.removeEntry(name,{recursive:true});deletedCount++}if(deletedCount>0){showToast(`Cleared ${deletedCount} incomplete files.`,"success");triggerHaptic('success')}else{showToast("Storage is already clean.","success")}}catch(e){showToast("Could not clear storage.","error");triggerHaptic('error')}}
-function saveToHistory(filename,filesize,type,peerInfo){let history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');history.unshift({id:Date.now(),filename,filesize:formatBytes(filesize),type,date:new Date().toISOString(),peer:peerInfo||{name:'Unknown',device:'Unknown',email:''}});if(history.length>50)history.pop();localStorage.setItem('peerdrop_history',JSON.stringify(history));renderHistory()}
-function renderHistory(){const list=document.getElementById('history-list');const history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');list.innerHTML='';if(history.length===0){list.innerHTML='<div class="empty-history">No past transfers found.</div>';return}history.forEach(item=>{const isSent=item.type==='sent';const actionText=isSent?'Sent to':'From';const iconSvg=isSent?`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;const peerDisplay=item.peer&&item.peer.device?`${item.peer.name||'Unknown'} (${item.peer.device})`:`${item.peer&&item.peer.name?item.peer.name:'Unknown'}`;const emailDisplay=item.peer&&item.peer.email?`<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>`:'';list.innerHTML+=`<div class="history-item"><div class="history-icon ${isSent?'':'received'}">${iconSvg}</div><div class="history-details"><p class="history-name" title="${item.filename}">${item.filename}</p><p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p><p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p></div></div>`})}
+
+// Storage Management Updates
+async function updateStorageUsageDisplay() {
+    const usageLabel = document.getElementById('storage-usage-label');
+    if (!usageLabel) return;
+    usageLabel.innerText = 'Calculating...';
+    try {
+        const root = await navigator.storage.getDirectory();
+        let totalSize = 0;
+        for await (const [name, handle] of root.entries()) {
+            if (handle.kind === 'file') {
+                const file = await handle.getFile();
+                totalSize += file.size;
+            }
+        }
+        usageLabel.innerText = totalSize > 0 ? formatBytes(totalSize) : '0 MB';
+        if (totalSize > 1024 * 1024 * 1024) {
+            usageLabel.style.color = '#ff3b30';
+            usageLabel.style.background = 'rgba(255, 59, 48, 0.1)';
+        } else {
+            usageLabel.style.color = 'var(--accent)';
+            usageLabel.style.background = 'rgba(10, 132, 255, 0.1)';
+        }
+    } catch (e) { usageLabel.innerText = 'Unknown'; }
+}
+
+async function clearOPFSCache(){
+    triggerHaptic('medium');
+    try{
+        const root=await navigator.storage.getDirectory();
+        let deletedCount=0;
+        for await(const [name,handle] of root.entries()){
+            await root.removeEntry(name,{recursive:true});
+            deletedCount++
+        }
+        if(deletedCount>0){
+            showToast(`Cleared ${deletedCount} cached files.`,"success");
+            triggerHaptic('success');
+            updateStorageUsageDisplay();
+        }else{
+            showToast("Storage is already clean.","success")
+        }
+    }catch(e){
+        showToast("Could not clear storage.","error");
+        triggerHaptic('error')
+    }
+}
+
+// History Updates
+function saveToHistory(filename, filesize, type, peerInfo, hasCache = false) {
+    let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
+    history.unshift({
+        id: Date.now(),
+        filename,
+        filesize: formatBytes(filesize),
+        type,
+        date: new Date().toISOString(),
+        peer: peerInfo || {name: 'Unknown', device: 'Unknown', email: ''},
+        hasCache: hasCache
+    });
+    if (history.length > 50) history.pop();
+    localStorage.setItem('peerdrop_history', JSON.stringify(history));
+    renderHistory();
+}
+
+function renderHistory(){
+    const list=document.getElementById('history-list');
+    const history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');
+    list.innerHTML='';
+    if(history.length===0){
+        list.innerHTML='<div class="empty-history">No past transfers found.</div>';
+        return;
+    }
+    history.forEach(item=>{
+        const isSent=item.type==='sent';
+        const actionText=isSent?'Sent to':'From';
+        const iconSvg=isSent?`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+        const peerDisplay=item.peer&&item.peer.device?`${item.peer.name||'Unknown'} (${item.peer.device})`:`${item.peer&&item.peer.name?item.peer.name:'Unknown'}`;
+        const emailDisplay=item.peer&&item.peer.email?`<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>`:'';
+        
+        let actionButton = '';
+        if (item.type === 'received' && item.hasCache) {
+            actionButton = `<button class="btn-icon" onclick="downloadFromCache('${item.filename}')" title="Redownload" style="width: 40px; height: 40px; background: rgba(10, 132, 255, 0.1); color: var(--accent); margin-left: auto; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>`;
+        }
+
+        list.innerHTML+=`<div class="history-item">
+            <div class="history-icon ${isSent?'':'received'}">${iconSvg}</div>
+            <div class="history-details">
+                <p class="history-name" title="${item.filename}">${item.filename}</p>
+                <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
+                <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
+            </div>
+            ${actionButton}
+        </div>`;
+    });
+}
+
+async function downloadFromCache(filename) {
+    triggerHaptic('light');
+    try {
+        const root = await navigator.storage.getDirectory();
+        const fileHandle = await root.getFileHandle(filename);
+        const file = await fileHandle.getFile();
+        const url = URL.createObjectURL(file);
+        
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        
+        setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
+        showToast("Downloaded from cache!", "success");
+    } catch (e) {
+        showToast("File is no longer in your local cache.", "error");
+    }
+}
+
 function toggleHistory(){triggerHaptic('light');const modal=document.getElementById('history-modal');if(!modal.classList.contains('active'))renderHistory();modal.classList.toggle('active')}
 function clearHistory(){triggerHaptic('medium');if(confirm("Are you sure you want to clear all your transfer history?")){localStorage.removeItem('peerdrop_history');renderHistory();showToast("History cleared successfully!")}}
 renderHistory();const themeIcon=document.getElementById('theme-icon');let currentShareUrl="";
@@ -543,7 +669,6 @@ function updateStats(loadedBytes,totalBytes){
     document.getElementById('custom-progress-bar').style.width=`${percent}%`
 }
 
-// NEW: Completion Handlers (Updated for Full Pane)
 function showCompletionScreen(isSending, peerName, totalSize, startTime, files) {
     const totalTime = (Date.now() - startTime) / 1000;
     const avgSpeed = totalSize / (totalTime || 1);
@@ -557,10 +682,8 @@ function showCompletionScreen(isSending, peerName, totalSize, startTime, files) 
     fileList.innerHTML = '';
     
     Array.from(files).forEach(file => {
-        // Fetch the appropriate icon for the file type
         const type = file.type || file.filetype || '';
         const svgIcon = getFileIconSVG(type);
-        
         fileList.innerHTML += `
         <div class="incoming-file-item" style="border: 1px solid var(--border); background: var(--card-bg); margin-bottom: 0;">
             <div class="file-preview-icon" style="background: var(--input-bg); border: none;">${svgIcon}</div>
@@ -570,9 +693,9 @@ function showCompletionScreen(isSending, peerName, totalSize, startTime, files) 
             </div>
         </div>`;
     });
-    
     document.getElementById('completion-modal').classList.add('active');
 }
+
 function closeCompletionScreen() {
     triggerHaptic('light');
     document.getElementById('completion-modal').classList.remove('active');
@@ -591,11 +714,8 @@ function sendNextFile() {
         conn.send({ type: 'batch_done' });
         triggerHaptic('success');
         
-        // 1. Reset the UI behind the modal immediately so we aren't "busy"
         resetTransferUI();
         updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-        
-        // 2. Show the completion screen
         showCompletionScreen(true, connectedPeerProfile.name, batchTotalSize, transferStartTime, sendQueue);
         return;
     }
@@ -733,7 +853,7 @@ function setupConnection() {
             updateStats(data.batchReceivedSize, batchTotalSize); 
             if (bytesConfirmedWritten >= sendQueue[currentSendIndex].size) {
                 conn.send({ type: 'file_done' });
-                saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile);
+                saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile, false);
                 markTransferFileDone(currentSendIndex);
                 currentSendIndex++;
                 sendNextFile(); 
@@ -741,12 +861,14 @@ function setupConnection() {
         } else if (data.type === 'file_done') {
             if (cancelTransfer) return;
             let url;
+            let usedCache = false;
             if (fileWritable) {
                 await writeQueue;
                 await fileWritable.close();
                 const diskFile = await fileHandle.getFile();
                 url = URL.createObjectURL(diskFile);
                 fileWritable = null; fileHandle = null;
+                usedCache = true;
             } else {
                 const safeType = receivingFileType || 'application/octet-stream';
                 const blob = new Blob(receivingFile, { type: safeType });
@@ -756,17 +878,13 @@ function setupConnection() {
             document.body.appendChild(a); a.click();
             setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
             markTransferFileDone(currentReceiveIndex);
-            saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile);
+            saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile, usedCache);
         } else if (data.type === 'batch_done') {
-                triggerHaptic('success');
-                
-                // 1. Reset the UI behind the modal immediately so we aren't "busy"
-                resetTransferUI();
-                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-                
-                // 2. Show the completion screen
-                showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
-            }
+            triggerHaptic('success');
+            resetTransferUI();
+            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+            showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
+        }
     });
     conn.on('close', async () => {
         if (pulseInterval) clearInterval(pulseInterval);

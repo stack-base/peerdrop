@@ -465,6 +465,7 @@ const ACK_INTERVAL = 8 * 1024 * 1024;
 
 let bytesConfirmedWritten = 0;
 let receiverBytesWritten = 0;
+let lastAckedBytes = 0; // <-- ADD THIS LINE
 
 let sendQueue=[]; let currentSendIndex=0; let receiveQueue=[]; let currentReceiveIndex=0; 
 let batchTotalSize=0; let batchSentSize=0; let batchReceivedSize=0;
@@ -817,7 +818,7 @@ function setupConnection() {
         }
     });
 
-    // 2. Connection State Change (Handling disconnects)
+    // 2. Connection State Change
     conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
         const state = conn.peerConnection.iceConnectionState;
         if (state === 'disconnected' || state === 'failed' || state === 'closed') {
@@ -834,15 +835,20 @@ function setupConnection() {
     // 3. Main Data Handler
     conn.on('data', async (data) => {
         
-        // --- THE FIX: Intercept raw binary chunks immediately ---
-        if (data instanceof ArrayBuffer) {
+        // --- THE FIX: Intercept ALL binary types (ArrayBuffer, Uint8Array, Blob) ---
+        if (data instanceof ArrayBuffer || ArrayBuffer.isView(data) || data instanceof Blob) {
             if (cancelTransfer) return;
             
-            batchReceivedSize += data.byteLength;
+            // Handle different binary object properties safely
+            const chunkLength = data.byteLength || data.size;
+            batchReceivedSize += chunkLength;
             
             const handleChunkWritten = () => {
-                receiverBytesWritten += data.byteLength;
-                if (receiverBytesWritten % ACK_INTERVAL === 0 || receiverBytesWritten >= receivingFileSize) {
+                receiverBytesWritten += chunkLength;
+                
+                // THE FIX: Use a distance threshold to account for varying stream chunk sizes
+                if ((receiverBytesWritten - lastAckedBytes) >= ACK_INTERVAL || receiverBytesWritten >= receivingFileSize) {
+                    lastAckedBytes = receiverBytesWritten;
                     conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
                 }
             };
@@ -857,7 +863,7 @@ function setupConnection() {
             return; // Exit here so it doesn't process as an object
         }
 
-        // --- STANDARD OBJECT HANDLER (For headers, acks, and syncs) ---
+        // --- STANDARD OBJECT HANDLER ---
         if (data.type === 'profile_sync') {
             triggerHaptic('success');
             connectedPeerProfile = data.profile;
@@ -905,6 +911,7 @@ function setupConnection() {
         } else if (data.type === 'file_header') {
             receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
             receiverBytesWritten = 0;
+            lastAckedBytes = 0; // THE FIX: Reset the ACK tracker for the new file
             try {
                 const root = await navigator.storage.getDirectory();
                 try { await root.removeEntry(data.name); } catch(e){}

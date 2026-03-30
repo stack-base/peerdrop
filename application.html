@@ -451,532 +451,541 @@
 <div id="toast-container"></div>
 
 <script>
-function getFileIconSVG(mimeType){if(!mimeType)mimeType='';if(mimeType.startsWith('image/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`}else if(mimeType.startsWith('video/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`}else if(mimeType.startsWith('audio/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`}else if(mimeType.includes('zip')||mimeType.includes('tar')||mimeType.includes('rar')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`}else{return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`}}
-function renderTransferFileList(files,isSending){document.getElementById('transfer-title').innerText=isSending?'Sending Files':'Receiving Files';const list=document.getElementById('transfer-file-list');list.innerHTML='';files.forEach((file,index)=>{const type=file.type||file.filetype||'';const svgIcon=getFileIconSVG(type);list.innerHTML+=`<div class="transfer-item" id="transfer-item-${index}"><div class="transfer-item-icon">${svgIcon}</div><div class="transfer-item-info"><div class="transfer-item-name">${file.name}</div><div class="transfer-item-size">${formatBytes(file.size)}</div></div><div class="transfer-item-status" id="transfer-item-status-${index}"></div></div>`})}
-function updateActiveTransferFile(index,totalFiles){document.querySelectorAll('.transfer-item').forEach(el=>el.classList.remove('active'));const activeItem=document.getElementById(`transfer-item-${index}`);if(activeItem){activeItem.classList.add('active');activeItem.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById(`transfer-item-status-${index}`).innerHTML=`<div class="spinner-ring"></div>`}document.getElementById('file-count-text').innerText=`File ${index+1} of ${totalFiles}`}
-function markTransferFileDone(index){const item=document.getElementById(`transfer-item-${index}`);if(item){item.classList.remove('active');item.classList.add('done');document.getElementById(`transfer-item-status-${index}`).innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`}}
+    function getFileIconSVG(mimeType){if(!mimeType)mimeType='';if(mimeType.startsWith('image/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`}else if(mimeType.startsWith('video/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`}else if(mimeType.startsWith('audio/')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`}else if(mimeType.includes('zip')||mimeType.includes('tar')||mimeType.includes('rar')){return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`}else{return `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`}}
+    function renderTransferFileList(files,isSending){document.getElementById('transfer-title').innerText=isSending?'Sending Files':'Receiving Files';const list=document.getElementById('transfer-file-list');list.innerHTML='';files.forEach((file,index)=>{const type=file.type||file.filetype||'';const svgIcon=getFileIconSVG(type);list.innerHTML+=`<div class="transfer-item" id="transfer-item-${index}"><div class="transfer-item-icon">${svgIcon}</div><div class="transfer-item-info"><div class="transfer-item-name">${file.name}</div><div class="transfer-item-size">${formatBytes(file.size)}</div></div><div class="transfer-item-status" id="transfer-item-status-${index}"></div></div>`})}
+    function updateActiveTransferFile(index,totalFiles){document.querySelectorAll('.transfer-item').forEach(el=>el.classList.remove('active'));const activeItem=document.getElementById(`transfer-item-${index}`);if(activeItem){activeItem.classList.add('active');activeItem.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById(`transfer-item-status-${index}`).innerHTML=`<div class="spinner-ring"></div>`}document.getElementById('file-count-text').innerText=`File ${index+1} of ${totalFiles}`}
+    function markTransferFileDone(index){const item=document.getElementById(`transfer-item-${index}`);if(item){item.classList.remove('active');item.classList.add('done');document.getElementById(`transfer-item-status-${index}`).innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`}}
 
-let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
+    let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
 
-const CHUNK_SIZE = 256 * 1024;
-const MAX_BUFFER = 16 * 1024 * 1024;
-const MAX_IN_FLIGHT = 16 * 1024 * 1024;
-const ACK_INTERVAL = 8 * 1024 * 1024;
+    // --- OPTIMIZED NETWORK CONSTANTS ---
+    const CHUNK_SIZE = 256 * 1024;
+    const MAX_BUFFER = 16 * 1024 * 1024;
+    const MAX_IN_FLIGHT = 8 * 1024 * 1024;
+    const ACK_INTERVAL = 4 * 1024 * 1024;
 
-let bytesConfirmedWritten = 0;
-let receiverBytesWritten = 0;
-let lastAckedBytes = 0; // <-- ADD THIS LINE
+    let bytesConfirmedWritten = 0;
+    let receiverBytesWritten = 0;
+    let lastAckedBytes = 0;
 
-let sendQueue=[]; let currentSendIndex=0; let receiveQueue=[]; let currentReceiveIndex=0; 
-let batchTotalSize=0; let batchSentSize=0; let batchReceivedSize=0;
-let resumeReading=null; let receivingFile=[]; let fileHandle=null; let fileWritable=null; 
-let writeQueue=Promise.resolve(); let receivingFileSize=0; let receivingFileName=''; let receivingFileType='';
+    let sendQueue=[]; let currentSendIndex=0; let receiveQueue=[]; let currentReceiveIndex=0; 
+    let batchTotalSize=0; let batchSentSize=0; let batchReceivedSize=0;
+    let resumeReading=null; let receivingFile=[]; let fileHandle=null; let fileWritable=null; 
 
-function triggerHaptic(type='light'){if(!navigator.vibrate)return;try{switch(type){case 'light':navigator.vibrate(15);break;case 'medium':navigator.vibrate(40);break;case 'heavy':navigator.vibrate(80);break;case 'success':navigator.vibrate([30,60,40]);break;case 'error':navigator.vibrate([50,100,50,100,50]);break;case 'pulse':navigator.vibrate([30,60,30]);break}}catch(e){}}
-let wakeLock=null;
-async function requestWakeLock(){if('wakeLock' in navigator){try{wakeLock=await navigator.wakeLock.request('screen')}catch(err){}}}
-document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'){requestWakeLock();if(isTransferring)showToast("Resumed. Keep app open for best speeds.")}});
-function showToast(message,type='success'){if(type==='error')triggerHaptic('error');const container=document.getElementById('toast-container');const toast=document.createElement('div');toast.className=`toast ${type}`;const icon=type==='success'?`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`:`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;toast.innerHTML=`${icon} <span>${message}</span>`;container.appendChild(toast);setTimeout(()=>toast.classList.add('show'),10);setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400)},3000)}
-function formatBytes(bytes,decimals=1){if(!+bytes)return '0.0 MB';const k=1024,dm=decimals<0?0:decimals,sizes=['B','KB','MB','GB'];const i=Math.floor(Math.log(bytes)/Math.log(k));return `${(bytes/Math.pow(k,i)).toFixed(dm)} ${sizes[i]}`}
-function formatTime(sec){if(!isFinite(sec)||sec<0)return "--:--";const m=Math.floor(sec/60);const s=Math.floor(sec%60);return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`}
-function formatDate(dateString){const date=new Date(dateString);return date.toLocaleDateString()+' at '+date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
-function handleModalClick(e,modalId,toggleFunction){if(e.target.id===modalId)toggleFunction()}
-function setTransferState(active){isTransferring=active;const dropUi=document.getElementById('drop-ui-elements');const transferUi=document.getElementById('transfer-active-ui');const sendBtn=document.getElementById('send-btn');const dropZone=document.getElementById('share-section');const fileInput=document.getElementById('file-input');if(active){dropUi.classList.add('hidden');sendBtn.classList.add('hidden');transferUi.classList.remove('hidden');dropZone.classList.remove('dragover');dropZone.style.border='none';dropZone.style.background='transparent';dropZone.style.boxShadow='none';dropZone.style.padding='0';fileInput.style.display='none'}else{dropUi.classList.remove('hidden');if(conn&&conn.open){sendBtn.classList.remove('hidden')}transferUi.classList.add('hidden');dropZone.style.border='2px dashed var(--border)';dropZone.style.background='var(--card-bg)';dropZone.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';dropZone.style.padding='40px 20px';fileInput.style.display='block'}}
-function resetTransferUI(){setTransferState(false);document.getElementById('custom-progress-bar').style.width='0%';document.getElementById('transfer-percentage').innerText='0%';document.getElementById('file-input').value='';updateFileText()}
-function startScan(){triggerHaptic('light');const modal=document.getElementById('scanner-modal');modal.classList.add('active');const viewfinder=document.getElementById('viewfinder');viewfinder.classList.remove('success');html5QrCode=new Html5Qrcode("reader-video");Html5Qrcode.getCameras().then(devices=>{if(devices&&devices.length){let cameraId=devices[0].id;let backCameras=devices.filter(d=>d.label.toLowerCase().includes("back")||d.label.toLowerCase().includes("environment"));if(backCameras.length>0)cameraId=backCameras[0].id;html5QrCode.start(cameraId,{fps:30},onScanSuccess).catch(e=>{showToast("Camera error.","error");stopScan()})}else{showToast("No cameras detected.","error");stopScan()}}).catch(e=>{showToast("Camera blocked.","error");stopScan()})}
-function stopScan(){triggerHaptic('light');document.getElementById('scanner-modal').classList.remove('active');if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop().then(()=>{html5QrCode.clear()}).catch(e=>{})}
-function onScanSuccess(decodedText){if(html5QrCode.isScanning===false)return;triggerHaptic('success');document.getElementById('viewfinder').classList.add('success');html5QrCode.pause();setTimeout(()=>{stopScan();let targetId=decodedText;try{const urlParams=new URLSearchParams(new URL(decodedText).search);if(urlParams.has('connect'))targetId=urlParams.get('connect')}catch(e){}document.getElementById('target-id').value=targetId;showToast("QR Code Scanned!");setTimeout(connectToPeer,300)},400)}
-function initApp(){const welcomeScreen=document.getElementById('welcome-screen');const mainScreen=document.getElementById('main-app-screen');if(myProfile&&myProfile.name&&myProfile.device){welcomeScreen.classList.add('hidden');mainScreen.classList.remove('hidden');const animatedEls=mainScreen.querySelectorAll('.box, .header, #connect-section, #status');animatedEls.forEach((el,index)=>el.classList.add('animate-enter',`delay-${index+1}`));requestWakeLock();initPeerJS();const urlParams=new URLSearchParams(window.location.search);if(urlParams.get('action')==='scan'){setTimeout(()=>{startScan();window.history.replaceState(null,'',window.location.pathname)},600)}}else{document.getElementById('setup-name').addEventListener('input',(e)=>{document.getElementById('avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'})}}
-function saveInitialProfile(){triggerHaptic('light');const name=document.getElementById('setup-name').value.trim();const device=document.getElementById('setup-device').value.trim();const email=document.getElementById('setup-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));showToast("Profile created successfully!");const welcomeScreen=document.getElementById('welcome-screen');welcomeScreen.style.opacity='0';welcomeScreen.style.transform='translateY(-20px)';welcomeScreen.style.transition='all 0.4s ease';setTimeout(()=>initApp(),400)}
-function toggleSettings(){
-    triggerHaptic('light');
-    const modal=document.getElementById('settings-modal');
-    if(!modal.classList.contains('active')){
-        document.getElementById('edit-name').value=myProfile.name||'';
-        document.getElementById('edit-device').value=myProfile.device||'';
-        document.getElementById('edit-email').value=myProfile.email||'';
-        document.getElementById('settings-avatar-initial').innerText=myProfile.name?myProfile.name.charAt(0).toUpperCase():'?';
-        updateStorageUsageDisplay();
-    }
-    modal.classList.toggle('active')
-}
-document.getElementById('edit-name').addEventListener('input',(e)=>{document.getElementById('settings-avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'});
-function saveSettingsProfile(){triggerHaptic('light');const name=document.getElementById('edit-name').value.trim();const device=document.getElementById('edit-device').value.trim();const email=document.getElementById('edit-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));if(conn&&conn.open)conn.send({type:'profile_sync',profile:myProfile});showToast("Settings saved successfully!");toggleSettings()}
+    // --- NEW MEMORY MANAGEMENT STATE ---
+    let writeBuffer = []; 
+    let isWritingToDisk = false;
 
-// Storage Management Updates
-async function updateStorageUsageDisplay() {
-    const usageLabel = document.getElementById('storage-usage-label');
-    if (!usageLabel) return;
-    usageLabel.innerText = 'Calculating...';
-    try {
-        const root = await navigator.storage.getDirectory();
-        let totalSize = 0;
-        for await (const [name, handle] of root.entries()) {
-            if (handle.kind === 'file') {
-                const file = await handle.getFile();
-                totalSize += file.size;
-            }
-        }
-        usageLabel.innerText = totalSize > 0 ? formatBytes(totalSize) : '0 MB';
-        if (totalSize > 1024 * 1024 * 1024) {
-            usageLabel.style.color = '#ff3b30';
-            usageLabel.style.background = 'rgba(255, 59, 48, 0.1)';
-        } else {
-            usageLabel.style.color = 'var(--accent)';
-            usageLabel.style.background = 'rgba(10, 132, 255, 0.1)';
-        }
-    } catch (e) { usageLabel.innerText = 'Unknown'; }
-}
+    let receivingFileSize=0; let receivingFileName=''; let receivingFileType='';
 
-async function clearOPFSCache(){
-    triggerHaptic('medium');
-    try{
-        const root=await navigator.storage.getDirectory();
-        let deletedCount=0;
-        for await(const [name,handle] of root.entries()){
-            await root.removeEntry(name,{recursive:true});
-            deletedCount++
-        }
-        if(deletedCount>0){
-            showToast(`Cleared ${deletedCount} cached files.`,"success");
-            triggerHaptic('success');
-            updateStorageUsageDisplay();
-        }else{
-            showToast("Storage is already clean.","success")
-        }
-    }catch(e){
-        showToast("Could not clear storage.","error");
-        triggerHaptic('error')
-    }
-}
+    function triggerHaptic(type='light'){if(!navigator.vibrate)return;try{switch(type){case 'light':navigator.vibrate(15);break;case 'medium':navigator.vibrate(40);break;case 'heavy':navigator.vibrate(80);break;case 'success':navigator.vibrate([30,60,40]);break;case 'error':navigator.vibrate([50,100,50,100,50]);break;case 'pulse':navigator.vibrate([30,60,30]);break}}catch(e){}}
+    let wakeLock=null;
+    async function requestWakeLock(){if('wakeLock' in navigator){try{wakeLock=await navigator.wakeLock.request('screen')}catch(err){}}}
+    document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'){requestWakeLock();if(isTransferring)showToast("Resumed. Keep app open for best speeds.")}});
+    function showToast(message,type='success'){if(type==='error')triggerHaptic('error');const container=document.getElementById('toast-container');const toast=document.createElement('div');toast.className=`toast ${type}`;const icon=type==='success'?`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`:`<svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;toast.innerHTML=`${icon} <span>${message}</span>`;container.appendChild(toast);setTimeout(()=>toast.classList.add('show'),10);setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400)},3000)}
+    function formatBytes(bytes,decimals=1){if(!+bytes)return '0.0 MB';const k=1024,dm=decimals<0?0:decimals,sizes=['B','KB','MB','GB'];const i=Math.floor(Math.log(bytes)/Math.log(k));return `${(bytes/Math.pow(k,i)).toFixed(dm)} ${sizes[i]}`}
+    function formatTime(sec){if(!isFinite(sec)||sec<0)return "--:--";const m=Math.floor(sec/60);const s=Math.floor(sec%60);return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`}
+    function formatDate(dateString){const date=new Date(dateString);return date.toLocaleDateString()+' at '+date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+    function handleModalClick(e,modalId,toggleFunction){if(e.target.id===modalId)toggleFunction()}
+    function setTransferState(active){isTransferring=active;const dropUi=document.getElementById('drop-ui-elements');const transferUi=document.getElementById('transfer-active-ui');const sendBtn=document.getElementById('send-btn');const dropZone=document.getElementById('share-section');const fileInput=document.getElementById('file-input');if(active){dropUi.classList.add('hidden');sendBtn.classList.add('hidden');transferUi.classList.remove('hidden');dropZone.classList.remove('dragover');dropZone.style.border='none';dropZone.style.background='transparent';dropZone.style.boxShadow='none';dropZone.style.padding='0';fileInput.style.display='none'}else{dropUi.classList.remove('hidden');if(conn&&conn.open){sendBtn.classList.remove('hidden')}transferUi.classList.add('hidden');dropZone.style.border='2px dashed var(--border)';dropZone.style.background='var(--card-bg)';dropZone.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';dropZone.style.padding='40px 20px';fileInput.style.display='block'}}
+    function resetTransferUI(){setTransferState(false);document.getElementById('custom-progress-bar').style.width='0%';document.getElementById('transfer-percentage').innerText='0%';document.getElementById('file-input').value='';updateFileText()}
+    function startScan(){triggerHaptic('light');const modal=document.getElementById('scanner-modal');modal.classList.add('active');const viewfinder=document.getElementById('viewfinder');viewfinder.classList.remove('success');html5QrCode=new Html5Qrcode("reader-video");Html5Qrcode.getCameras().then(devices=>{if(devices&&devices.length){let cameraId=devices[0].id;let backCameras=devices.filter(d=>d.label.toLowerCase().includes("back")||d.label.toLowerCase().includes("environment"));if(backCameras.length>0)cameraId=backCameras[0].id;html5QrCode.start(cameraId,{fps:30},onScanSuccess).catch(e=>{showToast("Camera error.","error");stopScan()})}else{showToast("No cameras detected.","error");stopScan()}}).catch(e=>{showToast("Camera blocked.","error");stopScan()})}
+    function stopScan(){triggerHaptic('light');document.getElementById('scanner-modal').classList.remove('active');if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop().then(()=>{html5QrCode.clear()}).catch(e=>{})}
+    function onScanSuccess(decodedText){if(html5QrCode.isScanning===false)return;triggerHaptic('success');document.getElementById('viewfinder').classList.add('success');html5QrCode.pause();setTimeout(()=>{stopScan();let targetId=decodedText;try{const urlParams=new URLSearchParams(new URL(decodedText).search);if(urlParams.has('connect'))targetId=urlParams.get('connect')}catch(e){}document.getElementById('target-id').value=targetId;showToast("QR Code Scanned!");setTimeout(connectToPeer,300)},400)}
+    function initApp(){const welcomeScreen=document.getElementById('welcome-screen');const mainScreen=document.getElementById('main-app-screen');if(myProfile&&myProfile.name&&myProfile.device){welcomeScreen.classList.add('hidden');mainScreen.classList.remove('hidden');const animatedEls=mainScreen.querySelectorAll('.box, .header, #connect-section, #status');animatedEls.forEach((el,index)=>el.classList.add('animate-enter',`delay-${index+1}`));requestWakeLock();initPeerJS();const urlParams=new URLSearchParams(window.location.search);if(urlParams.get('action')==='scan'){setTimeout(()=>{startScan();window.history.replaceState(null,'',window.location.pathname)},600)}}else{document.getElementById('setup-name').addEventListener('input',(e)=>{document.getElementById('avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'})}}
+    function saveInitialProfile(){triggerHaptic('light');const name=document.getElementById('setup-name').value.trim();const device=document.getElementById('setup-device').value.trim();const email=document.getElementById('setup-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));showToast("Profile created successfully!");const welcomeScreen=document.getElementById('welcome-screen');welcomeScreen.style.opacity='0';welcomeScreen.style.transform='translateY(-20px)';welcomeScreen.style.transition='all 0.4s ease';setTimeout(()=>initApp(),400)}
+    function toggleSettings(){triggerHaptic('light');const modal=document.getElementById('settings-modal');if(!modal.classList.contains('active')){document.getElementById('edit-name').value=myProfile.name||'';document.getElementById('edit-device').value=myProfile.device||'';document.getElementById('edit-email').value=myProfile.email||'';document.getElementById('settings-avatar-initial').innerText=myProfile.name?myProfile.name.charAt(0).toUpperCase():'?';updateStorageUsageDisplay();}modal.classList.toggle('active')}
+    document.getElementById('edit-name').addEventListener('input',(e)=>{document.getElementById('settings-avatar-initial').innerText=e.target.value.charAt(0).toUpperCase()||'?'});
+    function saveSettingsProfile(){triggerHaptic('light');const name=document.getElementById('edit-name').value.trim();const device=document.getElementById('edit-device').value.trim();const email=document.getElementById('edit-email').value.trim();if(!name||!device)return showToast("Name and Device are required.","error");myProfile={name,device,email};localStorage.setItem('peerdrop_profile',JSON.stringify(myProfile));if(conn&&conn.open)conn.send({type:'profile_sync',profile:myProfile});showToast("Settings saved successfully!");toggleSettings()}
 
-// History Updates
-function saveToHistory(filename, filesize, type, peerInfo, hasCache = false) {
-    let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
-    history.unshift({
-        id: Date.now(),
-        filename,
-        filesize: formatBytes(filesize),
-        type,
-        date: new Date().toISOString(),
-        peer: peerInfo || {name: 'Unknown', device: 'Unknown', email: ''},
-        hasCache: hasCache
-    });
-    if (history.length > 50) history.pop();
-    localStorage.setItem('peerdrop_history', JSON.stringify(history));
-    renderHistory();
-}
-
-function renderHistory(){
-    const list=document.getElementById('history-list');
-    const history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');
-    list.innerHTML='';
-    if(history.length===0){
-        list.innerHTML='<div class="empty-history">No past transfers found.</div>';
-        return;
-    }
-    history.forEach(item=>{
-        const isSent=item.type==='sent';
-        const actionText=isSent?'Sent to':'From';
-        const iconSvg=isSent?`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
-        const peerDisplay=item.peer&&item.peer.device?`${item.peer.name||'Unknown'} (${item.peer.device})`:`${item.peer&&item.peer.name?item.peer.name:'Unknown'}`;
-        const emailDisplay=item.peer&&item.peer.email?`<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>`:'';
-        
-        let actionButton = '';
-        if (item.type === 'received' && item.hasCache) {
-            actionButton = `<button class="btn-icon" onclick="downloadFromCache('${item.filename}')" title="Redownload" style="width: 40px; height: 40px; background: rgba(10, 132, 255, 0.1); color: var(--accent); margin-left: auto; flex-shrink: 0;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </button>`;
-        }
-
-        list.innerHTML+=`<div class="history-item">
-            <div class="history-icon ${isSent?'':'received'}">${iconSvg}</div>
-            <div class="history-details">
-                <p class="history-name" title="${item.filename}">${item.filename}</p>
-                <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
-                <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
-            </div>
-            ${actionButton}
-        </div>`;
-    });
-}
-
-async function downloadFromCache(filename) {
-    triggerHaptic('light');
-    try {
-        const root = await navigator.storage.getDirectory();
-        const fileHandle = await root.getFileHandle(filename);
-        const file = await fileHandle.getFile();
-        const url = URL.createObjectURL(file);
-        
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        
-        setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
-        showToast("Downloaded from cache!", "success");
-    } catch (e) {
-        showToast("File is no longer in your local cache.", "error");
-    }
-}
-
-function toggleHistory(){triggerHaptic('light');const modal=document.getElementById('history-modal');if(!modal.classList.contains('active'))renderHistory();modal.classList.toggle('active')}
-function clearHistory(){triggerHaptic('medium');if(confirm("Are you sure you want to clear all your transfer history?")){localStorage.removeItem('peerdrop_history');renderHistory();showToast("History cleared successfully!")}}
-renderHistory();const themeIcon=document.getElementById('theme-icon');let currentShareUrl="";
-function updateThemeIcon(isDark){if(isDark){themeIcon.innerHTML=`<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;themeIcon.setAttribute('fill','none');themeIcon.setAttribute('stroke','currentColor');themeIcon.setAttribute('stroke-width','2')}else{themeIcon.innerHTML=`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;themeIcon.removeAttribute('stroke');themeIcon.setAttribute('fill','currentColor')}}
-function renderQR(url){currentShareUrl=url;const qrContainer=document.getElementById("qrcode");const qrWrapper=document.getElementById("qr-wrapper");qrContainer.innerHTML="";const isDark=document.body.classList.contains('dark-mode');qrWrapper.style.backgroundColor=isDark?'#1a1a1a':'#ffffff';qrWrapper.style.borderColor=isDark?'#333':'#e5e5ea';new QRCode(qrContainer,{text:url,width:240,height:240,colorDark:isDark?"#ffffff":"#000000",colorLight:isDark?"#1a1a1a":"#ffffff",correctLevel:QRCode.CorrectLevel.H})}
-if(localStorage.getItem('darkMode')==='true'){document.body.classList.add('dark-mode');updateThemeIcon(true);document.getElementById('theme-color-meta').setAttribute('content','#000000')}
-function toggleDarkMode(){triggerHaptic('light');const isDark=document.body.classList.toggle('dark-mode');try{localStorage.setItem('darkMode',isDark)}catch(e){}updateThemeIcon(isDark);if(currentShareUrl)renderQR(currentShareUrl);document.getElementById('theme-color-meta').setAttribute('content',isDark?'#000000':'#f5f5f7')}
-function copyId(){triggerHaptic('success');navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(()=>{showToast("Device ID copied!");const copyBtn=document.getElementById('copy-btn');copyBtn.innerText='Copied!';copyBtn.style.background='var(--accent)';copyBtn.style.color='#fff';setTimeout(()=>{copyBtn.innerText='Copy';copyBtn.style.background='transparent';copyBtn.style.color='var(--text-main)'},2000)}).catch(()=>showToast("Could not copy ID.","error"))}
-const dropZone=document.getElementById('share-section'),fileInput=document.getElementById('file-input');const dropText=document.getElementById('drop-text'),dropSubtext=document.getElementById('drop-subtext');
-['dragenter','dragover','dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation()},false));
-['dragenter','dragover'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.add('dragover')},false));
-['dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.remove('dragover')},false));
-dropZone.addEventListener('drop',(e)=>{if(isTransferring)return;if(e.dataTransfer.files.length>0){fileInput.files=e.dataTransfer.files;updateFileText()}});
-fileInput.addEventListener('change',updateFileText);
-function updateFileText(){if(fileInput.files.length===1){triggerHaptic('light');const file=fileInput.files[0];dropText.innerHTML=`<strong style="color: var(--text-main)">${file.name}</strong>`;dropSubtext.innerHTML=formatBytes(file.size);dropSubtext.classList.remove('hidden')}else if(fileInput.files.length>1){triggerHaptic('light');let totalSize=0;for(let i=0;i<fileInput.files.length;i++)totalSize+=fileInput.files[i].size;dropText.innerHTML=`<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;dropSubtext.innerHTML=`Total Size: ${formatBytes(totalSize)}`;dropSubtext.classList.remove('hidden')}else{dropText.innerHTML=`Select files to send`;dropSubtext.innerHTML=`or drag and drop them here`;dropSubtext.classList.remove('hidden')}}
-const statusTextEl=document.getElementById('status-text'),statusDotEl=document.getElementById('status-dot');const connectSection=document.getElementById('connect-section'),identitySection=document.getElementById('identity-section');const sendBtn=document.getElementById('send-btn'),copyBtn=document.getElementById('copy-btn');const speedText=document.getElementById('speed-text'),amountText=document.getElementById('amount-text');
-function updateStatus(message,color="var(--text-muted)",shadowColor="transparent"){statusTextEl.innerText=message;statusDotEl.style.backgroundColor=color;statusDotEl.style.boxShadow=`0 0 8px ${shadowColor==="transparent"?color:shadowColor}`}
-
-function updateStats(loadedBytes,totalBytes){
-    const now=Date.now();
-    if(loadedBytes===0){
-        lastUpdateTime=now;lastLoadedBytes=0;smoothedSpeedBps=0;
-        speedText.innerText=`0 B/s`;
-        amountText.innerText=`0 B / ${formatBytes(totalBytes)}`;
-        document.getElementById('transfer-percentage').innerText=`0%`;
-        document.getElementById('custom-progress-bar').style.width=`0%`;
-        document.getElementById('eta-text').innerText="--:--";
-        document.getElementById('eta-suffix').innerText=" left";
-        return;
-    }
-    const elapsedSinceLastUpdate=(now-lastUpdateTime)/1000;
-    if(elapsedSinceLastUpdate>=0.25||loadedBytes===totalBytes){
-        const bytesSinceLast=loadedBytes-lastLoadedBytes;
-        const currentInstantSpeed=elapsedSinceLastUpdate>0?bytesSinceLast/elapsedSinceLastUpdate:0;
-        if(smoothedSpeedBps===0){smoothedSpeedBps=currentInstantSpeed}else{smoothedSpeedBps=(currentInstantSpeed*0.3)+(smoothedSpeedBps*0.7)}
-        speedText.innerText=`${formatBytes(smoothedSpeedBps)}/s`;
-        const remainingBytes=totalBytes-loadedBytes;
-        const etaSeconds=smoothedSpeedBps>0?remainingBytes/smoothedSpeedBps:0;
-        document.getElementById('eta-text').innerText=formatTime(etaSeconds);
-        lastUpdateTime=now;lastLoadedBytes=loadedBytes
-    }
-    amountText.innerText=`${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
-    const percent=totalBytes>0?Math.min(100,Math.floor((loadedBytes/totalBytes)*100)):0;
-    document.getElementById('transfer-percentage').innerText=`${percent}%`;
-    document.getElementById('custom-progress-bar').style.width=`${percent}%`
-}
-
-function showCompletionScreen(isSending, peerName, totalSize, startTime, files) {
-    const totalTime = (Date.now() - startTime) / 1000;
-    const avgSpeed = totalSize / (totalTime || 1);
-    
-    document.getElementById('completion-subtitle').innerText = isSending ? `Successfully sent to ${peerName}` : `Successfully received from ${peerName}`;
-    document.getElementById('completion-size').innerText = formatBytes(totalSize);
-    document.getElementById('completion-time').innerText = formatTime(totalTime);
-    document.getElementById('completion-speed').innerText = `${formatBytes(avgSpeed)}/s`;
-    
-    const fileList = document.getElementById('completion-files');
-    fileList.innerHTML = '';
-    
-    Array.from(files).forEach(file => {
-        const type = file.type || file.filetype || '';
-        const svgIcon = getFileIconSVG(type);
-        fileList.innerHTML += `
-        <div class="incoming-file-item" style="border: 1px solid var(--border); background: var(--card-bg); margin-bottom: 0;">
-            <div class="file-preview-icon" style="background: var(--input-bg); border: none;">${svgIcon}</div>
-            <div class="file-details">
-                <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${file.name}</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(file.size)}</div>
-            </div>
-        </div>`;
-    });
-    document.getElementById('completion-modal').classList.add('active');
-}
-
-function closeCompletionScreen() {
-    triggerHaptic('light');
-    document.getElementById('completion-modal').classList.remove('active');
-}
-
-function initPeerJS(){peer=new Peer({config:{'iceServers':[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});peer.on('open',(id)=>{document.getElementById('my-id').innerText=id;copyBtn.classList.remove('hidden');const shareUrl=window.location.href.split('?')[0]+'?connect='+id;renderQR(shareUrl);const connectId=new URLSearchParams(window.location.search).get('connect');if(connectId){document.getElementById('target-id').value=connectId;setTimeout(connectToPeer,500)}});peer.on('connection',(connection)=>{conn=connection;setupConnection()})}
-function connectToPeer(){triggerHaptic('light');const targetId=document.getElementById('target-id').value.trim();if(!targetId)return showToast("Please enter a Device ID","error");updateStatus("Connecting...","#f59e0b");conn=peer.connect(targetId,{reliable:true});setupConnection()}
-function disconnectPeer(){triggerHaptic('medium');if(conn)conn.close();resetTransferUI();document.getElementById('active-connection').classList.add('hidden');document.getElementById('share-section').classList.add('hidden');document.getElementById('send-btn').classList.add('hidden');connectSection.classList.remove('hidden');identitySection.classList.remove('hidden');connectSection.style.opacity='1';identitySection.style.opacity='1';updateStatus("Waiting for connection...","var(--text-muted)");connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''}}
-async function abortTransfer(event){if(event){event.preventDefault();event.stopPropagation()}if(!isTransferring)return;triggerHaptic('error');cancelTransfer=true;if(fileWritable){try{await fileWritable.abort()}catch(e){}fileWritable=null;fileHandle=null}receivingFile=[];if(conn&&conn.open){conn.send({type:'transfer_response',accepted:false,reason:'cancelled_mid_transfer'})}resetTransferUI();showToast("Transfer cancelled","error");updateStatus("Ready to share.","#34c759","rgba(52, 199, 89, 0.4)")}
-function acceptTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');if(!pendingFileTransfer)return;cancelTransfer=false;receiveQueue=pendingFileTransfer.files;currentReceiveIndex=0;batchTotalSize=pendingFileTransfer.totalSize;batchReceivedSize=0;renderTransferFileList(receiveQueue,false);setTransferState(true);updateStats(0,batchTotalSize);transferStartTime=Date.now();updateStatus(`Receiving 1 of ${receiveQueue.length}...`,"var(--accent)");conn.send({type:'transfer_response',accepted:true})}
-function rejectTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');pendingFileTransfer=null;conn.send({type:'transfer_response',accepted:false,reason:'declined'})}
-
-async function sendNextFile() {
-    if (cancelTransfer) return;
-    
-    // Check if the batch is completely finished
-    if (currentSendIndex >= sendQueue.length) {
-        conn.send({ type: 'batch_done' });
-        triggerHaptic('success');
-        resetTransferUI();
-        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-        showCompletionScreen(true, connectedPeerProfile.name, batchTotalSize, transferStartTime, sendQueue);
-        return;
-    }
-    
-    const file = sendQueue[currentSendIndex];
-    updateActiveTransferFile(currentSendIndex, sendQueue.length);
-    
-    // Send the file header so the receiver prepares the OPFS file
-    conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
-    
-    bytesConfirmedWritten = 0;
-    
-    // Setup the Web Stream Pipeline
-    const stream = file.stream();
-    const reader = stream.getReader();
-    
-    let isReading = false;
-    let currentChunk = null; // Holds the remainder of a stream read if it's larger than CHUNK_SIZE
-    let chunkOffset = 0;
-    let totalSentOffset = 0;
-    
-    resumeReading = async () => {
-        if (cancelTransfer || isReading) return;
-        isReading = true;
-        
+    async function updateStorageUsageDisplay() {
+        const usageLabel = document.getElementById('storage-usage-label');
+        if (!usageLabel) return;
+        usageLabel.innerText = 'Calculating...';
         try {
-            // Keep looping and pumping data as long as the buffer has room
-            while (true) {
-                if (cancelTransfer) { 
-                    await reader.cancel(); 
-                    break; 
-                }
-                
-                // BACKPRESSURE CHECK: Stop looping if WebRTC buffer is full or we are waiting on ACKs
-                if (conn.dataChannel.bufferedAmount > MAX_BUFFER || 
-                   (totalSentOffset - bytesConfirmedWritten) > MAX_IN_FLIGHT) {
-                    break; // Exit loop. It will automatically resume via onbufferedamountlow or cumulative_ack
-                }
-                
-                // If we don't have an active chunk in memory, read the next one from disk
-                if (!currentChunk) {
-                    const { done, value } = await reader.read();
-                    if (done) break; // File is fully read, wait for final ACKs
-                    
-                    currentChunk = value; // value is natively a Uint8Array
-                    chunkOffset = 0;
-                }
-                
-                // Slice the chunk to our optimal CHUNK_SIZE limit
-                // .subarray is zero-copy, it just creates a view over the existing memory
-                const end = Math.min(chunkOffset + CHUNK_SIZE, currentChunk.byteLength);
-                const slice = currentChunk.subarray(chunkOffset, end);
-                
-                // Send raw binary down the WebRTC pipe
-                conn.send(slice);
-                
-                totalSentOffset += slice.byteLength;
-                chunkOffset = end;
-                
-                // If we consumed the entire chunk, clear it so the next loop reads from disk again
-                if (chunkOffset >= currentChunk.byteLength) {
-                    currentChunk = null;
+            const root = await navigator.storage.getDirectory();
+            let totalSize = 0;
+            for await (const [name, handle] of root.entries()) {
+                if (handle.kind === 'file') {
+                    const file = await handle.getFile();
+                    totalSize += file.size;
                 }
             }
-        } catch (err) {
-            console.error("Stream read error, retrying...", err);
-            // If it fails, we just let the next ACK or buffer drain trigger a retry
-        } finally {
-            isReading = false;
-        }
-    };
-    
-    // Kick off the pipeline
-    resumeReading();
-}
-
-function setupConnection() {
-    // 1. Connection Opened Event
-    conn.on('open', () => {
-        conn.send({ type: 'profile_sync', profile: myProfile });
-        updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-        connectSection.style.opacity = '0';
-        identitySection.style.opacity = '0';
-        setTimeout(() => {
-            connectSection.classList.add('hidden');
-            identitySection.classList.add('hidden');
-            document.getElementById('active-connection').classList.remove('hidden');
-            dropZone.classList.remove('hidden');
-            sendBtn.classList.remove('hidden');
-            void dropZone.offsetWidth;
-            document.getElementById('active-connection').classList.add('animate-enter');
-            dropZone.classList.add('animate-enter');
-            sendBtn.classList.add('animate-enter');
-        }, 300);
-        if (conn.dataChannel) {
-            conn.dataChannel.bufferedAmountLowThreshold = 12 * 1024 * 1024;
-            conn.dataChannel.onbufferedamountlow = () => { if (resumeReading) resumeReading(); };
-        }
-    });
-
-    // 2. Connection State Change
-    conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
-        const state = conn.peerConnection.iceConnectionState;
-        if (state === 'disconnected' || state === 'failed' || state === 'closed') {
-            if (isTransferring) {
-                cancelTransfer = true;
-                if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
-                receivingFile = [];
-                showToast("Transfer failed: Wi-Fi dropped", "error");
-            } else { showToast("Connection lost", "error"); }
-            disconnectPeer();
-        }
-    });
-
-    // 3. Main Data Handler
-    conn.on('data', async (data) => {
-        
-        // --- THE FIX: Intercept ALL binary types (ArrayBuffer, Uint8Array, Blob) ---
-        if (data instanceof ArrayBuffer || ArrayBuffer.isView(data) || data instanceof Blob) {
-            if (cancelTransfer) return;
-            
-            // Handle different binary object properties safely
-            const chunkLength = data.byteLength || data.size;
-            batchReceivedSize += chunkLength;
-            
-            const handleChunkWritten = () => {
-                receiverBytesWritten += chunkLength;
-                
-                // THE FIX: Use a distance threshold to account for varying stream chunk sizes
-                if ((receiverBytesWritten - lastAckedBytes) >= ACK_INTERVAL || receiverBytesWritten >= receivingFileSize) {
-                    lastAckedBytes = receiverBytesWritten;
-                    conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
-                }
-            };
-
-            if (fileWritable) { 
-                writeQueue = writeQueue.then(() => fileWritable.write(data)).then(handleChunkWritten); 
-            } else { 
-                receivingFile.push(data); 
-                handleChunkWritten(); 
-            }
-            updateStats(batchReceivedSize, batchTotalSize);
-            return; // Exit here so it doesn't process as an object
-        }
-
-        // --- STANDARD OBJECT HANDLER ---
-        if (data.type === 'profile_sync') {
-            triggerHaptic('success');
-            connectedPeerProfile = data.profile;
-            showToast(`Connected to ${connectedPeerProfile.name}`);
-            document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
-            document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
-            const emailEl = document.getElementById('peer-email-display');
-            if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } 
-            else { emailEl.style.display = 'none'; }
-            
-        } else if (data.type === 'batch_header') {
-            if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
-            document.getElementById('completion-modal').classList.remove('active');
-            triggerHaptic('heavy');
-            if (pulseInterval) clearInterval(pulseInterval);
-            pulseInterval = setInterval(() => { triggerHaptic('pulse') }, 1000);
-            pendingFileTransfer = data;
-            document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
-            document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
-            document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
-            document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
-            const fileListContainer = document.getElementById('incoming-file-list-container');
-            fileListContainer.innerHTML = '';
-            data.files.forEach(f => {
-                fileListContainer.innerHTML += `<div class="incoming-file-item"><div class="file-preview-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><div class="file-details"><div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div><div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div></div></div>`;
-            });
-            document.getElementById('incoming-modal').classList.add('active');
-            
-        } else if (data.type === 'transfer_response') {
-            if (data.accepted) {
-                updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
-                transferStartTime = Date.now();
-                sendNextFile();
+            usageLabel.innerText = totalSize > 0 ? formatBytes(totalSize) : '0 MB';
+            if (totalSize > 1024 * 1024 * 1024) {
+                usageLabel.style.color = '#ff3b30';
+                usageLabel.style.background = 'rgba(255, 59, 48, 0.1)';
             } else {
-                if (isTransferring) { cancelTransfer = true; receivingFile = []; }
-                resetTransferUI();
-                let msg = "Transfer cancelled";
-                if (data.reason === 'declined') msg = "Transfer declined by peer";
-                if (data.reason === 'busy') msg = "Peer is busy receiving another file";
-                if (data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
-                showToast(msg, "error");
-                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                usageLabel.style.color = 'var(--accent)';
+                usageLabel.style.background = 'rgba(10, 132, 255, 0.1)';
             }
-            
-        } else if (data.type === 'file_header') {
-            receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
-            receiverBytesWritten = 0;
-            lastAckedBytes = 0; // THE FIX: Reset the ACK tracker for the new file
-            try {
-                const root = await navigator.storage.getDirectory();
-                try { await root.removeEntry(data.name); } catch(e){}
-                fileHandle = await root.getFileHandle(data.name, { create: true });
-                fileWritable = await fileHandle.createWritable();
-            } catch(e) { fileWritable = null; receivingFile = []; }
-            updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
-            updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
-            
-        } else if (data.type === 'cumulative_ack') {
-            bytesConfirmedWritten = data.bytesWritten;
-            updateStats(data.batchReceivedSize, batchTotalSize); 
-            if (bytesConfirmedWritten >= sendQueue[currentSendIndex].size) {
-                conn.send({ type: 'file_done' });
-                saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile, false);
-                markTransferFileDone(currentSendIndex);
-                currentSendIndex++;
-                sendNextFile(); 
-            } else { if (resumeReading) resumeReading(); }
-            
-        } else if (data.type === 'file_done') {
-            if (cancelTransfer) return;
-            let url;
-            let usedCache = false;
-            if (fileWritable) {
-                await writeQueue;
-                await fileWritable.close();
-                const diskFile = await fileHandle.getFile();
-                url = URL.createObjectURL(diskFile);
-                fileWritable = null; fileHandle = null;
-                usedCache = true;
-            } else {
-                const safeType = receivingFileType || 'application/octet-stream';
-                const blob = new Blob(receivingFile, { type: safeType });
-                url = URL.createObjectURL(blob);
+        } catch (e) { usageLabel.innerText = 'Unknown'; }
+    }
+
+    async function clearOPFSCache(){
+        triggerHaptic('medium');
+        try{
+            const root=await navigator.storage.getDirectory();
+            let deletedCount=0;
+            for await(const [name,handle] of root.entries()){
+                await root.removeEntry(name,{recursive:true});
+                deletedCount++
             }
-            const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = receivingFileName;
-            document.body.appendChild(a); a.click();
+            if(deletedCount>0){
+                showToast(`Cleared ${deletedCount} cached files.`,"success");
+                triggerHaptic('success');
+                updateStorageUsageDisplay();
+            }else{
+                showToast("Storage is already clean.","success")
+            }
+        }catch(e){
+            showToast("Could not clear storage.","error");
+            triggerHaptic('error')
+        }
+    }
+
+    function saveToHistory(filename, filesize, type, peerInfo, hasCache = false) {
+        let history = JSON.parse(localStorage.getItem('peerdrop_history') || '[]');
+        history.unshift({
+            id: Date.now(),
+            filename,
+            filesize: formatBytes(filesize),
+            type,
+            date: new Date().toISOString(),
+            peer: peerInfo || {name: 'Unknown', device: 'Unknown', email: ''},
+            hasCache: hasCache
+        });
+        if (history.length > 50) history.pop();
+        localStorage.setItem('peerdrop_history', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function renderHistory(){
+        const list=document.getElementById('history-list');
+        const history=JSON.parse(localStorage.getItem('peerdrop_history')||'[]');
+        list.innerHTML='';
+        if(history.length===0){
+            list.innerHTML='<div class="empty-history">No past transfers found.</div>';
+            return;
+        }
+        history.forEach(item=>{
+            const isSent=item.type==='sent';
+            const actionText=isSent?'Sent to':'From';
+            const iconSvg=isSent?`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+            const peerDisplay=item.peer&&item.peer.device?`${item.peer.name||'Unknown'} (${item.peer.device})`:`${item.peer&&item.peer.name?item.peer.name:'Unknown'}`;
+            const emailDisplay=item.peer&&item.peer.email?`<span style="opacity: 0.8; font-weight: 400; font-size: 0.85rem;">&bull; ${item.peer.email}</span>`:'';
+            
+            let actionButton = '';
+            if (item.type === 'received' && item.hasCache) {
+                actionButton = `<button class="btn-icon" onclick="downloadFromCache('${item.filename}')" title="Redownload" style="width: 40px; height: 40px; background: rgba(10, 132, 255, 0.1); color: var(--accent); margin-left: auto; flex-shrink: 0;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </button>`;
+            }
+
+            list.innerHTML+=`<div class="history-item">
+                <div class="history-icon ${isSent?'':'received'}">${iconSvg}</div>
+                <div class="history-details">
+                    <p class="history-name" title="${item.filename}">${item.filename}</p>
+                    <p class="history-peer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${actionText} ${peerDisplay} ${emailDisplay}</p>
+                    <p class="history-meta"><span>${item.filesize}</span> <span>${formatDate(item.date)}</span></p>
+                </div>
+                ${actionButton}
+            </div>`;
+        });
+    }
+
+    async function downloadFromCache(filename) {
+        triggerHaptic('light');
+        try {
+            const root = await navigator.storage.getDirectory();
+            const fileHandle = await root.getFileHandle(filename);
+            const file = await fileHandle.getFile();
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
             setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
-            markTransferFileDone(currentReceiveIndex);
-            saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile, usedCache);
-            
-        } else if (data.type === 'batch_done') {
+            showToast("Downloaded from cache!", "success");
+        } catch (e) {
+            showToast("File is no longer in your local cache.", "error");
+        }
+    }
+
+    function toggleHistory(){triggerHaptic('light');const modal=document.getElementById('history-modal');if(!modal.classList.contains('active'))renderHistory();modal.classList.toggle('active')}
+    function clearHistory(){triggerHaptic('medium');if(confirm("Are you sure you want to clear all your transfer history?")){localStorage.removeItem('peerdrop_history');renderHistory();showToast("History cleared successfully!")}}
+    renderHistory();const themeIcon=document.getElementById('theme-icon');let currentShareUrl="";
+    function updateThemeIcon(isDark){if(isDark){themeIcon.innerHTML=`<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;themeIcon.setAttribute('fill','none');themeIcon.setAttribute('stroke','currentColor');themeIcon.setAttribute('stroke-width','2')}else{themeIcon.innerHTML=`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;themeIcon.removeAttribute('stroke');themeIcon.setAttribute('fill','currentColor')}}
+    function renderQR(url){currentShareUrl=url;const qrContainer=document.getElementById("qrcode");const qrWrapper=document.getElementById("qr-wrapper");qrContainer.innerHTML="";const isDark=document.body.classList.contains('dark-mode');qrWrapper.style.backgroundColor=isDark?'#1a1a1a':'#ffffff';qrWrapper.style.borderColor=isDark?'#333':'#e5e5ea';new QRCode(qrContainer,{text:url,width:240,height:240,colorDark:isDark?"#ffffff":"#000000",colorLight:isDark?"#1a1a1a":"#ffffff",correctLevel:QRCode.CorrectLevel.H})}
+    if(localStorage.getItem('darkMode')==='true'){document.body.classList.add('dark-mode');updateThemeIcon(true);document.getElementById('theme-color-meta').setAttribute('content','#000000')}
+    function toggleDarkMode(){triggerHaptic('light');const isDark=document.body.classList.toggle('dark-mode');try{localStorage.setItem('darkMode',isDark)}catch(e){}updateThemeIcon(isDark);if(currentShareUrl)renderQR(currentShareUrl);document.getElementById('theme-color-meta').setAttribute('content',isDark?'#000000':'#f5f5f7')}
+    function copyId(){triggerHaptic('success');navigator.clipboard.writeText(document.getElementById('my-id').innerText).then(()=>{showToast("Device ID copied!");const copyBtn=document.getElementById('copy-btn');copyBtn.innerText='Copied!';copyBtn.style.background='var(--accent)';copyBtn.style.color='#fff';setTimeout(()=>{copyBtn.innerText='Copy';copyBtn.style.background='transparent';copyBtn.style.color='var(--text-main)'},2000)}).catch(()=>showToast("Could not copy ID.","error"))}
+    const dropZone=document.getElementById('share-section'),fileInput=document.getElementById('file-input');const dropText=document.getElementById('drop-text'),dropSubtext=document.getElementById('drop-subtext');
+    ['dragenter','dragover','dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation()},false));
+    ['dragenter','dragover'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.add('dragover')},false));
+    ['dragleave','drop'].forEach(evt=>dropZone.addEventListener(evt,()=>{if(!isTransferring)dropZone.classList.remove('dragover')},false));
+    dropZone.addEventListener('drop',(e)=>{if(isTransferring)return;if(e.dataTransfer.files.length>0){fileInput.files=e.dataTransfer.files;updateFileText()}});
+    fileInput.addEventListener('change',updateFileText);
+    function updateFileText(){if(fileInput.files.length===1){triggerHaptic('light');const file=fileInput.files[0];dropText.innerHTML=`<strong style="color: var(--text-main)">${file.name}</strong>`;dropSubtext.innerHTML=formatBytes(file.size);dropSubtext.classList.remove('hidden')}else if(fileInput.files.length>1){triggerHaptic('light');let totalSize=0;for(let i=0;i<fileInput.files.length;i++)totalSize+=fileInput.files[i].size;dropText.innerHTML=`<strong style="color: var(--text-main)">${fileInput.files.length} files selected</strong>`;dropSubtext.innerHTML=`Total Size: ${formatBytes(totalSize)}`;dropSubtext.classList.remove('hidden')}else{dropText.innerHTML=`Select files to send`;dropSubtext.innerHTML=`or drag and drop them here`;dropSubtext.classList.remove('hidden')}}
+    const statusTextEl=document.getElementById('status-text'),statusDotEl=document.getElementById('status-dot');const connectSection=document.getElementById('connect-section'),identitySection=document.getElementById('identity-section');const sendBtn=document.getElementById('send-btn'),copyBtn=document.getElementById('copy-btn');const speedText=document.getElementById('speed-text'),amountText=document.getElementById('amount-text');
+    function updateStatus(message,color="var(--text-muted)",shadowColor="transparent"){statusTextEl.innerText=message;statusDotEl.style.backgroundColor=color;statusDotEl.style.boxShadow=`0 0 8px ${shadowColor==="transparent"?color:shadowColor}`}
+
+    function updateStats(loadedBytes,totalBytes){
+        const now=Date.now();
+        if(loadedBytes===0){
+            lastUpdateTime=now;lastLoadedBytes=0;smoothedSpeedBps=0;
+            speedText.innerText=`0 B/s`;
+            amountText.innerText=`0 B / ${formatBytes(totalBytes)}`;
+            document.getElementById('transfer-percentage').innerText=`0%`;
+            document.getElementById('custom-progress-bar').style.width=`0%`;
+            document.getElementById('eta-text').innerText="--:--";
+            document.getElementById('eta-suffix').innerText=" left";
+            return;
+        }
+        const elapsedSinceLastUpdate=(now-lastUpdateTime)/1000;
+        if(elapsedSinceLastUpdate>=0.25||loadedBytes===totalBytes){
+            const bytesSinceLast=loadedBytes-lastLoadedBytes;
+            const currentInstantSpeed=elapsedSinceLastUpdate>0?bytesSinceLast/elapsedSinceLastUpdate:0;
+            if(smoothedSpeedBps===0){smoothedSpeedBps=currentInstantSpeed}else{smoothedSpeedBps=(currentInstantSpeed*0.3)+(smoothedSpeedBps*0.7)}
+            speedText.innerText=`${formatBytes(smoothedSpeedBps)}/s`;
+            const remainingBytes=totalBytes-loadedBytes;
+            const etaSeconds=smoothedSpeedBps>0?remainingBytes/smoothedSpeedBps:0;
+            document.getElementById('eta-text').innerText=formatTime(etaSeconds);
+            lastUpdateTime=now;lastLoadedBytes=loadedBytes
+        }
+        amountText.innerText=`${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`;
+        const percent=totalBytes>0?Math.min(100,Math.floor((loadedBytes/totalBytes)*100)):0;
+        document.getElementById('transfer-percentage').innerText=`${percent}%`;
+        document.getElementById('custom-progress-bar').style.width=`${percent}%`
+    }
+
+    function showCompletionScreen(isSending, peerName, totalSize, startTime, files) {
+        const totalTime = (Date.now() - startTime) / 1000;
+        const avgSpeed = totalSize / (totalTime || 1);
+        
+        document.getElementById('completion-subtitle').innerText = isSending ? `Successfully sent to ${peerName}` : `Successfully received from ${peerName}`;
+        document.getElementById('completion-size').innerText = formatBytes(totalSize);
+        document.getElementById('completion-time').innerText = formatTime(totalTime);
+        document.getElementById('completion-speed').innerText = `${formatBytes(avgSpeed)}/s`;
+        
+        const fileList = document.getElementById('completion-files');
+        fileList.innerHTML = '';
+        
+        Array.from(files).forEach(file => {
+            const type = file.type || file.filetype || '';
+            const svgIcon = getFileIconSVG(type);
+            fileList.innerHTML += `
+            <div class="incoming-file-item" style="border: 1px solid var(--border); background: var(--card-bg); margin-bottom: 0;">
+                <div class="file-preview-icon" style="background: var(--input-bg); border: none;">${svgIcon}</div>
+                <div class="file-details">
+                    <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${file.name}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(file.size)}</div>
+                </div>
+            </div>`;
+        });
+        document.getElementById('completion-modal').classList.add('active');
+    }
+
+    function closeCompletionScreen() {
+        triggerHaptic('light');
+        document.getElementById('completion-modal').classList.remove('active');
+    }
+
+    function initPeerJS(){peer=new Peer({config:{'iceServers':[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});peer.on('open',(id)=>{document.getElementById('my-id').innerText=id;copyBtn.classList.remove('hidden');const shareUrl=window.location.href.split('?')[0]+'?connect='+id;renderQR(shareUrl);const connectId=new URLSearchParams(window.location.search).get('connect');if(connectId){document.getElementById('target-id').value=connectId;setTimeout(connectToPeer,500)}});peer.on('connection',(connection)=>{conn=connection;setupConnection()})}
+    function connectToPeer(){triggerHaptic('light');const targetId=document.getElementById('target-id').value.trim();if(!targetId)return showToast("Please enter a Device ID","error");updateStatus("Connecting...","#f59e0b");conn=peer.connect(targetId,{reliable:true});setupConnection()}
+    function disconnectPeer(){triggerHaptic('medium');if(conn)conn.close();resetTransferUI();document.getElementById('active-connection').classList.add('hidden');document.getElementById('share-section').classList.add('hidden');document.getElementById('send-btn').classList.add('hidden');connectSection.classList.remove('hidden');identitySection.classList.remove('hidden');connectSection.style.opacity='1';identitySection.style.opacity='1';updateStatus("Waiting for connection...","var(--text-muted)");connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''}}
+    async function abortTransfer(event){if(event){event.preventDefault();event.stopPropagation()}if(!isTransferring)return;triggerHaptic('error');cancelTransfer=true;if(fileWritable){try{await fileWritable.abort()}catch(e){}fileWritable=null;fileHandle=null}receivingFile=[];if(conn&&conn.open){conn.send({type:'transfer_response',accepted:false,reason:'cancelled_mid_transfer'})}resetTransferUI();showToast("Transfer cancelled","error");updateStatus("Ready to share.","#34c759","rgba(52, 199, 89, 0.4)")}
+    function acceptTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');if(!pendingFileTransfer)return;cancelTransfer=false;receiveQueue=pendingFileTransfer.files;currentReceiveIndex=0;batchTotalSize=pendingFileTransfer.totalSize;batchReceivedSize=0;renderTransferFileList(receiveQueue,false);setTransferState(true);updateStats(0,batchTotalSize);transferStartTime=Date.now();updateStatus(`Receiving 1 of ${receiveQueue.length}...`,"var(--accent)");conn.send({type:'transfer_response',accepted:true})}
+    function rejectTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');pendingFileTransfer=null;conn.send({type:'transfer_response',accepted:false,reason:'declined'})}
+
+    // --- OPTIMIZED SENDER ENGINE (WEB STREAMS API) ---
+    async function sendNextFile() {
+        if (cancelTransfer) return;
+        
+        if (currentSendIndex >= sendQueue.length) {
+            conn.send({ type: 'batch_done' });
             triggerHaptic('success');
             resetTransferUI();
             updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
-            showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
+            showCompletionScreen(true, connectedPeerProfile.name, batchTotalSize, transferStartTime, sendQueue);
+            return;
         }
-    });
+        
+        const file = sendQueue[currentSendIndex];
+        updateActiveTransferFile(currentSendIndex, sendQueue.length);
+        conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
+        
+        bytesConfirmedWritten = 0;
+        
+        const stream = file.stream();
+        const reader = stream.getReader();
+        
+        let isReading = false;
+        let currentChunk = null;
+        let chunkOffset = 0;
+        let totalSentOffset = 0;
+        
+        resumeReading = async () => {
+            if (cancelTransfer || isReading) return;
+            isReading = true;
+            
+            try {
+                while (true) {
+                    if (cancelTransfer) { 
+                        await reader.cancel(); 
+                        break; 
+                    }
+                    
+                    if (conn.dataChannel.bufferedAmount > MAX_BUFFER || 
+                    (totalSentOffset - bytesConfirmedWritten) > MAX_IN_FLIGHT) {
+                        break; 
+                    }
+                    
+                    if (!currentChunk) {
+                        const { done, value } = await reader.read();
+                        if (done) break; 
+                        currentChunk = value; 
+                        chunkOffset = 0;
+                    }
+                    
+                    const end = Math.min(chunkOffset + CHUNK_SIZE, currentChunk.byteLength);
+                    const slice = currentChunk.subarray(chunkOffset, end);
+                    
+                    conn.send(slice);
+                    totalSentOffset += slice.byteLength;
+                    chunkOffset = end;
+                    
+                    if (chunkOffset >= currentChunk.byteLength) {
+                        currentChunk = null;
+                    }
+                }
+            } catch (err) {
+                console.error("Stream read error, retrying...", err);
+            } finally {
+                isReading = false;
+            }
+        };
+        
+        resumeReading();
+    }
 
-    // 4. Connection Closed Event
-    conn.on('close', async () => {
-        if (pulseInterval) clearInterval(pulseInterval);
-        if (isTransferring && !cancelTransfer) {
-            cancelTransfer = true;
-            if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
-            showToast("Connection ended abruptly", "error");
-        }
-        disconnectPeer();
-    });
-}
+    // --- OPTIMIZED RECEIVER ENGINE (MEMORY SAFE & RAW BINARY) ---
+    function setupConnection() {
+        conn.on('open', () => {
+            conn.send({ type: 'profile_sync', profile: myProfile });
+            updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+            connectSection.style.opacity = '0';
+            identitySection.style.opacity = '0';
+            setTimeout(() => {
+                connectSection.classList.add('hidden');
+                identitySection.classList.add('hidden');
+                document.getElementById('active-connection').classList.remove('hidden');
+                dropZone.classList.remove('hidden');
+                sendBtn.classList.remove('hidden');
+                void dropZone.offsetWidth;
+                document.getElementById('active-connection').classList.add('animate-enter');
+                dropZone.classList.add('animate-enter');
+                sendBtn.classList.add('animate-enter');
+            }, 300);
+            if (conn.dataChannel) {
+                conn.dataChannel.bufferedAmountLowThreshold = 12 * 1024 * 1024;
+                conn.dataChannel.onbufferedamountlow = () => { if (resumeReading) resumeReading(); };
+            }
+        });
 
-function sendFile(){triggerHaptic('light');if(isTransferring)return showToast("Transfer already in progress.","error");if(fileInput.files.length===0)return showToast("Please select files first.","error");if(conn&&conn.open){cancelTransfer=false;sendQueue=Array.from(fileInput.files);currentSendIndex=0;batchTotalSize=sendQueue.reduce((acc,file)=>acc+file.size,0);batchSentSize=0;renderTransferFileList(sendQueue,true);setTransferState(true);updateStats(0,batchTotalSize);updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`,"#f59e0b");const filesMetadata=sendQueue.map(f=>({name:f.name,size:f.size,type:f.type}));conn.send({type:'batch_header',files:filesMetadata,totalSize:batchTotalSize})}else showToast("No active connection.","error")}
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>{}));
-initApp();
+        conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
+            const state = conn.peerConnection.iceConnectionState;
+            if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+                if (isTransferring) {
+                    cancelTransfer = true;
+                    if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
+                    receivingFile = [];
+                    showToast("Transfer failed: Wi-Fi dropped", "error");
+                } else { showToast("Connection lost", "error"); }
+                disconnectPeer();
+            }
+        });
+
+        conn.on('data', async (data) => {
+            
+            if (data instanceof ArrayBuffer || ArrayBuffer.isView(data) || data instanceof Blob) {
+                if (cancelTransfer) return;
+                
+                const chunkLength = data.byteLength || data.size;
+                batchReceivedSize += chunkLength;
+                
+                const handleChunkWritten = () => {
+                    receiverBytesWritten += chunkLength;
+                    if ((receiverBytesWritten - lastAckedBytes) >= ACK_INTERVAL || receiverBytesWritten >= receivingFileSize) {
+                        lastAckedBytes = receiverBytesWritten;
+                        conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
+                    }
+                };
+
+                if (fileWritable) { 
+                    writeBuffer.push(data);
+                    
+                    const processBuffer = async () => {
+                        if (isWritingToDisk || writeBuffer.length === 0) return;
+                        isWritingToDisk = true;
+                        const chunkToWrite = writeBuffer.shift(); 
+                        
+                        try {
+                            await fileWritable.write(chunkToWrite);
+                            handleChunkWritten(); 
+                        } catch (err) {
+                            console.error("Disk write failed", err);
+                        } finally {
+                            isWritingToDisk = false;
+                            if (writeBuffer.length > 0) processBuffer();
+                        }
+                    };
+                    processBuffer();
+                } else { 
+                    receivingFile.push(data); 
+                    handleChunkWritten(); 
+                }
+                updateStats(batchReceivedSize, batchTotalSize);
+                return; 
+            }
+
+            if (data.type === 'profile_sync') {
+                triggerHaptic('success');
+                connectedPeerProfile = data.profile;
+                showToast(`Connected to ${connectedPeerProfile.name}`);
+                document.getElementById('peer-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
+                document.getElementById('peer-name-display').innerText = `${connectedPeerProfile.name}'s ${connectedPeerProfile.device}`;
+                const emailEl = document.getElementById('peer-email-display');
+                if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } 
+                else { emailEl.style.display = 'none'; }
+                
+            } else if (data.type === 'batch_header') {
+                if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
+                document.getElementById('completion-modal').classList.remove('active');
+                triggerHaptic('heavy');
+                if (pulseInterval) clearInterval(pulseInterval);
+                pulseInterval = setInterval(() => { triggerHaptic('pulse') }, 1000);
+                pendingFileTransfer = data;
+                document.getElementById('incoming-avatar').innerText = connectedPeerProfile.name ? connectedPeerProfile.name.charAt(0).toUpperCase() : '?';
+                document.getElementById('incoming-name').innerText = connectedPeerProfile.name;
+                document.getElementById('incoming-device').innerText = connectedPeerProfile.device || 'Unknown Device';
+                document.getElementById('incoming-title').innerText = data.files.length > 1 ? `${data.files.length} Files Incoming` : 'File Transfer Request';
+                const fileListContainer = document.getElementById('incoming-file-list-container');
+                fileListContainer.innerHTML = '';
+                data.files.forEach(f => {
+                    fileListContainer.innerHTML += `<div class="incoming-file-item"><div class="file-preview-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><div class="file-details"><div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div><div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div></div></div>`;
+                });
+                document.getElementById('incoming-modal').classList.add('active');
+                
+            } else if (data.type === 'transfer_response') {
+                if (data.accepted) {
+                    updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
+                    transferStartTime = Date.now();
+                    sendNextFile();
+                } else {
+                    if (isTransferring) { cancelTransfer = true; receivingFile = []; }
+                    resetTransferUI();
+                    let msg = "Transfer cancelled";
+                    if (data.reason === 'declined') msg = "Transfer declined by peer";
+                    if (data.reason === 'busy') msg = "Peer is busy receiving another file";
+                    if (data.reason === 'storage_error') msg = "Recipient's device cannot store a file this large.";
+                    if (data.reason === 'cancelled_mid_transfer') msg = "Transfer cancelled by peer";
+                    showToast(msg, "error");
+                    updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                }
+                
+            } else if (data.type === 'file_header') {
+                receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
+                receiverBytesWritten = 0;
+                lastAckedBytes = 0;
+                writeBuffer = []; 
+                isWritingToDisk = false;
+                
+                try {
+                    const root = await navigator.storage.getDirectory();
+                    try { await root.removeEntry(data.name); } catch(e){}
+                    fileHandle = await root.getFileHandle(data.name, { create: true });
+                    fileWritable = await fileHandle.createWritable();
+                } catch(e) { 
+                    fileWritable = null; 
+                    if (receivingFileSize > 250 * 1024 * 1024) {
+                        conn.send({ type: 'transfer_response', accepted: false, reason: 'storage_error' });
+                        cancelTransfer = true;
+                        showToast("File too large. Browser storage permission required.", "error");
+                        return;
+                    }
+                    receivingFile = []; 
+                }
+                updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
+                updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
+                
+            } else if (data.type === 'cumulative_ack') {
+                bytesConfirmedWritten = data.bytesWritten;
+                updateStats(data.batchReceivedSize, batchTotalSize); 
+                if (bytesConfirmedWritten >= sendQueue[currentSendIndex].size) {
+                    conn.send({ type: 'file_done' });
+                    saveToHistory(sendQueue[currentSendIndex].name, sendQueue[currentSendIndex].size, 'sent', connectedPeerProfile, false);
+                    markTransferFileDone(currentSendIndex);
+                    currentSendIndex++;
+                    sendNextFile(); 
+                } else { if (resumeReading) resumeReading(); }
+                
+            } else if (data.type === 'file_done') {
+                if (cancelTransfer) return;
+                let url;
+                let usedCache = false;
+                if (fileWritable) {
+                    // Wait until the buffer is completely empty and written
+                    const waitForFlush = new Promise(resolve => {
+                        const checkBuffer = setInterval(() => {
+                            if (writeBuffer.length === 0 && !isWritingToDisk) {
+                                clearInterval(checkBuffer);
+                                resolve();
+                            }
+                        }, 50);
+                    });
+                    await waitForFlush;
+                    
+                    await fileWritable.close();
+                    const diskFile = await fileHandle.getFile();
+                    url = URL.createObjectURL(diskFile);
+                    fileWritable = null; fileHandle = null;
+                    usedCache = true;
+                } else {
+                    const safeType = receivingFileType || 'application/octet-stream';
+                    const blob = new Blob(receivingFile, { type: safeType });
+                    url = URL.createObjectURL(blob);
+                }
+                const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = receivingFileName;
+                document.body.appendChild(a); a.click();
+                setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
+                markTransferFileDone(currentReceiveIndex);
+                saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile, usedCache);
+                
+            } else if (data.type === 'batch_done') {
+                triggerHaptic('success');
+                resetTransferUI();
+                updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
+                showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
+            }
+        });
+
+        conn.on('close', async () => {
+            if (pulseInterval) clearInterval(pulseInterval);
+            if (isTransferring && !cancelTransfer) {
+                cancelTransfer = true;
+                if (fileWritable) { try { await fileWritable.abort(); } catch(e){} fileWritable = null; fileHandle = null; }
+                showToast("Connection ended abruptly", "error");
+            }
+            disconnectPeer();
+        });
+    }
+
+    function sendFile(){triggerHaptic('light');if(isTransferring)return showToast("Transfer already in progress.","error");if(fileInput.files.length===0)return showToast("Please select files first.","error");if(conn&&conn.open){cancelTransfer=false;sendQueue=Array.from(fileInput.files);currentSendIndex=0;batchTotalSize=sendQueue.reduce((acc,file)=>acc+file.size,0);batchSentSize=0;renderTransferFileList(sendQueue,true);setTransferState(true);updateStats(0,batchTotalSize);updateStatus(`Waiting for ${connectedPeerProfile.name} to accept...`,"#f59e0b");const filesMetadata=sendQueue.map(f=>({name:f.name,size:f.size,type:f.type}));conn.send({type:'batch_header',files:filesMetadata,totalSize:batchTotalSize})}else showToast("No active connection.","error")}
+    if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>{}));
+    initApp();
 </script>
 </body>
 </html>

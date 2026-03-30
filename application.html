@@ -458,7 +458,7 @@ function markTransferFileDone(index){const item=document.getElementById(`transfe
 
 let myProfile=JSON.parse(localStorage.getItem('peerdrop_profile'));let connectedPeerProfile={name:'Unknown Peer',device:'Unknown Device',email:''};let peer,conn;let transferStartTime=0;let lastUpdateTime=0;let lastLoadedBytes=0;let smoothedSpeedBps=0;let isTransferring=false;let cancelTransfer=false;let pendingFileTransfer=null;let html5QrCode=null;let pulseInterval=null;
 
-const CHUNK_SIZE = 64 * 1024;
+const CHUNK_SIZE = 256 * 1024;
 const MAX_BUFFER = 16 * 1024 * 1024;
 const MAX_IN_FLIGHT = 16 * 1024 * 1024;
 const ACK_INTERVAL = 8 * 1024 * 1024;
@@ -708,48 +708,93 @@ async function abortTransfer(event){if(event){event.preventDefault();event.stopP
 function acceptTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');if(!pendingFileTransfer)return;cancelTransfer=false;receiveQueue=pendingFileTransfer.files;currentReceiveIndex=0;batchTotalSize=pendingFileTransfer.totalSize;batchReceivedSize=0;renderTransferFileList(receiveQueue,false);setTransferState(true);updateStats(0,batchTotalSize);transferStartTime=Date.now();updateStatus(`Receiving 1 of ${receiveQueue.length}...`,"var(--accent)");conn.send({type:'transfer_response',accepted:true})}
 function rejectTransfer(){if(pulseInterval)clearInterval(pulseInterval);triggerHaptic('medium');document.getElementById('incoming-modal').classList.remove('active');pendingFileTransfer=null;conn.send({type:'transfer_response',accepted:false,reason:'declined'})}
 
-function sendNextFile() {
+async function sendNextFile() {
     if (cancelTransfer) return;
+    
+    // Check if the batch is completely finished
     if (currentSendIndex >= sendQueue.length) {
         conn.send({ type: 'batch_done' });
         triggerHaptic('success');
-        
         resetTransferUI();
         updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
         showCompletionScreen(true, connectedPeerProfile.name, batchTotalSize, transferStartTime, sendQueue);
         return;
     }
+    
     const file = sendQueue[currentSendIndex];
     updateActiveTransferFile(currentSendIndex, sendQueue.length);
+    
+    // Send the file header so the receiver prepares the OPFS file
     conn.send({ type: 'file_header', index: currentSendIndex, name: file.name, filetype: file.type, size: file.size });
-    let offset = 0;
+    
     bytesConfirmedWritten = 0;
+    
+    // Setup the Web Stream Pipeline
+    const stream = file.stream();
+    const reader = stream.getReader();
+    
     let isReading = false;
-    resumeReading = () => {
-        if (cancelTransfer || isReading || offset >= file.size) return;
-        if (conn.dataChannel.bufferedAmount > MAX_BUFFER) return;
-        let unacknowledgedBytes = offset - bytesConfirmedWritten;
-        if (unacknowledgedBytes > MAX_IN_FLIGHT) return;
+    let currentChunk = null; // Holds the remainder of a stream read if it's larger than CHUNK_SIZE
+    let chunkOffset = 0;
+    let totalSentOffset = 0;
+    
+    resumeReading = async () => {
+        if (cancelTransfer || isReading) return;
         isReading = true;
-        const slice = file.slice(offset, offset + CHUNK_SIZE);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            isReading = false;
-            if (cancelTransfer) return;
-            try {
-                conn.send({ type: 'chunk', data: e.target.result });
-                offset += slice.size;
-                resumeReading(); 
-            } catch (err) {
-                setTimeout(resumeReading, 50);
+        
+        try {
+            // Keep looping and pumping data as long as the buffer has room
+            while (true) {
+                if (cancelTransfer) { 
+                    await reader.cancel(); 
+                    break; 
+                }
+                
+                // BACKPRESSURE CHECK: Stop looping if WebRTC buffer is full or we are waiting on ACKs
+                if (conn.dataChannel.bufferedAmount > MAX_BUFFER || 
+                   (totalSentOffset - bytesConfirmedWritten) > MAX_IN_FLIGHT) {
+                    break; // Exit loop. It will automatically resume via onbufferedamountlow or cumulative_ack
+                }
+                
+                // If we don't have an active chunk in memory, read the next one from disk
+                if (!currentChunk) {
+                    const { done, value } = await reader.read();
+                    if (done) break; // File is fully read, wait for final ACKs
+                    
+                    currentChunk = value; // value is natively a Uint8Array
+                    chunkOffset = 0;
+                }
+                
+                // Slice the chunk to our optimal CHUNK_SIZE limit
+                // .subarray is zero-copy, it just creates a view over the existing memory
+                const end = Math.min(chunkOffset + CHUNK_SIZE, currentChunk.byteLength);
+                const slice = currentChunk.subarray(chunkOffset, end);
+                
+                // Send raw binary down the WebRTC pipe
+                conn.send(slice);
+                
+                totalSentOffset += slice.byteLength;
+                chunkOffset = end;
+                
+                // If we consumed the entire chunk, clear it so the next loop reads from disk again
+                if (chunkOffset >= currentChunk.byteLength) {
+                    currentChunk = null;
+                }
             }
-        };
-        reader.readAsArrayBuffer(slice);
+        } catch (err) {
+            console.error("Stream read error, retrying...", err);
+            // If it fails, we just let the next ACK or buffer drain trigger a retry
+        } finally {
+            isReading = false;
+        }
     };
+    
+    // Kick off the pipeline
     resumeReading();
 }
 
 function setupConnection() {
+    // 1. Connection Opened Event
     conn.on('open', () => {
         conn.send({ type: 'profile_sync', profile: myProfile });
         updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
@@ -771,6 +816,8 @@ function setupConnection() {
             conn.dataChannel.onbufferedamountlow = () => { if (resumeReading) resumeReading(); };
         }
     });
+
+    // 2. Connection State Change (Handling disconnects)
     conn.peerConnection.addEventListener('iceconnectionstatechange', async () => {
         const state = conn.peerConnection.iceConnectionState;
         if (state === 'disconnected' || state === 'failed' || state === 'closed') {
@@ -783,7 +830,34 @@ function setupConnection() {
             disconnectPeer();
         }
     });
+
+    // 3. Main Data Handler
     conn.on('data', async (data) => {
+        
+        // --- THE FIX: Intercept raw binary chunks immediately ---
+        if (data instanceof ArrayBuffer) {
+            if (cancelTransfer) return;
+            
+            batchReceivedSize += data.byteLength;
+            
+            const handleChunkWritten = () => {
+                receiverBytesWritten += data.byteLength;
+                if (receiverBytesWritten % ACK_INTERVAL === 0 || receiverBytesWritten >= receivingFileSize) {
+                    conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
+                }
+            };
+
+            if (fileWritable) { 
+                writeQueue = writeQueue.then(() => fileWritable.write(data)).then(handleChunkWritten); 
+            } else { 
+                receivingFile.push(data); 
+                handleChunkWritten(); 
+            }
+            updateStats(batchReceivedSize, batchTotalSize);
+            return; // Exit here so it doesn't process as an object
+        }
+
+        // --- STANDARD OBJECT HANDLER (For headers, acks, and syncs) ---
         if (data.type === 'profile_sync') {
             triggerHaptic('success');
             connectedPeerProfile = data.profile;
@@ -793,6 +867,7 @@ function setupConnection() {
             const emailEl = document.getElementById('peer-email-display');
             if (connectedPeerProfile.email) { emailEl.innerText = connectedPeerProfile.email; emailEl.style.display = 'block'; } 
             else { emailEl.style.display = 'none'; }
+            
         } else if (data.type === 'batch_header') {
             if (isTransferring) { conn.send({ type: 'transfer_response', accepted: false, reason: 'busy' }); return; }
             document.getElementById('completion-modal').classList.remove('active');
@@ -810,6 +885,7 @@ function setupConnection() {
                 fileListContainer.innerHTML += `<div class="incoming-file-item"><div class="file-preview-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><div class="file-details"><div style="font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${f.name}</div><div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${formatBytes(f.size)}</div></div></div>`;
             });
             document.getElementById('incoming-modal').classList.add('active');
+            
         } else if (data.type === 'transfer_response') {
             if (data.accepted) {
                 updateStatus(`Sending 1 of ${sendQueue.length}...`, "var(--accent)");
@@ -825,6 +901,7 @@ function setupConnection() {
                 showToast(msg, "error");
                 updateStatus("Ready to share.", "#34c759", "rgba(52, 199, 89, 0.4)");
             }
+            
         } else if (data.type === 'file_header') {
             receivingFileSize = data.size; receivingFileName = data.name; receivingFileType = data.filetype; currentReceiveIndex = data.index;
             receiverBytesWritten = 0;
@@ -836,18 +913,7 @@ function setupConnection() {
             } catch(e) { fileWritable = null; receivingFile = []; }
             updateActiveTransferFile(currentReceiveIndex, receiveQueue.length);
             updateStatus(`Receiving ${currentReceiveIndex + 1} of ${receiveQueue.length}...`, "var(--accent)");
-        } else if (data.type === 'chunk') {
-            if (cancelTransfer) return;
-            batchReceivedSize += data.data.byteLength;
-            const handleChunkWritten = () => {
-                receiverBytesWritten += data.data.byteLength;
-                if (receiverBytesWritten % ACK_INTERVAL === 0 || receiverBytesWritten >= receivingFileSize) {
-                    conn.send({ type: 'cumulative_ack', bytesWritten: receiverBytesWritten, batchReceivedSize: batchReceivedSize });
-                }
-            };
-            if (fileWritable) { writeQueue = writeQueue.then(() => fileWritable.write(data.data)).then(handleChunkWritten); } 
-            else { receivingFile.push(data.data); handleChunkWritten(); }
-            updateStats(batchReceivedSize, batchTotalSize);
+            
         } else if (data.type === 'cumulative_ack') {
             bytesConfirmedWritten = data.bytesWritten;
             updateStats(data.batchReceivedSize, batchTotalSize); 
@@ -858,6 +924,7 @@ function setupConnection() {
                 currentSendIndex++;
                 sendNextFile(); 
             } else { if (resumeReading) resumeReading(); }
+            
         } else if (data.type === 'file_done') {
             if (cancelTransfer) return;
             let url;
@@ -879,6 +946,7 @@ function setupConnection() {
             setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
             markTransferFileDone(currentReceiveIndex);
             saveToHistory(receivingFileName, receivingFileSize, 'received', connectedPeerProfile, usedCache);
+            
         } else if (data.type === 'batch_done') {
             triggerHaptic('success');
             resetTransferUI();
@@ -886,6 +954,8 @@ function setupConnection() {
             showCompletionScreen(false, connectedPeerProfile.name, batchTotalSize, transferStartTime, receiveQueue);
         }
     });
+
+    // 4. Connection Closed Event
     conn.on('close', async () => {
         if (pulseInterval) clearInterval(pulseInterval);
         if (isTransferring && !cancelTransfer) {
